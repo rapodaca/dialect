@@ -59,15 +59,6 @@ Two enable stereochemical and delocalized bonding features, each node is given t
 
 # Constitution
 
-TODO: recast constitution as a set of properties applied to atoms and bonds:
-
-- element identity
-- virtual hydrogen count
-- implicit hydrogen count
-- charge
-- isotope
-- bond electron count
-
 A Dialect molecule is described at the lowest level by its constitution. A molecule's constitution includes a set of atomic nuclei (nodes), a set of pairwise bonding relationships between them (edges), and those atom/bond properties needed to associate every valence electron with a particular node or edge. However, constitution excludes those molecular attributes related to stereochemistry and any features extending across more than two nodes.
 
 Electron counting in Dialect is based on the well-known "valence bond model."[^Lewis1916] This model can most clearly be viewed as a series of assembly events. It starts with a set of atomic nuclei, where each nucleus is associated with an integer electron count. A bond is created by first identifying two nodes. Then, from each node the same positive electron count is deducted, and credited to the new bond's electron count.
