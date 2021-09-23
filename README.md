@@ -21,3 +21,7 @@ To ensure maximum compatibility of Dialect-branded readers and writers, certain 
 - to specify any extensions whatsoever, except to exemplify ways in which extensions can be created
 - to preserve any terminology or concepts used previously in the context of SMILES
 - partial specification of any aspect of the language
+
+## FAQ
+
+- *Will Dialect support multi-center bonding?* No. Dialect is based on the valence bond (VB) model, which views a bond as a feature consisting of two atoms and an even electron count drawn equally from each atom. This simplification is key to Dialect's brevity. Any structure compatible with the VB model can be encoded and decoded through Dialect without information loss. Other structures can be encoded and decoded using more capable (and verbose) methods should they become available.
