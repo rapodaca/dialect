@@ -1,6 +1,6 @@
 # Dialect
 
-A chemical line notation that is backward-compatible with SMILES. For an introduction, see [the blog post]().
+A chemical line notation that is backward-compatible with SMILES. For an introduction, see [the blog post](https://depth-first.com/articles/2021/09/22/beyond-smiles/).
 
 ## Goals
 
