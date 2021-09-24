@@ -59,7 +59,11 @@ Two enable stereochemical and delocalized bonding features, each node is given t
 
 # Constitution
 
-A Dialect molecule is described at the lowest level by its constitution. A molecule's constitution includes a set of atomic nuclei (nodes), a set of pairwise bonding relationships between them (edges), and those atom/bond properties needed to associate every valence electron with a particular node or edge. However, constitution excludes those molecular attributes related to stereochemistry and any features extending across more than two nodes.
+A Dialect molecule is described at the lowest level by its constitution. Constitution consists of a set of atomic nuclei (nodes), a set of pairwise bonding relationships between them (edges), and those attributes needed to associate every valence electron with a specific node or edge. Constitution excludes attributes related to stereochemistry, or any other feature whose attributes extend over more than one atom or bond.
+
+Two attributes characterize an atom's nucleus: `element` and `isotope`. The `element` attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC/IUPAP Working Party.[^IUPAC2016] When the Working Party authorizes additional symbols, they will become valid values for the `element` attribute. If the elemental identity of an atom is unknown, its `element` attribute can be omitted. The `isotope` attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Omitting the `isotope` property means that the isotopic composition is unspecified. When present, the lower bound on `isotope` is equal to the atomic number of the element. This restriction renders physically meaningless constructs such as <sup>5</sup>C invalid. If the element attribute is not defined, the lower bound on `isotope` is one.
+
+The atomic `hydrogens` attribute records the number of associated *virtual hydrogens*. A virtual hydrogen is an atom whose presence is recorded, not as a node and edge, but rather as a unit contribution to an integer tally. For example, methane can be represented by a molecular graph having five nodes and four edges. But methane can also be represented as a graph of one node having a `hydrogens` attribute set to four. The `hydrogens` attribute, if present, may assume integer values ranging from zero to nine. Only monovalent hydrogens with unspecified isotopic composition are eligible for virtualization.
 
 Electron counting in Dialect is based on the well-known "valence bond model."[^Lewis1916] This model can most clearly be viewed as a series of assembly events. It starts with a set of atomic nuclei, where each nucleus is associated with an integer electron count. A bond is created by first identifying two nodes. Then, from each node the same positive electron count is deducted, and credited to the new bond's electron count.
 
@@ -138,3 +142,4 @@ Whereas negative bond order is disallowed, Dialect places no restrictions on *hy
 [^BIOVIA]: https://discover.3ds.com/ctfile-documentation-request-form
 [^CDXML]: https://www.cambridgesoft.com/services/documentation/sdk/chemdraw/cdx/IntroCDXML.htm
 [^Lewis1916]: https://doi.org/10.1021/ja02261a002
+[^IUPAC2016]: https://doi.org/10.1515/pac-2016-0501
