@@ -1,24 +1,31 @@
 ---
 title: "Dialect: A Dialect of the SMILES Language"
+author:
+  - "Richard L. Apodaca^[rapodaca@metamolecular.com]"
+bibliography: citations.bib
+csl: acs.csl
+classoption:
+  - twocolumn
+papersize: a4paper
 ---
 
 # Abstract
 
 # Introduction
 
-Simplified Molecular Input Line Entry System (SMILES) was first described by Weininger in 1988.[^Weininger88] As a line notation,[^Wiswesser68] SMILES represents molecules as single line character sequences, or strings. SMILES strings can be read and written algorithmically, and can be canonicalized[^Weininger288] to yield unique molecular identifiers.
+Simplified Molecular Input Line Entry System (SMILES) was first described by Weininger in 1988.[@weininger1988] As a line notation,[@wiswesser1968] SMILES represents molecules as single line character sequences, or strings. SMILES strings can be read and written algorithmically, and can be canonicalized[@weininger1989] to yield unique molecular identifiers.
 
 SMILES has since been widely adopted. Read and write functionalities are routinely supported by popular cheminformatics toolkits, including: Open Babel; RDKit; Chemistry Development Kit; JChem; the Daylight Toolkit; OEChem; and JChem. SMILES encodings can be found in many public-facing databases, including: PubChem; Kegg; ChEBI; the eMolecules Catalog; ZINC; and ChEMBL. Increasingly, raw SMILES strings are being used in both predictive and generative machine learning applications.
 
 Despite its widespread adoption, SMILES remains a language with an incomplete specification. Weininger's 1989 paper either fails to address several crucial points entirely, or addresses them only superficially. Examples include: (1) no discussion of stereochemical configuration; (2) no specific protocol for encoding and decoding "aromatic" features; (3) an incomplete protocol for computing implicit hydrogen count; (4) no formal syntax description; (5) no constraints around quantities such as mass number or charge; (6) several points of ambiguity; and (7) no explicit enumeration of error states.
 
-Additional SMILES documentation is available from the Daylight Theory Manual ("the Manual").[^DaylightTheoryManual]. Maintained by SMILES' corporate sponsor, Daylight Chemical Information Systems, Inc. (Daylight), the Manual further refines the SMILES language specification. The Manual also introduces a few extensions, including one for stereoisomerism. Some points around computing implicit hydrogen count were also addressed.
+Additional SMILES documentation is available from the Daylight Theory Manual ("the Manual").[@daylightTheory]. Maintained by SMILES' corporate sponsor, Daylight Chemical Information Systems, Inc. (Daylight), the Manual further refines the SMILES language specification. The Manual also introduces a few extensions, including one for stereoisomerism. Some points around computing implicit hydrogen count were also addressed.
 
-An implementation of SMILES is available through the Daylight Toolkit.[^DaylightToolkit] Although this implementation could potentially address issues not resolved through documentation, the software's commercial distribution model restricts this use. For several years Daylight operated a web service that could interactively depict SMILES strings,[^DepictWebsite], but has since been decommissioned.
+An implementation of SMILES is available through the Daylight Toolkit.[@daylightToolkit] Although this implementation could potentially address issues not resolved through documentation, the software's commercial distribution model restricts this use. For several years Daylight operated a web service that could interactively depict SMILES strings, but has since been decommissioned.
 
-In 2007 a documentation effort that would become known as OpenSMILES began.[^OpenSMILES] OpenSMILES was conceived as "a non-proprietary specification for the SMILES language," and it addressed many of the points left open by previous SMILES documentation efforts. Noteworthy contributions included: the first formal grammar; many refinements around stereochemistry; and introduction of the idea of "standard form." Absent were detailed procedures for assigning and interpreting aromatic features, and a detailed procedure for computing implicit hydrogen count. OpenSMILES also left several points of semantic ambiguity unaddressed.
+In 2007 a documentation effort that would become known as OpenSMILES began.[@openSMILES] OpenSMILES was conceived as "a non-proprietary specification for the SMILES language," and it addressed many of the points left open by previous SMILES documentation efforts. Noteworthy contributions included: the first formal grammar; many refinements around stereochemistry; and introduction of the idea of "standard form." Absent were detailed procedures for assigning and interpreting aromatic features, and a detailed procedure for computing implicit hydrogen count. OpenSMILES also left several points of semantic ambiguity unaddressed.
 
-In 2019 IUPAC announced the SMILES+ initiative.[^SMILESPlus] Noting the limitations of existing SMILES documentation, the SMILES+ effort seeks to "establish a formalized recommended up-to-date specification of the SMILES format." SMILES+ took as its starting point the documentation produced by the OpenSMILES project. Efforts to extend this starting point are in progress online through a public repository,[^SMILESPlusRepo] but no formal recommendation has to date resulted.
+In 2019 IUPAC announced the SMILES+ initiative.[@smilesPlus] Noting the limitations of existing SMILES documentation, the SMILES+ effort seeks to "establish a formalized recommended up-to-date specification of the SMILES format." SMILES+ took as its starting point the documentation produced by the OpenSMILES project. Efforts to extend this starting point are in progress online through a public repository,[@smilesPlusRepo] but no formal recommendation has to date resulted.
 
 The ongoing lack of a comprehensive SMILES documentation suite has caused several problems. First, authors of new SMILES implementations have limited guidance for resolving ambiguities and so must invent their own. Second, maintainers of existing SMILES implementations lack a blueprint for working toward a common feature set. Third, standards bodies draw from a limited set of source material when preparing recommendations. Fourth, a lack of detailed documentation hinders the development of compliance suites, thereby interfering with efforts to validate cross-implementation compatibility. Finally, extensions to SMILES only make sense in the context of a rigorously defined base language.
 
@@ -47,7 +54,7 @@ For flexibility, Dialect also supports the atomic "extension" attribute. As will
 
 # Molecular Graph
 
-Dialect's system of representation is based on the *molecular graph* concept.[^Balaban1985] A graph is a data structure comprised of a set of nodes (which map to "atoms") and a set of pairwise relationships between them called edges (which map to "bonds"). A molecular graph is a specialized graph onto which atomic and bonding metadata have been overlaid. Molecular graphs are ubiquitous in cheminformatics, appearing in contexts such as data formats like Chemical Markup Language[^Murray-Rust2011], CDXML[^CDXML], and Molfile[^BIOVIA], as well as in-memory data structures found in cheminformatics toolkits. Like these systems, Dialect augments its underlying graph with node and edge labels.
+Dialect's system of representation is based on the *molecular graph* concept.[@balaban1985] A graph is a data structure comprised of a set of nodes (which map to "atoms") and a set of pairwise relationships between them called edges (which map to "bonds"). A molecular graph is a specialized graph onto which atomic and bonding metadata have been overlaid. Molecular graphs are ubiquitous in cheminformatics, appearing in contexts such as data formats like Chemical Markup Language[@murrayrust2011], CDXML[@cdxml], and Molfile[@ctfileFormats], as well as in-memory data structures found in cheminformatics toolkits. Like these systems, Dialect augments its underlying graph with node and edge labels.
 
 A Dialect molecule consists of a graph with at least one node and zero or more edges. The "empty molecule", devoid of atoms and bonds, is therefore disallowed. Dialect imposes no upper bound on the number of atoms or bonds. However, practical limitations related to memory, storage, and CPU time will likely limit the size of molecules in practice.
 
@@ -61,13 +68,13 @@ Two enable stereochemical and delocalized bonding features, each node is given t
 
 A Dialect molecule is described at the lowest level by its constitution. Constitution consists of a set of atomic nuclei (nodes), a set of pairwise bonding relationships between them (edges), and those attributes needed to associate every valence electron with a specific node or edge. Constitution excludes attributes related to stereochemistry, or any other feature whose attributes extend over more than one atom or bond.
 
-Two attributes characterize an atom's nucleus: `element` and `isotope`. The `element` attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC/IUPAP Working Party.[^IUPAC2016] When the Working Party authorizes additional symbols, they will become valid values for the `element` attribute. If the elemental identity of an atom is unknown, its `element` attribute can be omitted. The `isotope` attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Omitting the `isotope` property means that the isotopic composition is unspecified. When present, the lower bound on `isotope` equals one. This constraint leaves room for physically meaningless negative implied neutron count as in, for example, <sup>5</sup>C. The lower bound for isotope applies even if the `element` attribute is not defined.
+Two attributes characterize an atom's nucleus: `element` and `isotope`. The `element` attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC/IUPAP Working Party.[@iupac2016] When the Working Party authorizes additional symbols, they will become valid values for the `element` attribute. If the elemental identity of an atom is unknown, its `element` attribute can be omitted. The `isotope` attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Omitting the `isotope` property means that the isotopic composition is unspecified. When present, the lower bound on `isotope` equals one. This constraint leaves room for physically meaningless negative implied neutron count as in, for example, <sup>5</sup>C. The lower bound for isotope applies even if the `element` attribute is not defined.
 
 The atomic `hydrogens` attribute records the number of associated *virtual hydrogens*. A virtual hydrogen is an atom whose presence is recorded, not as a node and edge, but rather as a unit contribution to an integer tally. For example, methane can be represented by a molecular graph having five nodes and four edges. But methane can also be represented as a graph of one node having a `hydrogens` attribute set to four. The `hydrogens` attribute, if present, may assume integer values ranging from zero to nine. Only monovalent hydrogens with unspecified isotopic composition are eligible for virtualization.
 
 The two remaining constitutional attributes support *electron counting*. The purpose of electron counting is to ensure that every valence electron, whether bonding or nonbonding, can be associated with either an atom or a bond. Accurate electron counting is crucial for any molecular representation system given their influence on charge, bond order, and mass.
 
-Electron counting in Dialect is based on the well-known *valence bond model* (VB Model).[^Lewis1916] Although not commonly considered as such, the VB model can be thought of as an algorithm for molecular assembly. The perspective is especially useful given that Dialect itself can be viewed as a programming language for molecular assembly.
+Electron counting in Dialect is based on the well-known *valence bond model* (VB Model).[@lewis1916] Although not commonly considered as such, the VB model can be thought of as an algorithm for molecular assembly. The perspective is especially useful given that Dialect itself can be viewed as a programming language for molecular assembly.
 
 A simplified algorithm for electron counting can be summarized as follows. A molecular graph starts as a set of atoms, where each atom consists of a nucleus (as described above) and an integer electron count equal to the atomic number of the atom's element. Two nodes (nuclei) are selected as the terminals of a bond. From each atom, the same positive electron count is deducted. The total electron count deducted from each atom is simultaneously credited to the bond's electron count. For example, if each atom contributes one electron to a bond, then the bond's electron count will increment by two.
 
@@ -130,20 +137,3 @@ Whereas negative bond order is disallowed by definition, Dialect places no restr
 \[TODO\]
 
 # References
-
-[^Weininger88]: http://pubs.acs.org/cgi-bin/doilookup/?10.1021/ci00057a005
-[^Wisweser68]:
-[^Weininger288]: http://pubs.acs.org/cgi-bin/doilookup/?10.1021/ci00062a008
-[^Weininger03]: https://onlinelibrary.wiley.com/doi/abs/10.1002/9783527618279.ch5
-[^DaylightTheoryManual]: https://www.daylight.com/dayhtml/doc/theory/theory.smiles.html
-[^DaylightToolkit]: https://www.daylight.com/products/toolkit.html
-[^DepictWebsite]: https://www.daylight.com/dayhtml/help/depict-help.html
-[^OpenSMILES]: http://opensmiles.org/opensmiles.html
-[^SMILESPlus]: https://iupac.org/projects/project-details/?project_nr=2019-002-2-024
-[^SMILESPlusRepo]: https://github.com/IUPAC/IUPAC_SMILES_plus
-[^Balaban1985]: https://doi.org/10.1021/ci00047a033
-[^Murray-Rust2011]: https://doi.org/10.1186/1758-2946-3-44
-[^BIOVIA]: https://discover.3ds.com/ctfile-documentation-request-form
-[^CDXML]: https://www.cambridgesoft.com/services/documentation/sdk/chemdraw/cdx/IntroCDXML.htm
-[^Lewis1916]: https://doi.org/10.1021/ja02261a002
-[^IUPAC2016]: https://doi.org/10.1515/pac-2016-0501

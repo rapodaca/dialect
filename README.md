@@ -25,3 +25,20 @@ To ensure maximum compatibility of Dialect-branded readers and writers, certain 
 ## FAQ
 
 - *Will Dialect support multi-center bonding?* No. Dialect is based on the valence bond (VB) model, which views a bond as a feature consisting of two atoms and an even electron count drawn equally from each atom. This simplification is key to Dialect's brevity. Any structure compatible with the VB model can be encoded and decoded through Dialect without information loss. Other structures can be encoded and decoded using more capable (and verbose) methods should they become available.
+
+# Building the PDF
+
+Install [Tex](https://www.latex-project.org/get/) and [Pandoc](https://pandoc.org).
+
+On macOS, running Homebrew, this can be accomplished with:
+
+```bash
+brew install mactex # takes a long time
+brew install pandoc
+```
+
+Build the PDF with:
+
+```bash
+bin/build.sh
+```
