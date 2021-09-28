@@ -5,7 +5,8 @@ author:
 bibliography: citations.bib
 csl: acs.csl
 classoption:
-  - twocolumn
+header-includes:
+  - \usepackage{algorithm2e}
 papersize: a4paper
 ---
 
@@ -92,9 +93,71 @@ Whereas negative bond order is disallowed by definition, Dialect places no restr
 
 [FIGURE: LiCl2]
 
-# Hydrogen Suppression
+# Implicit Hydrogens
 
-\[TODO\]
+In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called *implicit hydrogen count*. Implicit hydrogens are represented neither as node/edge pairs nor as node properties. Instead, an implicit hydrogen count is computed on demand. Like virtual hydrogens, implicit hydrogens must be monovalent an have an undefined `isotope` attribute. The algorithm for computing implicit hydrogen count is an integral but invisible component of every Dialect representation. Dialect readers and writers must therefore conform to the following description to avoid the loss of constitutional information.
+
+For the purpose of implicit hydrogen counting, atoms can be divided into two classes: *eligible atoms* and *ineligible atoms*. Eligible atoms are those whose hydrogen counts may optionally be expressed algorithmically through implicit hydrogen counting. Ineligible atoms must use explicitly encoded hydrogens, either as node/edge pairs or as virtual hydrogens.
+
+Implicit hydrogen counts are computed with the aid of Table 1. An atom whose `element` attribute appears in this table is considered an eligible atom. All other atoms, including those whose `element` attribute is undefined, are considered ineligible atoms.
+
+| Element | Target<br>Valence |
+| :-----: | :------------: |
+|   B     |       3        |
+|   C     |       4        |
+|   N     |      3,5       |
+|   O     |       2        |
+|   F     |       1        |
+|   P     |      3,5       |
+|   S     |     2,4,6      |
+|   Cl    |       1        |
+|   Br    |       1        |
+|   I     |       1        |
+|   At    |       1        |
+|   Ts    |       1        |
+: Target Valences
+
+Table 1 associates an eligible atom with an ordered list of *target valences*. A target valence defines the number of hydrogen atoms associated with a fully-saturated atom. For example, the target valence of 4 for carbon means that a fully-saturated carbon atom will be bound to four hydrogen atoms. Likewise, a fully-saturated oxygen atom will be bound to two hydrogen atoms. Some elements such as nitrogen are associated with multiple target valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the target valences three and five. Both ammonia and nitrogen pentahydride (NH~5~) are fully saturated forms of nitrogen according to Table 1.
+
+The procedure for computing the implicit hydrogen count for an atom (`a`) is defined in Algorithm 1.
+
+\begin{algorithm}[H]
+  \SetKwInOut{Input}{input}
+  \SetKwInOut{Output}{output}
+  \SetKwFunction{BondOrderSum}{BondOrderSum}
+  \SetKwFunction{TargetValences}{TargetValences}
+  \caption{Compute implicit hydrogen count}
+  
+  \Input{An eligible atom $a$}
+  \Output{The implicit hydrogen count of $a$}
+  \Begin{
+    $v \leftarrow$ BondOrderSum($a$)\;
+    $T \leftarrow$ TargetValences($a$)\;
+    \For{$t \in T$}{
+      $d \leftarrow t-v$\;
+      \If{$d >= 0$}{
+        \Return{$d$}\;
+      }
+    }
+    \Return{$0$}\;
+  }
+\end{algorithm}
+
+The algorithm accepts an eligible atom `a` as input and returns its implicit hydrogen count as output. First, the valence (sum of bond orders) for `a` is computed. Next, the ordered list of target valences (`T`) is obtained from Table 1. For each target valence (`t`), the difference (`d`) between `t` and `v` is computed. If this difference is non-negative, `d` is returned as the implicit hydrogen count. If no suitable target valence can be found, zero is returned.
+
+Consider an isolated atom having a `symbol` of "N". Its bond order sum is zero. Its target valences are 3 and 5. The difference `d` is found to be three (3 - 0). Therefore, the implicit hydrogen count of this atom is three.
+
+The carbon atom of acetaldehyde illustrates the effect of substitution. The bond order sum for the carbon atom is three (2 + 1). The first and only target valence is four. Subtracting three from four yields one, which is returned as the implicit hydrogen count.
+
+The phosphorous atom in phosphorous acid (H3PO3) illustrates the use of Algorithm 1 for atoms with multiple target valences. In its hydrogen-elided form the formal bond order of the phosphorous-bearing atom is four (2 + 1 + 1). The first target valence is 3, but subtracting that value from four yields a negative number (-1). Continuing to the next target valence, 5, a difference of 1 is obtained. Therefore, the implicit hydrogen count of the phosphorous-bearing atom is reported as 1.
+
+The bond order sum of some atoms exceeds the largest start valence. In these cases, the implicit hydrogen count is reported as zero. Consider sodium perchlorate (NaClO4). The chlorine-bearing atom has a bond order sum of seven (2 + 2 + 2 + 1). From Table 1, the only target valence for chlorine is one. Subtracting seven yields a negative number (-6). Therefore, the implicit hydrogen count is reported as zero. 
+
+Some bonding arrangements render implicit hydrogen calculation unworkable. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H2). We expect a hydrogen count at this atom of two. However, eliding the hydrogen atoms bound to the phosphorous-bearing atom yields an implicit hydrogen count of zero. First, a bond order sum of three is computed (2 + 1). Then, the first target valence from Table 1 is found to be 3. Because the difference between these two values is zero (3 - 3), Algorithm 1 returns an implicit hydrogen count of zero. In this and similar cases, hydrogen atoms must be explicitly expressed as either node/edge pairs or as a virtual hydrogen count.
+
+[Figure: Example structures with implicit hydrogen calculations]
+
+Only those eligible atoms with an undefined `hydrogens` attribute are subject to implicit hydrogen counting. In other words, implicit hydrogen counting is disabled on atoms whose `hydrogens` attribute is defined. For example, the correct hydrogen count for hypophosphorous acid would be obtained by setting its `hydrogens` attribute to two.
 
 # Conformation
 
