@@ -161,7 +161,15 @@ Only those eligible atoms with an undefined `hydrogens` attribute are subject to
 
 # Conformation
 
-\[TODO\]
+The second major component of molecular representation in Dialect is *conformation*. Conformation is a rotational restriction about one or more bonds. Dialect limits conformation to just one of many possible types: rotational restrictions occurring at individual double bonds.
+
+Organic chemistry uses the parity descriptors *entgegen* (*E*) and zusammen (*Z*) to label conformational parity. This system is based on prioritization of the atoms neighboring the double bond. One pattern of priority yields the *E* parity, and the other yields *Z*. Conveniently, the parity descriptor can be localized at the double bond.
+
+[Figure: E and Z]
+
+Dialect takes a different approach by introducing **partial parity bonds** (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. At least two PPBs must flank the double bond.
+
+[Figure: Partial Parity Bond]
 
 # Configuration
 
