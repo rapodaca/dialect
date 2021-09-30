@@ -171,6 +171,20 @@ Dialect takes a different approach by introducing **partial parity bonds** (PPB)
 
 [Figure: Partial Parity Bond]
 
+A PPB may assume one of two possible states: `Up` or `Down`. These states refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates on a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `index` attribute appears to the left of the terminal with the higher atomic `index` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
+
+[Figure: Interpreting Partial Bonds]
+
+The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the neighbor and the left terminal. If the neighbor follows the left terminal, place it to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal follows its neighbor, reverse these assignments.
+
+An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place it to the upper right given an `Up` state, or to the lower left given a `Down` state. Reverse these assignments if the right terminal succeeds its neighbor.
+
+In some cases, the placement of a terminal neighbor can be deduced from the placement of a sibling. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
+
+[Figure: Implied Neighbor Placement]
+
+The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
+
 # Configuration
 
 \[TODO\]
