@@ -175,15 +175,21 @@ A PPB may assume one of two possible states: `Up` or `Down`. These states refer 
 
 [Figure: Interpreting Partial Bonds]
 
-The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the neighbor and the left terminal. If the neighbor follows the left terminal, place it to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal follows its neighbor, reverse these assignments.
+The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the neighbor and the left terminal. If the neighbor succeeds the left terminal, place it to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
 
-An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place it to the upper right given an `Up` state, or to the lower left given a `Down` state. Reverse these assignments if the right terminal succeeds its neighbor.
+An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place it to the upper right given an `Up` state, or to the lower right given a `Down` state. Reverse these assignments if the right terminal succeeds its neighbor.
 
-In some cases, the placement of a terminal neighbor can be deduced from the placement of a sibling. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
+In some cases the placement of a terminal neighbor can be deduced from the placement of a sibling, without the presence of an explicit PPB. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
 
 [Figure: Implied Neighbor Placement]
 
 The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
+
+Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are assigned on the basis that index 2 precedes index 3. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should therefore be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
+
+[Figure: Assigning PPBs to (*E*)-2-butene]
+
+In a similar manner assigned PPBs can be decoded. The process starts by placing Atom 1 to the left of Atom 2 along the x-axis. The PPB between the left terminal and its neighbor (Atom 0) uses the `Up` state. The neighbor precedes the left terminal, so Atom 0 should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor (Atom 3) uses the `Up` state. The neighbor (Atom 3) succeeds the right terminal (Atom 2). Therefore, Atom 3 is placed in the upper right quadrant. This results in the expected conformation (*E*).
 
 # Configuration
 
