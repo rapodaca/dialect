@@ -185,7 +185,7 @@ In some cases the placement of a terminal neighbor can be deduced from the place
 
 The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
 
-Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are assigned on the basis that index 2 precedes index 3. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should therefore be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
+Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are assigned on the basis that index 1 precedes index 2. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
 
 [Figure: Assigning PPBs to (*E*)-2-butene]
 
