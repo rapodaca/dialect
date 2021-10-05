@@ -191,6 +191,24 @@ Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assign
 
 In a similar manner assigned PPBs can be decoded. The process starts by placing Atom 1 to the left of Atom 2 along the x-axis. The PPB between the left terminal and its neighbor (Atom 0) uses the `Up` state. The neighbor precedes the left terminal, so Atom 0 should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor (Atom 3) uses the `Up` state. The neighbor (Atom 3) succeeds the right terminal (Atom 2). Therefore, Atom 3 is placed in the upper right quadrant. This results in the expected conformation (*E*).
 
+The distributed nature of conformational encoding means that several additive error states are possible:
+
+- Overspecification. This state occurs when two or more PPBs share a common ancestor and simultaneously use the same parity, this placing multiple neighbors into the same quadrant.
+- Underspecification. A required and non-deducible PPB is absent. This state occurs when a double bond terminal connects to at least one neighbor through a PPB, but the terminal's mate does not.
+- Misspecification. A PPB is used between atoms lacking at least one double bond.
+
+A reader that detects one of these error conditions must abort the molecular graph being read and report the error state. It is possible for a conformation to be both overspecified and underspecified.
+
+[Figure: Error States]
+
+An exception to the underspecification rule applies in the case of conjugated polyenes. In this case a double bond with a terminal bearing a PPB does not require the opposing terminal to also bear a neighbor with a PPB. If the opposing terminal lacks neighbors, no error is generated and reading continues normally. If the opposing terminal has at least one neighbor, the bond to it need not be a PPB. In either case the conformation of the double bond in question remains undefined.
+
+[Figure: Error State Exceptions]
+
+Given that conformational specification is distributed over three or more bonds, some conformations will be difficult or possible to represent. Cyclooctatetraene offers an example. Although the (E, E, E, E) conformation is accessible, the (Z, E, E, E) conformation is not. This problem arises because the same PPB encodes a partial conformation of two different double bonds.
+
+[Figure: Cyclooctatetraene]
+
 # Configuration
 
 \[TODO\]
