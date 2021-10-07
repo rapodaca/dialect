@@ -63,8 +63,6 @@ The edges of a molecular graph are defined as a set of unordered pairs of non-id
 
 A molecular graph contains one or more *connected components*. A connected component is a graph in which any two vertices are connected to each other by at least one path. Dialect places no restriction on the number of connected components, although practical limitations are likely to impose one.
 
-Two enable stereochemical and delocalized bonding features, each node is given two properties. The first is a non-negative integer index (`index`), assigned in the order in which the node was added. The second property is a boolean property (`selected`).
-
 # Constitution
 
 A Dialect molecule is described at the lowest level by its constitution. Constitution consists of a set of atomic nuclei (nodes), a set of pairwise bonding relationships between them (edges), and those attributes needed to associate every valence electron with a specific node or edge. Constitution excludes attributes related to stereochemistry, or any other feature whose attributes extend over more than one atom or bond.
@@ -159,6 +157,12 @@ Some bonding arrangements render implicit hydrogen calculation unworkable. Consi
 
 Only those eligible atoms with an undefined `hydrogens` attribute are subject to implicit hydrogen counting. In other words, implicit hydrogen counting is disabled on atoms whose `hydrogens` attribute is defined. For example, the correct hydrogen count for hypophosphorous acid would be obtained by setting its `hydrogens` attribute to two.
 
+# Atom Identifier
+
+To support the assignment and interpretation stereochemical features, each node is assigned a sequential, unique, non-negative integer `id` attribute ("identifier"). The value of an atom's identifier equals zero for a molecular's graph's first atom. The identifier for each subsequently-added atom equals the order (node count) of the graph prior to the addition. For example, the identifier for the second atom is one, the identifier for the third atom is two, and so on. There is no upper bound on the value of the identifier, although practical limitations of computer hardware and software will likely impose one.
+
+Identifiers impose an ordering over the atoms in a molecular graph. An atom with an identifier less than another atom is said to *precede* it. An atom with an identifier grater than another atom *succeeds* it. No special significance is ascribed to the atom whose identifier is zero, except that every other atom succeeds it.
+
 # Conformation
 
 The second major component of molecular representation in Dialect is *conformation*. Conformation is a rotational restriction about one or more bonds. Dialect limits conformation to just one of many possible types: rotational restrictions occurring at individual double bonds.
@@ -171,13 +175,13 @@ Dialect takes a different approach by introducing **partial parity bonds** (PPB)
 
 [Figure: Partial Parity Bond]
 
-A PPB may assume one of two possible states: `Up` or `Down`. These states refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates on a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `index` attribute appears to the left of the terminal with the higher atomic `index` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
+A PPB may assume one of two possible states: `Up` or `Down`. These states refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates on a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `id` attribute appears to the left of the terminal with the higher atomic `id` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
 
 [Figure: Interpreting Partial Bonds]
 
-The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the neighbor and the left terminal. If the neighbor succeeds the left terminal, place it to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
+The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the identifiers for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
 
-An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place it to the upper right given an `Up` state, or to the lower right given a `Down` state. Reverse these assignments if the right terminal succeeds its neighbor.
+An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place the neighbor to the upper right given an `Up` state, or to the lower right given a `Down` state. Reverse these assignments if the right terminal succeeds its neighbor.
 
 In some cases the placement of a terminal neighbor can be deduced from the placement of a sibling, without the presence of an explicit PPB. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
 
@@ -185,7 +189,7 @@ In some cases the placement of a terminal neighbor can be deduced from the place
 
 The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
 
-Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are assigned on the basis that index 1 precedes index 2. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
+Consider the encoding of PPBs for (*E*)-2-butene. Assume that identifiers are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are placed on the basis of succession. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
 
 [Figure: Assigning PPBs to (*E*)-2-butene]
 
