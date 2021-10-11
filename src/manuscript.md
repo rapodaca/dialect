@@ -173,9 +173,11 @@ Organic chemistry uses the parity descriptors *entgegen* (*E*) and zusammen (*Z*
 
 Dialect takes a different approach by introducing **partial parity bonds** (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. At least two PPBs must flank the double bond.
 
+A PPB possesses three attributes: `source`, `target`, and `state`. The `source` and `target` attributes are the identifiers assigned to the PPB's beginning and end terminals, respectively. The atom with the same identifier of a PPB's `source` attribute is called its *source*. The atom with the same identifier as a PPB's `target` attribute is called its *target*. The `state` attribute is an enumeration comprised of the values `Up` and `Down`.
+
 [Figure: Partial Parity Bond]
 
-A PPB may assume one of two possible states: `Up` or `Down`. These states refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates on a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `id` attribute appears to the left of the terminal with the higher atomic `id` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
+The PPB `state` attribute refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates on a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `id` attribute appears to the left of the terminal with the higher atomic `id` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
 
 [Figure: Interpreting Partial Bonds]
 
@@ -194,6 +196,12 @@ Consider the encoding of PPBs for (*E*)-2-butene. Assume that identifiers are as
 [Figure: Assigning PPBs to (*E*)-2-butene]
 
 In a similar manner assigned PPBs can be decoded. The process starts by placing Atom 1 to the left of Atom 2 along the x-axis. The PPB between the left terminal and its neighbor (Atom 0) uses the `Up` state. The neighbor precedes the left terminal, so Atom 0 should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor (Atom 3) uses the `Up` state. The neighbor (Atom 3) succeeds the right terminal (Atom 2). Therefore, Atom 3 is placed in the upper right quadrant. This results in the expected conformation (*E*).
+
+The above procedures assume that all PPBs are expressed in *normal form*. In normal form, a PPB's source precedes it target. In other words, `source` is less than `target`. If a PPB is not in normal form, it must be *inverted* before quadrants can be assigned. Inversion swaps the values of `source` and target attributes while simultaneously toggling the `state` attribute. Inversion occurs in two contexts: conjugated polyenes and cycles. In the case of polyenes, the same PPB carries partial conformation for at least two different double bond systems. In the case of cycles, non-normal PPBs can be generated at bonds forming cycles. However, readers and writers must be capable of inverting PPBs wherever they appear.
+
+Consider (*E*)-2-butene. The PPB spanning atoms 0 and 1 will typically be encoded as the tuple `(0, 1, Up)` because this orientation tracks the order of atom identifiers. However, the PPB can be equivalently encoded as the tuple `(1, 0, Down)`. Before this representation can be used, it must first be inverted into the equivalent form represented by the tuple `(0, 1, Up)`.
+
+[Figure: PPB inversion]
 
 The distributed nature of conformational encoding means that several additive error states are possible:
 
