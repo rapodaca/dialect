@@ -223,7 +223,11 @@ Given that conformational specification is distributed over three or more bonds,
 
 # Configuration
 
-\[TODO\]
+The third major element of molecular representation is *configuration*. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits conformation to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. One of the four substituents may be a virtual hydrogen.
+
+Configuration is encoded by the optional atomic property `configuration`, an enumeration selected from the values `TH1` and `TH2`. These values denote a tetrahedron with counterclockwise parity and a tetrahedron with clockwise parity, respectively.
+
+The parity of tetrahedral conformation is determined by the relative ordering of bonds about the central atom.
 
 # Delocalization Subgraph
 
