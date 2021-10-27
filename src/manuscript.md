@@ -225,9 +225,33 @@ Given that conformational specification is distributed over three or more bonds,
 
 The third major element of molecular representation is *configuration*. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits conformation to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. One of the four substituents may be a virtual hydrogen.
 
-Configuration is encoded by the optional atomic property `configuration`, an enumeration selected from the values `TH1` and `TH2`. These values denote a tetrahedron with counterclockwise parity and a tetrahedron with clockwise parity, respectively.
+A configuration is comprised of two components: an ordering of bonds to a central atom; and a *configurational descriptor*. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: `TH1` and `TH2`. For reasons that will soon become clear, these descriptors are also known as "clockwise" and "counterclockwise," respectively.
 
-The parity of tetrahedral conformation is determined by the relative ordering of bonds about the central atom.
+The descriptors `TH1` and `TH2` restrict neighboring atoms to the vertices of a tetrahedron whose center is the central atom. First, the mate of the first bond to the central atom is placed at an arbitrary vertex. Then shift the frame of reference by sighting along the first bond from the neighbor toward the central atom. Finally, arrange the remaining neighbors using the ordering of bonds to the central atom. For the `TH1` descriptor, use a counterclockwise distribution. For the `TH2` descriptor, use a clockwise distribution.
+
+[Figure: Configurational Descriptor]
+
+If an atom bears one virtual hydrogen and three substituents, a modified procedure is used. The virtual hydrogen is first placed at an arbitrary vertex of the tetrahedron. The tetrahedron is then oriented along the axis pointing from the virtual hydrogen to the center. Neighbor atoms are then distributed in a counterclockwise (`TH1`) or clockwise (`TH2`) pattern to the remaining vertices.
+
+[Figure: Configurational Descriptor with Virtual Hydrogen]
+
+The association of a configurational descriptor with an atom implies a neighbor count of either four if no virtual hydrogens are present, or three if exactly one virtual hydrogen is present. In any other context, the use of a configurational descriptor is considered an error.
+
+This restriction places some constraints around the use of configuration. For example, the use of `TH1` and `TH2` descriptors with the elongated tetrahedron of allenes and other cumulenes might seem valid. However, this use is invalid because the central atom lacks four substituents. Similarly, it is invalid to consider lone pairs for placement within the tetrahedral template. Chiral sulfoxides represent a class of molecules in which such features are present.
+
+[Figure: Invalid Uses of Configurational Descriptors]
+
+A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, quadruple, and partial parity bond types can all be present. The only requirement that must be satisfied is four substituents or, equivalently, three substituents and a virtual hydrogen.
+
+It is sometimes useful to manipulate a configuration in a way that preserves the relative three-dimensional positioning of neighbor atoms. This process is called *transformation*. Five rules suffice to transform any configuration into any other:
+
+- *Virtualize*. Replaces an atomic hydrogen neighbor with a virtual hydrogen. If the deleted bond was first in the bond ordering, toggle the configurational descriptor.
+- *Reify*. Replaces a virtual hydrogen with an atomic hydrogen neighbor. The bond ordering must place the new neighbor in the second position.
+- *Swap*. Exchanges any two bonds ordered second or higher while simultaneously toggling the configurational descriptor.
+- *Slide Left*. Re-orders a bond from the first position to the second position. Disabled if the central atom carries a virtual hydrogen.
+- *Slide Right.* Re-orders a bond from the second position to the first position. Disabled if the central atom carries a virtual hydrogen.
+
+[Figure: Transformations]
 
 # Delocalization Subgraph
 
