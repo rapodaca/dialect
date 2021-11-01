@@ -255,7 +255,19 @@ It is sometimes useful to manipulate a configuration in a way that preserves the
 
 # Delocalization Subgraph
 
-\[TODO\]
+A molecular representation based solely on the valence bond model can yield artifacts resulting from *delocalization induced molecular equality* (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their extensive history of controversy in organic chemistry.
+
+[Figure: DIME]
+
+DIME can interfere with *canonicalization*, or the selection of a single representation for a molecular graph. The presence of multiple equivalent molecular graphs differing only in the placement of single and double bonds complicates selection rules and invariants, which must be adapted to account for the artificial asymmetry.
+
+To eliminate DIME and thereby streamline canonicalization, Dialect representations support a *delocalization subgraph* (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS is drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
+
+A non-empty DS must possess a *perfect matching*. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent subgraph. Every atom added to a DS must therefore be part of a perfect matching over it.
+
+[Figure: Perfect Matching]
+
+
 
 # Syntax
 
