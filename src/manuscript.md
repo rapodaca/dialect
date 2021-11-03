@@ -263,11 +263,13 @@ DIME can interfere with *canonicalization*, or the selection of a single represe
 
 To eliminate DIME and thereby streamline canonicalization, Dialect representations support a *delocalization subgraph* (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS is drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
 
-A non-empty DS must possess a *perfect matching*. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent subgraph. Every atom added to a DS must therefore be part of a perfect matching over it.
+A non-empty DS must possess a *perfect matching*. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
 
 [Figure: Perfect Matching]
 
+Only some atoms are eligible for inclusion in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. All other atoms are ineligible and must not be added to a DS.
 
+To support the construction of a DS, eligible atoms carry a `selected` boolean attribute. Setting this attribute to `true`, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
 
 # Syntax
 
