@@ -271,6 +271,16 @@ Only some atoms are eligible for inclusion in a DS. Atoms whose `element` values
 
 To support the construction of a DS, eligible atoms carry a `selected` boolean attribute. Setting this attribute to `true`, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
 
+A bond will be added to the DS only if both of the following two conditions are met: (a) both terminals are selected; and (b) the bond itself is elided. No other bond will be added to the DS.
+
+A filled DS can be emptied through a two-step process of *deselection*. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds.
+
+[Figure: deselection]
+
+The opposite operation can be accomplished with a *selection algorithm*. A selection algorithm selects two or more eligible atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of "aromaticity." A double bond between two selected atoms may or may not be elided, depending on the application.
+
+[Figure: selection algorithm]
+
 # Syntax
 
 \[TODO\]
