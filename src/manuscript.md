@@ -283,7 +283,9 @@ The opposite operation can be accomplished with a *selection algorithm*. A selec
 
 # Syntax
 
-\[TODO\]
+A Dialect string ("string") is a sequence of one or more UTF-8 characters encoding one or more molecular graphs. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components are all supported.
+
+Strings conform to an *LL(1) grammar*, which will be described in detail. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect strings a good fit for manually-written recursive descent parsers.
 
 # Reading Dialect
 
