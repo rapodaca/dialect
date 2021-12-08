@@ -1,0 +1,7 @@
+Diagram(
+ Terminal(':'),
+  NonTerminal('hex'),
+  Optional(NonTerminal('hex')),
+  Optional(NonTerminal('hex')),
+  Optional(NonTerminal('hex'))
+)

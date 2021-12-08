@@ -1,0 +1,9 @@
+Diagram(
+  Choice(
+    0,
+    NonTerminal('bracket'),
+    NonTerminal('shortcut'),
+    NonTerminal('selected-shortcut'),
+    Terminal('*')
+  )
+)

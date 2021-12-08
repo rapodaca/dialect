@@ -1,0 +1,22 @@
+"b" | "c" | "n" | "o" | "p" | "s" "e"? | "as"
+
+Diagram(
+  Choice(
+    0,
+    Terminal('b'),
+    Terminal('c'),
+    Terminal('n'),
+    Terminal('o'),
+    Terminal('p'),
+    Sequence(
+      Terminal('s'),
+      Optional(
+        Terminal('e')
+      )
+    ),
+    Sequence(
+      Terminal('a'),
+      Terminal('s')
+    )
+  )
+)

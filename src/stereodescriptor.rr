@@ -1,0 +1,6 @@
+Diagram(
+  Terminal('@'),
+  Optional(
+    Terminal('@')
+  )
+)

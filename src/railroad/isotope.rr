@@ -1,0 +1,11 @@
+Diagram(
+  Sequence(
+    Terminal('1..9'),
+    Optional(
+      NonTerminal('0..9')
+    ),
+    Optional(
+      NonTerminal('0..9')
+    )
+  )
+)

@@ -1,0 +1,6 @@
+Diagram(
+  NonTerminal('H'),
+  Optional(
+    NonTerminal('1..9')
+  )
+)

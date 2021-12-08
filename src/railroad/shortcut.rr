@@ -1,0 +1,16 @@
+Diagram(
+  Choice(
+    0,
+    Sequence(Terminal('B'), Optional(Terminal('r'))),
+    Sequence(Terminal('C'), Optional(Terminal('l'))),
+    Terminal('N'),
+    Terminal('O'),
+    Terminal('P'),
+    Terminal('S'),
+    Terminal('F'),
+    Terminal('I'),
+    Sequence(Terminal('A'), Terminal('t')),
+    Sequence(Terminal('T'), Terminal('s')),
+    Terminal('*')
+  )
+)

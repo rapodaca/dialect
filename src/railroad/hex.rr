@@ -1,0 +1,15 @@
+Diagram(
+  Choice(
+    0,
+    NonTerminal('digit'),
+    Choice(
+      0,
+      Terminal('a'),
+      Terminal('b'),
+      Terminal('c'),
+      Terminal('d'),
+      Terminal('e'),
+      Terminal('f')
+    )
+  )
+)

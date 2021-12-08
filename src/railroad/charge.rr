@@ -1,0 +1,8 @@
+Diagram(
+  Choice(
+    0,
+    Terminal('+'),
+    Terminal('-')
+  ),
+  Terminal('1..9')
+)

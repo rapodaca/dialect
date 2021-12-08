@@ -283,9 +283,39 @@ The opposite operation can be accomplished with a *selection algorithm*. A selec
 
 # Syntax
 
-A Dialect string ("string") is a sequence of one or more UTF-8 characters encoding one or more molecular graphs. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components are all supported.
+A Dialect string ("string") is a sequence of one or more UTF-8 characters encoding one or more molecular graphs. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
 
-Strings conform to an *LL(1) grammar*, which will be described in detail. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect strings a good fit for manually-written recursive descent parsers.
+Strings conform to an *LL(1) grammar*. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR.[@parr2014] The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
+
+Rather than present the Dialect formal grammar here, however, a series of *railroad diagrams* will be used instead. A railroad diagram represents the rules for constructing valid strings for a language graphically. Construction begins at the leftmost terminal, advancing only over rightward-curving lines until the rightmost terminal is reached. Both leftmost and rightmost terminals are depicted with the double pipe symbol (`||`). Lines passing through a terminal (bounded by an oval) add characters to the string. Lines passing through a non-terminal (bounded by a square) expand to the named diagram. The graphical nature of railroad diagrams allows them to be readily understood by experts and non-experts alike.
+
+At the top level of the Dialect grammar sits `string`. A `string` is composed of an `atom` followed by an optional choice of `union`, `branch` or `split`. The elements `atom`, `union`, `branch` and `split` are non-terminals (bounded by rectangles) so their definitions will be provided below.
+
+[Figure: string]
+
+An `atom` can be constructed from one of four choices: `bracket`; `shortcut`; `selected-shortcut`; or the "star atom" character (`*`). Combining the diagrams for `atom` and `string`, it becomes apparent that a Dialect `string` must define at least one `atom`. At this point, it's possible to expand the possible set of Dialect strings to `*`.
+
+The presence of a star atom signals that the reader should construct a node whose element, isotope, stereodescriptor, virtual hydrogen count, and extension are undefined. For example, the string `*` represents a graph with a single node with completely undefined attributes.
+
+A `bracket` consists of several items arranged sequentially and wrapped by left and right bracket characters (`[` and `]`, respectively). The first item, `isotope` is optional. The second item must be chosen from the list: `element`; `selection`; or the star atom. This is followed by three optional items in the sequence `stereodescriptor`, `virtual-hydrogen`, and `extension`.
+
+[Figure: bracket]
+
+`bracket` is used to signal the reader to construct a node with full range of access to attributes. The lack of an attribute definition within `bracket` leads to the assignment of the default value to the node. For example, the string `[*]` represents a molecular graph with a single node, all of whose attributes are set to their default values.
+
+The first item within `bracket` is `isotope`. It consists of at between one and three digits encoding the integers 1-999. On encountering an `isotope`, a reader must assign the encoded value to the corresponding node's isotope attribute. The range of possible integer values was chosen to include all possible physical isotope mass numbers while excluding zero.
+
+[Figure: isotope]
+
+The next item within `bracket` is a selection among `element`, `selection`, and the star atom. `element` is a one- or two-character sequence representing one of the IUPAC-approved element symbols. On encountering an `element`, a reader must set the corresponding node's element attribute to the encoded value. Furthermore, the node's `selected` attribute must be set to `false`.
+
+[Figure: element]
+
+As an alternative to `element`, an `atom` can use `selection`. This item is comprised of one or two characters chosen from the set of atomic symbols, and subsequently converted to lower case. On encountering a `selection`, a reader must set the corresponding node's element attribute to the corresponding upper-cased value (one of: `B`; `C`; `N`; `O`; `P`; `As`; `S`; or `Se`). Additionally, the reader must set the node's `selected` attribute to `true`.
+
+[Figure: selection]
+
+
 
 # Reading Dialect
 

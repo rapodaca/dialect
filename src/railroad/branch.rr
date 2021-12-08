@@ -1,0 +1,12 @@
+Diagram(
+  NonTerminal('('),
+  Optional(
+    Choice(
+      0,
+      Terminal('.'),
+      NonTerminal('bond')
+    )
+  ),
+  NonTerminal('string'),
+  NonTerminal(')')
+)
