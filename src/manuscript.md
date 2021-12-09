@@ -287,17 +287,17 @@ A Dialect string ("string") is a sequence of one or more UTF-8 characters encodi
 
 Strings conform to an *LL(1) grammar*. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR.[@parr2014] The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
 
-Rather than present the Dialect formal grammar here, however, a series of *railroad diagrams* will be used instead. A railroad diagram represents the rules for constructing valid strings for a language graphically. Construction begins at the leftmost terminal, advancing only over rightward-curving lines until the rightmost terminal is reached. Both leftmost and rightmost terminals are depicted with the double pipe symbol (`||`). Lines passing through a terminal (bounded by an oval) add characters to the string. Lines passing through a non-terminal (bounded by a square) expand to the named diagram. The graphical nature of railroad diagrams allows them to be readily understood by experts and non-experts alike.
+Rather than present the Dialect formal grammar here, however, a series of *railroad diagrams* will be used instead. A railroad diagram represents the rules for constructing valid strings for a language graphically. Construction begins at the origin, advancing only over rightward-curving lines until the rightmost destination is reached. Both origin and destination are depicted with the double pipe symbol (`||`). Lines passing through a terminal (bounded by an oval) add characters to the string. Lines passing through a non-terminal (bounded by a square) expand to the named diagram. The graphical nature of railroad diagrams allows them to be readily understood by experts and non-experts alike.
 
 At the top level of the Dialect grammar sits `string`. A `string` is composed of an `atom` followed by an optional choice of `union`, `branch` or `split`. The elements `atom`, `union`, `branch` and `split` are non-terminals (bounded by rectangles) so their definitions will be provided below.
 
 [Figure: string]
 
-An `atom` can be constructed from one of four choices: `bracket`; `shortcut`; `selected-shortcut`; or the "star atom" character (`*`). Combining the diagrams for `atom` and `string`, it becomes apparent that a Dialect `string` must define at least one `atom`. At this point, it's possible to expand the possible set of Dialect strings to `*`.
+An `atom` can be constructed from one of four choices: `bracket`; `shortcut`; `selected-shortcut`; or the "star atom" (`*`). Combining the diagrams for `atom` and `string`, it becomes apparent that a Dialect `string` must define at least one `atom`. At this point, it's possible to expand the possible set of Dialect strings to `*`.
 
 The presence of a star atom signals that the reader should construct a node whose element, isotope, stereodescriptor, virtual hydrogen count, and extension are undefined. For example, the string `*` represents a graph with a single node with completely undefined attributes.
 
-A `bracket` consists of several items arranged sequentially and wrapped by left and right bracket characters (`[` and `]`, respectively). The first item, `isotope` is optional. The second item must be chosen from the list: `element`; `selection`; or the star atom. This is followed by three optional items in the sequence `stereodescriptor`, `virtual-hydrogen`, and `extension`.
+A `bracket` consists of several items arranged sequentially and wrapped by left and right bracket characters (`[` and `]`, respectively). The first item, `isotope` is optional. The second item must be chosen from the list: `element`; `selection`; or the star atom. This is followed by four optional items in the sequence `stereodescriptor`, `virtual-hydrogen`, 'charge', and `extension`.
 
 [Figure: bracket]
 
@@ -315,7 +315,48 @@ As an alternative to `element`, an `atom` can use `selection`. This item is comp
 
 [Figure: selection]
 
+Following the choice of `element`, `selection` or star atom is `stereodescriptor`. Allowed values are "@" and "@@", representing `TH1` (counterclockwise) and `TH2` (clockwise) tetrahedral configurations, respectively. On encountering `stereodescriptor`, a reader must set the configurational descriptor of the corresponding atom to the value indicated.
 
+[Figure: stereodescriptor]
+
+Following `stereodescriptor` in the `bracket` chain is `virtual-hydrogen`. This non-terminal is comprised of the character `H` followed by a digit ranging from one to nine. The presence of a `virtual-hydrogen` item directs a reader to assign the `hydrogens` attribute for the corresponding atom. Omitting the `virtual-hydrogen` leaves the `hydrogens` attribute with its default value, 0.
+
+[Figure: virtual-hydrogen]
+
+Following `virtual-hydrogen` in the `bracket` chain is `charge`. This non terminal begins with either the plus or minus characters (`+`, `-`, respectively) and ends with a digit ranging from one to nine, inclusive. The presence of a `charge` item directs a reader to assign the `charge attribute for the corresponding atom. Omitting the `charge` item leaves the `charge` attribute with its default value, 0.
+
+[Figure: charge]
+
+The last item in the `bracket` chain is `extension`. The presence of `extension` directs a reader to set the appropriate value of the corresponding atom's `extension` attribute. These values may assume the four-digit hex value `0x0000` through `0xffff`, inclusive.
+
+[Figure: extension]
+
+Given the complete definition of `atom`, the remaining items of `string` can be defined: `union`; `branch`; and `split`. The purpose of these items, when present, is to connect a parent atom with its child. Each option does so in a different way.
+
+`union` consists of an optional `bond` followed by a choice of either `string` or `cut`. 
+
+When `bond` is absent from `union`, a reader must construct a Bond of single order. When `bond` is present, a reader must create a bond according to the following plan:
+
+- `-` (single). A bond of order one.
+- `=` (double). A bond of order two.
+- `#` (triple). A bond of order three.
+- `$` (quadruple) A bond of order four.
+- `/` (up) A PPB with `state` attribute of `Up`.
+- `\` (down) A PPB with `state` attribute of `Down`.
+
+Following `bond`, one of `string` or `cut` will appear. If `string`, a reader recurses back to the previously-defined item, connecting parent and child with a Bond. Alternatively, `cut` may be present, whose definition expands as follows.
+
+[Figure: cut]
+
+`cut` takes the form of an integer index ranging from zero to 99, inclusive. For indexes up to and including nine, a single digit suffices. For higher indexes, two digits preceded by the percent symbol (`%`) are used.
+
+`cut` indexes must be paired within a complete `string`. If one or more indexes are unpaired, the `string` is invalid. For example, `*1**1` is a valid `string` whereas `*1**` is not. A reader encountering an unpaired `cut` index must report an error. Additional actions to be taken on encountering a `cut` will be described in the next section.
+
+A `branch`, like `union` joins parent and child nodes through a bond. Wrapped by opening and closing parentheses (`(` and `)`, respectively), a branch contains two items. The first is a choice between a disconnection (`.`) or the `bond` non-terminal. A mandatory `string` item follows. A reader encountering a disconnection must not create a bond between parent and child atoms. Further processing instructions for `branch` are discussed in the next section.
+
+[Figure: branch]
+
+The purpose of a `split` is to prevent the connection of parent and child atoms through a bond. A reader encountering a split stops construction of the parent atom and directly begins construction on the child.
 
 # Reading Dialect
 

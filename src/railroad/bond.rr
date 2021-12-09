@@ -1,7 +1,6 @@
 Diagram(
     Choice(
         0,
-        NonTerminal(':'),
         NonTerminal('-'),
         NonTerminal('='),
         NonTerminal('#'),

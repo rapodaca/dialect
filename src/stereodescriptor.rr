@@ -1,6 +1,0 @@
-Diagram(
-  Terminal('@'),
-  Optional(
-    Terminal('@')
-  )
-)
