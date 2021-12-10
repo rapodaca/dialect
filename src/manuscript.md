@@ -309,13 +309,13 @@ The first item within `bracket` is `isotope`. It consists of at between one and 
 
 ![Isotope](../build/isotope.svg)
 
-The next item within `bracket` is a selection among `element`, `selection`, and the star atom. `element` is a one- or two-character sequence representing one of the IUPAC-approved element symbols. On encountering an `element`, a reader must set the corresponding node's element attribute to the encoded value. Furthermore, the node's `selected` attribute must be set to `false`.
+The next item within `bracket` is a choice among `element`, `selection`, and the star atom. `element` is a one- or two-character sequence representing one of the IUPAC-approved element symbols. On encountering an `element`, a reader must set the corresponding node's element attribute to the encoded value. Furthermore, the node's `selected` attribute must be set to `false`.
 
 ![Element](../build/element.svg)
 
 As an alternative to `element`, an `atom` can use `selection`. This item is comprised of one or two characters chosen from the set of atomic symbols, and subsequently converted to lower case. On encountering a `selection`, a reader must set the corresponding node's element attribute to the corresponding upper-cased value (one of: `B`; `C`; `N`; `O`; `P`; `As`; `S`; or `Se`). Additionally, the reader must set the node's `selected` attribute to `true`.
 
-![Element](../build/selection.svg)
+![Element](../build/selected-element.svg)
 
 Following the choice of `element`, `selection` or star atom is `stereodescriptor`. Allowed values are "@" and "@@", representing `TH1` (counterclockwise) and `TH2` (clockwise) tetrahedral configurations, respectively. On encountering `stereodescriptor`, a reader must set the configurational descriptor of the corresponding atom to the value indicated.
 
@@ -333,9 +333,21 @@ The last item in the `bracket` chain is `extension`. The presence of `extension`
 
 ![extension](../build/extension.svg)
 
+Two choices for `atom` remain to be described: `shortcut` and `selected-shortcut`. A reader encountering either item must create an Atom whose whose `hydrogen` attribute is set to `implicit`. The Atoms' remaining attributes must be set to their default values.
+
+A `shortcut` item encodes an atomic symbol selected from one of the following: "B"; "C"; "N"; "O"; "F"; "Cl"; "Br": "I"; "At": "Ts"; "P"; and "S". These are the element symbols which may appear outside of brackets.
+
+![shortcut](../build/shortcut.svg)
+
+`selected-shortcut` represents the subset of `shortcut` elements whose corresponding atoms are selectable. A reader encountering the `shortcut` item must set the `selected` attribute of the corresponding Atom to `true`. The `element` attribute of the corresponding Atom must be set to the uppercase version of the encoded label. For example, "b" becomes "B", "c" becomes "C" and so on.
+
+![selected-shortcut](../build/selected-shortcut.svg)
+
 Given the complete definition of `atom`, the remaining items of `string` can be defined: `union`; `branch`; and `split`. The purpose of these items, when present, is to connect a parent atom with its child. Each option does so in a different way.
 
 `union` consists of an optional `bond` followed by a choice of either `string` or `cut`. 
+
+![union](../build/union.svg)
 
 When `bond` is absent from `union`, a reader must construct a Bond of single order. When `bond` is present, a reader must create a bond according to the following plan:
 
@@ -359,6 +371,8 @@ A `branch`, like `union` joins parent and child nodes through a bond. Wrapped by
 ![branch](../build/branch.svg)
 
 The purpose of a `split` is to prevent the connection of parent and child atoms through a bond. A reader encountering a split stops construction of the parent atom and directly begins construction on the child.
+
+![split](../build/split.svg)
 
 # Reading Dialect
 

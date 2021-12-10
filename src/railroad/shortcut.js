@@ -12,7 +12,6 @@ module.exports = Diagram(
     Terminal('F'),
     Terminal('I'),
     Sequence(Terminal('A'), Terminal('t')),
-    Sequence(Terminal('T'), Terminal('s')),
-    Terminal('*')
+    Sequence(Terminal('T'), Terminal('s'))
   )
 )
