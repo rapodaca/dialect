@@ -291,45 +291,47 @@ Rather than present the Dialect formal grammar here, however, a series of *railr
 
 At the top level of the Dialect grammar sits `string`. A `string` is composed of an `atom` followed by an optional choice of `union`, `branch` or `split`. The elements `atom`, `union`, `branch` and `split` are non-terminals (bounded by rectangles) so their definitions will be provided below.
 
-[Figure: string]
+![String.](../build/string.svg)
 
 An `atom` can be constructed from one of four choices: `bracket`; `shortcut`; `selected-shortcut`; or the "star atom" (`*`). Combining the diagrams for `atom` and `string`, it becomes apparent that a Dialect `string` must define at least one `atom`. At this point, it's possible to expand the possible set of Dialect strings to `*`.
+
+![Atom.](../build/atom.svg)
 
 The presence of a star atom signals that the reader should construct a node whose element, isotope, stereodescriptor, virtual hydrogen count, and extension are undefined. For example, the string `*` represents a graph with a single node with completely undefined attributes.
 
 A `bracket` consists of several items arranged sequentially and wrapped by left and right bracket characters (`[` and `]`, respectively). The first item, `isotope` is optional. The second item must be chosen from the list: `element`; `selection`; or the star atom. This is followed by four optional items in the sequence `stereodescriptor`, `virtual-hydrogen`, 'charge', and `extension`.
 
-[Figure: bracket]
+![Bracket](../build/bracket.svg)
 
 `bracket` is used to signal the reader to construct a node with full range of access to attributes. The lack of an attribute definition within `bracket` leads to the assignment of the default value to the node. For example, the string `[*]` represents a molecular graph with a single node, all of whose attributes are set to their default values.
 
 The first item within `bracket` is `isotope`. It consists of at between one and three digits encoding the integers 1-999. On encountering an `isotope`, a reader must assign the encoded value to the corresponding node's isotope attribute. The range of possible integer values was chosen to include all possible physical isotope mass numbers while excluding zero.
 
-[Figure: isotope]
+![Isotope](../build/isotope.svg)
 
 The next item within `bracket` is a selection among `element`, `selection`, and the star atom. `element` is a one- or two-character sequence representing one of the IUPAC-approved element symbols. On encountering an `element`, a reader must set the corresponding node's element attribute to the encoded value. Furthermore, the node's `selected` attribute must be set to `false`.
 
-[Figure: element]
+![Element](../build/element.svg)
 
 As an alternative to `element`, an `atom` can use `selection`. This item is comprised of one or two characters chosen from the set of atomic symbols, and subsequently converted to lower case. On encountering a `selection`, a reader must set the corresponding node's element attribute to the corresponding upper-cased value (one of: `B`; `C`; `N`; `O`; `P`; `As`; `S`; or `Se`). Additionally, the reader must set the node's `selected` attribute to `true`.
 
-[Figure: selection]
+![Element](../build/selection.svg)
 
 Following the choice of `element`, `selection` or star atom is `stereodescriptor`. Allowed values are "@" and "@@", representing `TH1` (counterclockwise) and `TH2` (clockwise) tetrahedral configurations, respectively. On encountering `stereodescriptor`, a reader must set the configurational descriptor of the corresponding atom to the value indicated.
 
-[Figure: stereodescriptor]
+![Stereodescriptor](../build/stereodescriptor.svg)
 
 Following `stereodescriptor` in the `bracket` chain is `virtual-hydrogen`. This non-terminal is comprised of the character `H` followed by a digit ranging from one to nine. The presence of a `virtual-hydrogen` item directs a reader to assign the `hydrogens` attribute for the corresponding atom. Omitting the `virtual-hydrogen` leaves the `hydrogens` attribute with its default value, 0.
 
-[Figure: virtual-hydrogen]
+![virtual-hydrogen](../build/virtual-hydrogen.svg)
 
 Following `virtual-hydrogen` in the `bracket` chain is `charge`. This non terminal begins with either the plus or minus characters (`+`, `-`, respectively) and ends with a digit ranging from one to nine, inclusive. The presence of a `charge` item directs a reader to assign the `charge attribute for the corresponding atom. Omitting the `charge` item leaves the `charge` attribute with its default value, 0.
 
-[Figure: charge]
+![charge](../build/charge.svg)
 
 The last item in the `bracket` chain is `extension`. The presence of `extension` directs a reader to set the appropriate value of the corresponding atom's `extension` attribute. These values may assume the four-digit hex value `0x0000` through `0xffff`, inclusive.
 
-[Figure: extension]
+![extension](../build/extension.svg)
 
 Given the complete definition of `atom`, the remaining items of `string` can be defined: `union`; `branch`; and `split`. The purpose of these items, when present, is to connect a parent atom with its child. Each option does so in a different way.
 
@@ -346,7 +348,7 @@ When `bond` is absent from `union`, a reader must construct a Bond of single ord
 
 Following `bond`, one of `string` or `cut` will appear. If `string`, a reader recurses back to the previously-defined item, connecting parent and child with a Bond. Alternatively, `cut` may be present, whose definition expands as follows.
 
-[Figure: cut]
+![cut](../build/cut.svg)
 
 `cut` takes the form of an integer index ranging from zero to 99, inclusive. For indexes up to and including nine, a single digit suffices. For higher indexes, two digits preceded by the percent symbol (`%`) are used.
 
@@ -354,7 +356,7 @@ Following `bond`, one of `string` or `cut` will appear. If `string`, a reader re
 
 A `branch`, like `union` joins parent and child nodes through a bond. Wrapped by opening and closing parentheses (`(` and `)`, respectively), a branch contains two items. The first is a choice between a disconnection (`.`) or the `bond` non-terminal. A mandatory `string` item follows. A reader encountering a disconnection must not create a bond between parent and child atoms. Further processing instructions for `branch` are discussed in the next section.
 
-[Figure: branch]
+![branch](../build/branch.svg)
 
 The purpose of a `split` is to prevent the connection of parent and child atoms through a bond. A reader encountering a split stops construction of the parent atom and directly begins construction on the child.
 

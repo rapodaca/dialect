@@ -1,4 +1,6 @@
-Diagram(
+const {Diagram, Choice, Terminal, Sequence, NonTerminal } = require('../../lib/railroad-diagrams');
+
+module.exports = Diagram(
   Choice(
     0,
     Terminal('0..9'),
@@ -8,4 +10,4 @@ Diagram(
       Terminal('0..9')
     )
   )
-)
+);

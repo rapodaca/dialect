@@ -1,4 +1,7 @@
-Diagram(
+const { Diagram, NonTerminal, Terminal, Optional, Choice, Sequence } = require('../../lib/railroad-diagrams');
+
+
+module.exports = Diagram(
   NonTerminal('['),
   Optional(NonTerminal('isotope')),
   Choice(
@@ -23,4 +26,4 @@ Diagram(
     )
   ),
   NonTerminal(']')
-)
+);

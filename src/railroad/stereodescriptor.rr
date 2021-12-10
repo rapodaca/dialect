@@ -1,4 +1,0 @@
-Diagram(
-    NonTerminal('@'),
-    Optional(NonTerminal('@'))
-)

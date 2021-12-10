@@ -1,4 +1,6 @@
-Diagram(
+const {Diagram, NonTerminal, ZeroOrMore, Choice } = require('../../lib/railroad-diagrams');
+
+module.exports = Diagram(
   NonTerminal('atom'),
   ZeroOrMore(
     Choice(
@@ -8,4 +10,4 @@ Diagram(
       NonTerminal('split')
     )
   )
-)
+);

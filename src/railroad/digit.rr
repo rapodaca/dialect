@@ -1,7 +1,0 @@
-Diagram(
-  Choice(
-    0,
-    Terminal('0'),
-    NonTerminal('not-zero')
-  )
-)

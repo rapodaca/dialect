@@ -1,4 +1,6 @@
-Diagram(
+const { Diagram, Choice, Sequence, Terminal, Optional } = require('../../lib/railroad-diagrams.js');
+
+module.exports = Diagram(
   Choice(
     0,
     Sequence(Terminal('B'), Optional(Terminal('r'))),

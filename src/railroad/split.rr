@@ -1,4 +1,0 @@
-Diagram(
-  Terminal('.'),
-  Terminal('string')
-)
