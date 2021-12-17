@@ -1,21 +1,22 @@
-<string>            ::= <atom> (<union> | <branch> | <split>)*
-<union>             ::= <bond>? ( <cut> | <string> )
-<branch>            ::= "(" ( "." | <bond> )? <string> ")"
-<split>             ::= "." <string>
-<atom>              ::= <shortcut> | <selected-shortcut> | "*" | <bracket>
+<string>            ::= <sequence>?
+<sequence>          ::= <atom> ( <union> | <branch> | <split> )*
+<union>             ::= <bond>? ( <cut> | <sequence> )
+<branch>            ::= "(" ( "." | <bond> )? <sequence> ")"
+<split>             ::= "." <sequence>
+<atom>              ::= <shortcut> | <selected_shortcut> | "*" | <bracket>
 <bracket>           ::= "[" <isotope>?
-                         ( <element> | <selected-element> | "*" )
-                         <stereodescriptor>? <virtual-hydrogen>? <charge>?
+                         ( <element> | <selected_element> | "*" )
+                         <stereodescriptor>? <virtual_hydrogen>? <charge>?
                          <extension>? "]"
-<isotope>           ::= <non-zero> <digit>? <digit>?
-<virtual-hydrogen>  ::= "H" <digit>?
-<charge>            ::= ( "+" | '-' ) <non-zero>?
+<isotope>           ::= <non_zero> <digit>? <digit>?
+<virtual_hydrogen>  ::= "H" <digit>?
+<charge>            ::= ( "+" | "-" ) <non_zero>?
 <extension>         ::= ":" <hex>? <hex>? <hex>? <hex>
-<cut>               ::= <digit> | "%" <non-zero> <digit>
+<cut>               ::= <digit> | "%" <non_zero> <digit>
 <stereodescriptor>  ::= "@" "@"?
 <shortcut>          ::= "B" "r"? | "C" "l"? | "N" | "O" | "P" | "S"
                       | "F" | "I" | "At" | "Ts"
-<selected-shortcut> ::= "b" | "c" | "n" | "o" | "p" | "s"
+<selected_shortcut> ::= "b" | "c" | "n" | "o" | "p" | "s"
 <element>           ::= "A" ( "c" | "g" | "l" | "m" | "r" | "s" | "t" | "u" )
                       | "B" ( "a" | "e" | "h" | "i" | "k" | "r" )?
                       | "C" ( "a" | "d" | "e" | "f" | "l" | "m" | "n" | "o"
@@ -38,8 +39,8 @@
                       | "s" )
                       | "U" | "V" | "W" | "Xe" | "Y" "b"?
                       | "Z" ( "n" | "r" )
-<selected-element>  ::= "b" | "c" | "n" | "o" | "p" | "s" "e"? | "as"
+<selected_element>  ::= "b" | "c" | "n" | "o" | "p" | "s" "e"? | "as"
 <bond>              ::= "-" | "=" | "#" | "$" | "/" | "\\"
-<non-zero>          ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-<digit>             ::= "0" | <non-zero>
+<non_zero>          ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<digit>             ::= "0" | <non_zero>
 <hex>               ::= <digit> | "a" | "b" | "c" | "d" | "e" | "f"
