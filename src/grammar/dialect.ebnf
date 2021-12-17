@@ -15,7 +15,7 @@
 <cut>               ::= <digit> | "%" <non_zero> <digit>
 <stereodescriptor>  ::= "@" "@"?
 <shortcut>          ::= "B" "r"? | "C" "l"? | "N" | "O" | "P" | "S"
-                      | "F" | "I" | "At" | "Ts"
+                      | "F" | "I" | "A" "t" | "T" "s"
 <selected_shortcut> ::= "b" | "c" | "n" | "o" | "p" | "s"
 <element>           ::= "A" ( "c" | "g" | "l" | "m" | "r" | "s" | "t" | "u" )
                       | "B" ( "a" | "e" | "h" | "i" | "k" | "r" )?
