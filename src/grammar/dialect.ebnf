@@ -1,15 +1,14 @@
-<string>            ::= <sequence>?
+<script>            ::= <sequence>?
 <sequence>          ::= <atom> ( <union> | <branch> | <split> )*
 <union>             ::= <bond>? ( <cut> | <sequence> )
 <branch>            ::= "(" ( "." | <bond> )? <sequence> ")"
 <split>             ::= "." <sequence>
-<atom>              ::= <shortcut> | <selected_shortcut> | "*" | <bracket>
-<bracket>           ::= "[" <isotope>?
-                         ( <element> | <selected_element> | "*" )
-                         <stereodescriptor>? <virtual_hydrogen>? <charge>?
-                         <extension>? "]"
+<atom>              ::= "*" | <shortcut> | <selected_shortcut> | <bracket>
+<bracket>           ::= "[" <isotope>? <symbol> <stereodescriptor>?
+                         <virtual_hydrogen>? <charge>? <extension>? "]"
 <isotope>           ::= <non_zero> <digit>? <digit>?
-<virtual_hydrogen>  ::= "H" <digit>?
+<symbol>            ::= "*" | <element> | <selected_element>
+<virtual_hydrogen>  ::= "H" <non_zero>?
 <charge>            ::= ( "+" | "-" ) <non_zero>?
 <extension>         ::= ":" <hex>? <hex>? <hex>? <hex>
 <cut>               ::= <digit> | "%" <non_zero> <digit>
@@ -39,7 +38,7 @@
                       | "s" )
                       | "U" | "V" | "W" | "Xe" | "Y" "b"?
                       | "Z" ( "n" | "r" )
-<selected_element>  ::= "b" | "c" | "n" | "o" | "p" | "s" "e"? | "as"
+<selected_element>  ::= "a" "s" | "b" | "c" | "n" | "o" | "p" | "s" "e"?
 <bond>              ::= "-" | "=" | "#" | "$" | "/" | "\\"
 <non_zero>          ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <digit>             ::= "0" | <non_zero>
