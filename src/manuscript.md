@@ -391,7 +391,13 @@ Having defined these non-terminals, it's now possible to define a string as an o
 
 # Reading Dialect
 
-\[TODO\]
+The goal of a Dialect reader is to transform a string input into a data structure output consistent with the string's content. The output data structure can take many forms. For example, a reader can merely validate a string by returning a boolean type. A more sophisticated reader can return a molecular graph capturing all `Atom` and `Bond` attributes and connectivity relationships.
+
+Dialect strings are read sequentially from the leftmost character to the rightmost character. The first character sets an initial reader state, and each subsequent character causes a state transition. The cumulative application of these state transitions yields the data structure to be returned.
+
+Readers that capture `Atom`-`Atom` connectivity will typically maintain a reference to a *root atom*. The root atom is initially undefined. On reading the first complete `<atom>` non-terminal, the corresponding `Atom` is constructed and set as the root atom. Subsequently processing a complete `<union>`, `<branch>`, or `<split>` non-terminal triggers three changes: (1) a child `Atom` is constructed; (2) the child is connected to the current root atom, unless a `<detachment>` non-terminal intervenes; and (3) the root atom is replaced with the child atom.
+
+The presence of a `<branch>` non-terminal modifies this workflow.
 
 # Pruning the Delocalization Subgraph
 
