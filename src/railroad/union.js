@@ -6,7 +6,7 @@ module.exports = Diagram(
   ),
   Choice(
     0,
-    NonTerminal('string'),
-    NonTerminal('cut')
+    NonTerminal('cut'),
+    NonTerminal('sequence'),
   )
 )

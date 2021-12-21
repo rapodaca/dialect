@@ -3,9 +3,9 @@ const { Diagram, Choice, NonTerminal, Terminal } = require('../../lib/railroad-d
 module.exports = Diagram(
   Choice(
     0,
-    NonTerminal('bracket'),
+    NonTerminal('star'),
     NonTerminal('shortcut'),
     NonTerminal('selected-shortcut'),
-    Terminal('*')
+    NonTerminal('bracket'),
   )
 )

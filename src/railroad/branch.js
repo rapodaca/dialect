@@ -1,7 +1,7 @@
 const {Diagram, NonTerminal, Terminal, Optional, Choice } = require('../../lib/railroad-diagrams');
 
 module.exports = Diagram(
-  NonTerminal('('),
+  Terminal('('),
   Optional(
     Choice(
       0,
@@ -9,6 +9,6 @@ module.exports = Diagram(
       NonTerminal('bond')
     )
   ),
-  NonTerminal('string'),
-  NonTerminal(')')
+  NonTerminal('sequence'),
+  Terminal(')')
 );

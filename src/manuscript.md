@@ -289,90 +289,105 @@ Strings conform to an *LL(1) grammar*. An LL(1) grammar is a context-free gramma
 
 Rather than present the Dialect formal grammar here, however, a series of *railroad diagrams* will be used instead. A railroad diagram represents the rules for constructing valid strings for a language graphically. Construction begins at the origin, advancing only over rightward-curving lines until the rightmost destination is reached. Both origin and destination are depicted with the double pipe symbol (`||`). Lines passing through a terminal (bounded by an oval) add characters to the string. Lines passing through a non-terminal (bounded by a square) expand to the named diagram. The graphical nature of railroad diagrams allows them to be readily understood by experts and non-experts alike.
 
-At the top level of the Dialect grammar sits `string`. A `string` is composed of an `atom` followed by an optional choice of `union`, `branch` or `split`. The elements `atom`, `union`, `branch` and `split` are non-terminals (bounded by rectangles) so their definitions will be provided below.
+## Atom
 
-![String.](../build/string.svg)
+As noted previously, Dialect's representation is centered on `Atom`. The non-terminal `<atom>` offers four broad approaches to atomic encoding.
 
-An `atom` can be constructed from one of four choices: `bracket`; `shortcut`; `selected-shortcut`; or the "star atom" (`*`). Combining the diagrams for `atom` and `string`, it becomes apparent that a Dialect `string` must define at least one `atom`. At this point, it's possible to expand the possible set of Dialect strings to `*`.
+![&lt;atom&gt;.](../build/atom.svg)
 
-![Atom.](../build/atom.svg)
+The first atomic production rule, `<star>`, is a non-terminal whose only possible representation is the asterisk character (`*`). This "star atom" represents and `Atom` whose every attribute is assigned the corresponding default value. The implicit hydrogen count of a start atom is zero.
 
-The presence of a star atom signals that the reader should construct a node whose element, isotope, stereodescriptor, virtual hydrogen count, and extension are undefined. For example, the string `*` represents a graph with a single node with completely undefined attributes.
+![&lt;star&gt;.](../build/star.svg)
 
-A `bracket` consists of several items arranged sequentially and wrapped by left and right bracket characters (`[` and `]`, respectively). The first item, `isotope` is optional. The second item must be chosen from the list: `element`; `selection`; or the star atom. This is followed by four optional items in the sequence `stereodescriptor`, `virtual-hydrogen`, 'charge', and `extension`.
+The next atomic production rule, `<shortcut>` is a non-terminal comprised of the terminal element symbols: "B"; "C"; "N"; "O"; "P"; "S"; "F"; "Cl"; "Br"; "I"; "At"; "Ts"; "P"; and "S". An `Atom` encoded in this way ("shortcut atom") assigns the corresponding symbol to the `element` attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
 
-![Bracket](../build/bracket.svg)
+![&lt;shortcut&gt;](../build/shortcut.svg)
 
-`bracket` is used to signal the reader to construct a node with full range of access to attributes. The lack of an attribute definition within `bracket` leads to the assignment of the default value to the node. For example, the string `[*]` represents a molecular graph with a single node, all of whose attributes are set to their default values.
+The third atomic production rule, `<selected_shortcut>` is a non-terminal comprised of the terminals: "b"; "c"; "n"; "o"; "p"; and "s". An `Atom` encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the `element` attribute and sets the `selected` attribute to `true`. All other attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously. Note that pruning may be required.
 
-The first item within `bracket` is `isotope`. It consists of at between one and three digits encoding the integers 1-999. On encountering an `isotope`, a reader must assign the encoded value to the corresponding node's isotope attribute. The range of possible integer values was chosen to include all possible physical isotope mass numbers while excluding zero.
+![&lt;selected_shortcut&gt;.](../build/selected-shortcut.svg)
 
-![Isotope](../build/isotope.svg)
+The fourth, and most complex, atomic production rule is `<bracket>` ("bracket atom"). It can be used to set any atomic attribute other than `element` or `selected`. A bracket atom must be used when the `element` attribute of an `Atom` makes it ineligible for implicit hydrogen counting. Attributes not set within the `<bracket>` production rule will leave the corresponding atomic values in their default states.
 
-The next item within `bracket` is a choice among `element`, `selection`, and the star atom. `element` is a one- or two-character sequence representing one of the IUPAC-approved element symbols. On encountering an `element`, a reader must set the corresponding node's element attribute to the encoded value. Furthermore, the node's `selected` attribute must be set to `false`.
+![&lt;bracket&gt;.](../build/bracket.svg)
 
-![Element](../build/element.svg)
+The value of a bracket atom's `isotope` attribute is determined by the `<isotope>` non-terminal. It consists of between one and three digits encoding the integers 1-999. The range of possible integer values was chosen to include all possible physical isotope mass numbers while excluding zero.
 
-As an alternative to `element`, an `atom` can use `selection`. This item is comprised of one or two characters chosen from the set of atomic symbols, and subsequently converted to lower case. On encountering a `selection`, a reader must set the corresponding node's element attribute to the corresponding upper-cased value (one of: `B`; `C`; `N`; `O`; `P`; `As`; `S`; or `Se`). Additionally, the reader must set the node's `selected` attribute to `true`.
+![&lt;isotope&gt;.](../build/isotope.svg)
 
-![Element](../build/selected-element.svg)
+![&lt;non_zero&gt;.](../build/not_zero.svg)
 
-Following the choice of `element`, `selection` or star atom is `stereodescriptor`. Allowed values are "@" and "@@", representing `TH1` (counterclockwise) and `TH2` (clockwise) tetrahedral configurations, respectively. On encountering `stereodescriptor`, a reader must set the configurational descriptor of the corresponding atom to the value indicated.
+![&lt;digit&gt;.](../build/digit.svg)
 
-![Stereodescriptor](../build/stereodescriptor.svg)
+The values of a bracket atom's `element` and `selected` attributes are determined by the `<symbol>` production rule ("symbol"). Three non-terminal options are available: `<star>`; `<element>`; and `<selected_element>`.
 
-Following `stereodescriptor` in the `bracket` chain is `virtual-hydrogen`. This non-terminal is comprised of the character `H` followed by a digit ranging from one to nine. The presence of a `virtual-hydrogen` item directs a reader to assign the `hydrogens` attribute for the corresponding atom. Omitting the `virtual-hydrogen` leaves the `hydrogens` attribute with its default value, 0.
+![&lt;symbol&gt;.](../build/symbol.svg)
 
-![virtual-hydrogen](../build/virtual-hydrogen.svg)
+Choosing the `<star>` non-terminal within a symbol leaves the atomic `element` and `selected` attributes as their default values (`undefined` and `false`, respectively).
 
-Following `virtual-hydrogen` in the `bracket` chain is `charge`. This non terminal begins with either the plus or minus characters (`+`, `-`, respectively) and ends with a digit ranging from one to nine, inclusive. The presence of a `charge` item directs a reader to assign the `charge attribute for the corresponding atom. Omitting the `charge` item leaves the `charge` attribute with its default value, 0.
+An `<element>` non-terminal found within a symbol assigns the `element` attribute to the corresponding value while leaving the `selected` attribute as its default value. Given the large number of choices within the `<element>` non-terminal, its railroad diagram only presents the first several. For a complete list, see the EBNF grammar in the Supporting Information.
 
-![charge](../build/charge.svg)
+![&lt;element&gt;.](../build/element.svg)
 
-The last item in the `bracket` chain is `extension`. The presence of `extension` directs a reader to set the appropriate value of the corresponding atom's `extension` attribute. These values may assume the four-digit hex value `0x0000` through `0xffff`, inclusive.
+A `<selected_element>` non-terminal found within a symbol sets the atomic `selected` attribute to `true`. The corresponding `element` attribute is assigned by capitalizing the first character. For example, the terminal `as` would assign the atomic `element` and `selected` attributes to the values `As` and `true`, respectively.
 
-![extension](../build/extension.svg)
+![&lt;selected_element&gt;.](../build/selected-element.svg)
 
-Two choices for `atom` remain to be described: `shortcut` and `selected-shortcut`. A reader encountering either item must create an Atom whose whose `hydrogen` attribute is set to `implicit`. The Atoms' remaining attributes must be set to their default values.
+The `stereodescriptor` attribute of a bracket atom is determined by the `<stereodescriptor>` non-terminal. Allowed values are "@" and "@@", representing `TH1` (counterclockwise) and `TH2` (clockwise) tetrahedral configurations, respectively.
 
-A `shortcut` item encodes an atomic symbol selected from one of the following: "B"; "C"; "N"; "O"; "F"; "Cl"; "Br": "I"; "At": "Ts"; "P"; and "S". These are the element symbols which may appear outside of brackets.
+![&lt;stereodescriptor&gt;.](../build/stereodescriptor.svg)
 
-![shortcut](../build/shortcut.svg)
+The `virtual_hydrogens` attribute of a bracket atom is controlled by the `<virtual_hydrogen>` non-terminal. This non-terminal is comprised of the terminal `H` followed by an optional non-zero digit (`1`...`9`). A digit appearing after the `H` terminal sets the atomic `virtual_hydrogen` property to the corresponding value. If a digit does not appear, the `virtual_hydrogen` atomic property is set to one.
 
-`selected-shortcut` represents the subset of `shortcut` elements whose corresponding atoms are selectable. A reader encountering the `shortcut` item must set the `selected` attribute of the corresponding Atom to `true`. The `element` attribute of the corresponding Atom must be set to the uppercase version of the encoded label. For example, "b" becomes "B", "c" becomes "C" and so on.
+![&lt;virtual_hydrogen&gt;.](../build/virtual-hydrogen.svg)
 
-![selected-shortcut](../build/selected-shortcut.svg)
+The `<charge>` production rule sets the `charge` attribute of a bracket atom. This non terminal begins with either the plus or minus terminals (`+`, `-`, respectively) and ends with a non-zero digit.
 
-Given the complete definition of `atom`, the remaining items of `string` can be defined: `union`; `branch`; and `split`. The purpose of these items, when present, is to connect a parent atom with its child. Each option does so in a different way.
+![&lt;charge&gt;.](../build/charge.svg)
 
-`union` consists of an optional `bond` followed by a choice of either `string` or `cut`. 
+The presence of an `<extension>` non-terminal sets the `extension` attribute of the corresponding bracket atom. A colon terminal (`:`) is followed by between to and four `<hex>` nonterminals. 
+
+![&lt;extension&gt;.](../build/extension.svg)
+
+A `<hex>` non-terminal is in turn chosen from the non-terminals representing the hexadecimal digits (`0`...`9` and `a`...`f`). The `extension` attribute of a bracket atom will therefore assume a hexadecimal value between `0x0000` and `0xffff`, inclusive, given the presence of an `<extension>` non-terminal.
+
+![&lt;hex&gt;.](../build/hex.svg)
+
+## Bond
+
+An `Atom` may be connected to zero or more neighbors through a `Bond`, encoded with the non-terminal `<bond>`.
+
+![Bond](../build/bond.svg)
+
+Six terminals are available (`-`, `=`, `#`, `$`, `/`, and `\`). The first four (`-`, `=`, `#`, `$`) set the `order` attribute of a `Bond` to `single`; `double`; `triple`; and `quadruple`, respectively. The last two, `/` and `\`, set the `order` attribute to `single` while also setting the `state` attribute to `Up` and `Down`, respectively.
+
+## Sequence
+
+An `Atom` may be assigned zero or more children through the `<sequence>` non-terminal ("sequence"). A sequence starts with a required `<atom>` non-terminal. If no allowed non-terminals follow, the corresponding `Atom` will have no children. Allowed non-terminals are chosen from the list: `<union>`; `<branch>`; and `<sequence>`.
+
+![Sequence](../build/sequence.svg)
+
+The appearance of the `<sequence>` non-terminal within the non-terminal itself is an example of recursion. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in `<sequence>` is allowed. Right recursion also occurs within the `<union>` and `<branch>` non-terminals.
+
+The `<union>` non-terminal consists of an optional `<bond>` non-terminal followed by a mandatory non-terminal selected from the list: `<cut>` or `<sequence>`. If either of these latter non-terminals are detected but `<bond>` is not, bond elision is used. 
 
 ![union](../build/union.svg)
 
-When `bond` is absent from `union`, a reader must construct a Bond of single order. When `bond` is present, a reader must create a bond according to the following plan:
-
-- `-` (single). A bond of order one.
-- `=` (double). A bond of order two.
-- `#` (triple). A bond of order three.
-- `$` (quadruple) A bond of order four.
-- `/` (up) A PPB with `state` attribute of `Up`.
-- `\` (down) A PPB with `state` attribute of `Down`.
-
-Following `bond`, one of `string` or `cut` will appear. If `string`, a reader recurses back to the previously-defined item, connecting parent and child with a Bond. Alternatively, `cut` may be present, whose definition expands as follows.
+The `<cut>` non-terminal can takes two forms. A digit terminal (`0`...`9`, inclusive) can be used. This allows for single-digit cuts. Two-digit cuts, supporting the indexes zero through 99 inclusive, are available through the alternative form. These single- or double-digit indexes serve to mark ring closure. For this reason, cut indexes must always occur in pairs. The mechanism of this pairing will be described in the next two sections.
 
 ![cut](../build/cut.svg)
 
-`cut` takes the form of an integer index ranging from zero to 99, inclusive. For indexes up to and including nine, a single digit suffices. For higher indexes, two digits preceded by the percent symbol (`%`) are used.
-
-`cut` indexes must be paired within a complete `string`. If one or more indexes are unpaired, the `string` is invalid. For example, `*1**1` is a valid `string` whereas `*1**` is not. A reader encountering an unpaired `cut` index must report an error. Additional actions to be taken on encountering a `cut` will be described in the next section.
-
-A `branch`, like `union` joins parent and child nodes through a bond. Wrapped by opening and closing parentheses (`(` and `)`, respectively), a branch contains two items. The first is a choice between a disconnection (`.`) or the `bond` non-terminal. A mandatory `string` item follows. A reader encountering a disconnection must not create a bond between parent and child atoms. Further processing instructions for `branch` are discussed in the next section.
+An alternative to `<union>` within a sequence is the `<branch>` non-terminal ("branch"). Like `<union>`, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (`(` and `)`, respectively), the purpose of a branch is to define a subgraph. This subgraph is attached to the parent atom if the `<bond>` terminal is included. Alternative, the subgraph will be detached if the `<detached>` non-terminal appears. If neither `<bond>` nor `<detachment>` non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through elision.
 
 ![branch](../build/branch.svg)
 
-The purpose of a `split` is to prevent the connection of parent and child atoms through a bond. A reader encountering a split stops construction of the parent atom and directly begins construction on the child.
+The third option for associating a parent Atom with a child within a sequence is the `<split>` non-terminal ("split"). A split is a sequence of `<detachment>` and `<sequence>` non-terminals. The `<detachment>` non-terminal serves the same purpose as it does within a branch: the prevent the bonding of the parent `Atom` with a child.
 
 ![split](../build/split.svg)
+
+Having defined these non-terminals, it's now possible to define a string as an optional sequence. In other words, a Dialect string is comprised of one or more sequences. A string without sequences encodes a molecular graph of zero nodes and zero edges.
+
+![string](../build/string.svg)
 
 # Reading Dialect
 

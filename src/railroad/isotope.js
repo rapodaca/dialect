@@ -1,13 +1,13 @@
-const { Diagram, Sequence, Terminal, Optional, NonTerminal } = require('../../lib/railroad-diagrams.js');
+const { Diagram, Sequence, Optional, NonTerminal } = require('../../lib/railroad-diagrams.js');
 
 module.exports = Diagram(
   Sequence(
-    Terminal('1..9'),
+    NonTerminal('non_zero'),
     Optional(
-      NonTerminal('0..9')
+      NonTerminal('digit')
     ),
     Optional(
-      NonTerminal('0..9')
+      NonTerminal('digit')
     )
   )
 )

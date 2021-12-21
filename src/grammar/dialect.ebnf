@@ -1,18 +1,20 @@
-<script>            ::= <sequence>?
+<string>            ::= <sequence>?
 <sequence>          ::= <atom> ( <union> | <branch> | <split> )*
 <union>             ::= <bond>? ( <cut> | <sequence> )
-<branch>            ::= "(" ( "." | <bond> )? <sequence> ")"
-<split>             ::= "." <sequence>
-<atom>              ::= "*" | <shortcut> | <selected_shortcut> | <bracket>
+<branch>            ::= "(" ( <detachment> | <bond> )? <sequence> ")"
+<split>             ::= <detachment> <sequence>
+<atom>              ::= <star> | <shortcut> | <selected_shortcut> | <bracket>
 <bracket>           ::= "[" <isotope>? <symbol> <stereodescriptor>?
                          <virtual_hydrogen>? <charge>? <extension>? "]"
 <isotope>           ::= <non_zero> <digit>? <digit>?
-<symbol>            ::= "*" | <element> | <selected_element>
+<symbol>            ::= <star> | <element> | <selected_element>
 <virtual_hydrogen>  ::= "H" <non_zero>?
 <charge>            ::= ( "+" | "-" ) <non_zero>?
 <extension>         ::= ":" <hex>? <hex>? <hex>? <hex>
 <cut>               ::= <digit> | "%" <non_zero> <digit>
 <stereodescriptor>  ::= "@" "@"?
+<star>              ::= "*"
+<detachment>        ::= "."
 <shortcut>          ::= "B" "r"? | "C" "l"? | "N" | "O" | "P" | "S"
                       | "F" | "I" | "A" "t" | "T" "s"
 <selected_shortcut> ::= "b" | "c" | "n" | "o" | "p" | "s"

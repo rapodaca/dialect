@@ -1,8 +1,8 @@
-const { Diagram, NonTerminal, Optional } = require('../../lib/railroad-diagrams.js');
+const { Diagram, Terminal, NonTerminal, Optional } = require('../../lib/railroad-diagrams.js');
 
 module.exports = Diagram(
-  NonTerminal('H'),
+  Terminal('H'),
   Optional(
-    NonTerminal('1..9')
+    NonTerminal('non_zero')
   )
 )

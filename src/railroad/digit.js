@@ -4,6 +4,6 @@ module.exports = Diagram(
   Choice(
     0,
     Terminal('0'),
-    NonTerminal('not-zero')
+    NonTerminal('non_zero')
   )
 );
