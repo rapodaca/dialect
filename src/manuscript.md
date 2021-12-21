@@ -341,7 +341,7 @@ The `virtual_hydrogens` attribute of a bracket atom is controlled by the `<virtu
 
 ![&lt;virtual_hydrogen&gt;.](../build/virtual-hydrogen.svg)
 
-The `<charge>` production rule sets the `charge` attribute of a bracket atom. This non terminal begins with either the plus or minus terminals (`+`, `-`, respectively) and ends with a non-zero digit.
+The `<charge>` production rule sets the `charge` attribute of a bracket atom. This non terminal begins with either the plus or minus terminals (`+`, `-`, respectively) and ends with an optional non-zero digit. A missing digit defaults to the value `1`. So `+` becomes `+1` and `-` becomes `-1`.
 
 ![&lt;charge&gt;.](../build/charge.svg)
 
@@ -357,7 +357,7 @@ A `<hex>` non-terminal is in turn chosen from the non-terminals representing the
 
 An `Atom` may be connected to zero or more neighbors through a `Bond`, encoded with the non-terminal `<bond>`.
 
-![Bond](../build/bond.svg)
+![&lt;extension;&gt;.](../build/bond.svg)
 
 Six terminals are available (`-`, `=`, `#`, `$`, `/`, and `\`). The first four (`-`, `=`, `#`, `$`) set the `order` attribute of a `Bond` to `single`; `double`; `triple`; and `quadruple`, respectively. The last two, `/` and `\`, set the `order` attribute to `single` while also setting the `state` attribute to `Up` and `Down`, respectively.
 
@@ -365,29 +365,29 @@ Six terminals are available (`-`, `=`, `#`, `$`, `/`, and `\`). The first four (
 
 An `Atom` may be assigned zero or more children through the `<sequence>` non-terminal ("sequence"). A sequence starts with a required `<atom>` non-terminal. If no allowed non-terminals follow, the corresponding `Atom` will have no children. Allowed non-terminals are chosen from the list: `<union>`; `<branch>`; and `<sequence>`.
 
-![Sequence](../build/sequence.svg)
+![&lt;sequence&gt;.](../build/sequence.svg)
 
 The appearance of the `<sequence>` non-terminal within the non-terminal itself is an example of recursion. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in `<sequence>` is allowed. Right recursion also occurs within the `<union>` and `<branch>` non-terminals.
 
 The `<union>` non-terminal consists of an optional `<bond>` non-terminal followed by a mandatory non-terminal selected from the list: `<cut>` or `<sequence>`. If either of these latter non-terminals are detected but `<bond>` is not, bond elision is used. 
 
-![union](../build/union.svg)
+![&lt;union&gt;.](../build/union.svg)
 
 The `<cut>` non-terminal can takes two forms. A digit terminal (`0`...`9`, inclusive) can be used. This allows for single-digit cuts. Two-digit cuts, supporting the indexes zero through 99 inclusive, are available through the alternative form. These single- or double-digit indexes serve to mark ring closure. For this reason, cut indexes must always occur in pairs. The mechanism of this pairing will be described in the next two sections.
 
-![cut](../build/cut.svg)
+![&lt;cut&gt;.](../build/cut.svg)
 
 An alternative to `<union>` within a sequence is the `<branch>` non-terminal ("branch"). Like `<union>`, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (`(` and `)`, respectively), the purpose of a branch is to define a subgraph. This subgraph is attached to the parent atom if the `<bond>` terminal is included. Alternative, the subgraph will be detached if the `<detached>` non-terminal appears. If neither `<bond>` nor `<detachment>` non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through elision.
 
-![branch](../build/branch.svg)
+![&lt;branch&gt;.](../build/branch.svg)
 
 The third option for associating a parent Atom with a child within a sequence is the `<split>` non-terminal ("split"). A split is a sequence of `<detachment>` and `<sequence>` non-terminals. The `<detachment>` non-terminal serves the same purpose as it does within a branch: the prevent the bonding of the parent `Atom` with a child.
 
-![split](../build/split.svg)
+![&lt;split&gt;.](../build/split.svg)
 
 Having defined these non-terminals, it's now possible to define a string as an optional sequence. In other words, a Dialect string is comprised of one or more sequences. A string without sequences encodes a molecular graph of zero nodes and zero edges.
 
-![string](../build/string.svg)
+![&lt;string&gt;.](../build/string.svg)
 
 # Reading Dialect
 

@@ -1,4 +1,4 @@
-const { Diagram, Choice, Terminal, NonTerminal } = require('../../lib/railroad-diagrams');
+const { Diagram, Choice, Terminal, NonTerminal, Optional } = require('../../lib/railroad-diagrams');
 
 module.exports = Diagram(
   Choice(
@@ -6,5 +6,5 @@ module.exports = Diagram(
     Terminal('+'),
     Terminal('-')
   ),
-  NonTerminal('non_zero')
+  Optional(NonTerminal('non_zero'))
 );
