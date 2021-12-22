@@ -91,6 +91,34 @@ Whereas negative bond order is disallowed by definition, Dialect places no restr
 
 [FIGURE: LiCl2]
 
+# Delocalization Subgraph
+
+A molecular representation based solely on the valence bond model can yield artifacts resulting from *delocalization induced molecular equality* (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their extensive history of controversy in organic chemistry.
+
+[Figure: DIME]
+
+DIME can interfere with *canonicalization*, or the selection of a single representation for a molecular graph. The presence of multiple equivalent molecular graphs differing only in the placement of single and double bonds complicates selection rules and invariants, which must be adapted to account for the artificial asymmetry.
+
+To eliminate DIME and thereby streamline canonicalization, Dialect representations support a *delocalization subgraph* (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS is drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
+
+A non-empty DS must possess a *perfect matching*. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
+
+[Figure: Perfect Matching]
+
+Only some atoms are eligible for inclusion in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. All other atoms are ineligible and must not be added to a DS.
+
+To support the construction of a DS, eligible atoms carry a `selected` boolean attribute. Setting this attribute to `true`, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
+
+A bond will be added to the DS only if both of the following two conditions are met: (a) both terminals are selected; and (b) the bond itself is elided. No other bond will be added to the DS.
+
+A filled DS can be emptied through a two-step process of *deselection*. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds.
+
+[Figure: deselection]
+
+The opposite operation can be accomplished with a *selection algorithm*. A selection algorithm selects two or more eligible atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of "aromaticity." A double bond between two selected atoms may or may not be elided, depending on the application.
+
+[Figure: selection algorithm]
+
 # Implicit Hydrogens
 
 In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called *implicit hydrogen count*. Implicit hydrogens are represented neither as node/edge pairs nor as node properties. Instead, an implicit hydrogen count is computed on demand. Like virtual hydrogens, implicit hydrogens must be monovalent an have an undefined `isotope` attribute. The algorithm for computing implicit hydrogen count is an integral but invisible component of every Dialect representation. Dialect readers and writers must therefore conform to the following description to avoid the loss of constitutional information.
@@ -252,34 +280,6 @@ It is sometimes useful to manipulate a configuration in a way that preserves the
 - *Slide Right.* Re-orders a bond from the second position to the first position. Disabled if the central atom carries a virtual hydrogen.
 
 [Figure: Transformations]
-
-# Delocalization Subgraph
-
-A molecular representation based solely on the valence bond model can yield artifacts resulting from *delocalization induced molecular equality* (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their extensive history of controversy in organic chemistry.
-
-[Figure: DIME]
-
-DIME can interfere with *canonicalization*, or the selection of a single representation for a molecular graph. The presence of multiple equivalent molecular graphs differing only in the placement of single and double bonds complicates selection rules and invariants, which must be adapted to account for the artificial asymmetry.
-
-To eliminate DIME and thereby streamline canonicalization, Dialect representations support a *delocalization subgraph* (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS is drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
-
-A non-empty DS must possess a *perfect matching*. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
-
-[Figure: Perfect Matching]
-
-Only some atoms are eligible for inclusion in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. All other atoms are ineligible and must not be added to a DS.
-
-To support the construction of a DS, eligible atoms carry a `selected` boolean attribute. Setting this attribute to `true`, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
-
-A bond will be added to the DS only if both of the following two conditions are met: (a) both terminals are selected; and (b) the bond itself is elided. No other bond will be added to the DS.
-
-A filled DS can be emptied through a two-step process of *deselection*. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds.
-
-[Figure: deselection]
-
-The opposite operation can be accomplished with a *selection algorithm*. A selection algorithm selects two or more eligible atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of "aromaticity." A double bond between two selected atoms may or may not be elided, depending on the application.
-
-[Figure: selection algorithm]
 
 # Syntax
 
