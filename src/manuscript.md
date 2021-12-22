@@ -119,13 +119,15 @@ The opposite operation can be accomplished with a *selection algorithm*. A selec
 
 [Figure: selection algorithm]
 
-# Implicit Hydrogens
+# Implicit Hydrogens and Subvalence
 
-In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called *implicit hydrogen count*. Implicit hydrogens are represented neither as node/edge pairs nor as node properties. Instead, an implicit hydrogen count is computed on demand. Like virtual hydrogens, implicit hydrogens must be monovalent an have an undefined `isotope` attribute. The algorithm for computing implicit hydrogen count is an integral but invisible component of every Dialect representation. Dialect readers and writers must therefore conform to the following description to avoid the loss of constitutional information.
+In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called *implicit hydrogens*. Like a virtual hydrogen, an implicit hydrogen is monovalent, has only default attributes, and is present as an integer tally associated with a particular atom. But unlike a virtual hydrogen, the presence of an implicit hydrogen can only be deduced through computation. Implicit hydrogens are an integral yet invisible component of many molecular graphs.
 
-For the purpose of implicit hydrogen counting, atoms can be divided into two classes: *eligible atoms* and *ineligible atoms*. Eligible atoms are those whose hydrogen counts may optionally be expressed algorithmically through implicit hydrogen counting. Ineligible atoms must use explicitly encoded hydrogens, either as node/edge pairs or as virtual hydrogens.
+To support implicit hydrogen counting, Dialect uses the concept of *valence*. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, triple bonds three, and quadruple bonds four. Every other bond contributes one, as does each virtual hydrogen. For example, the valence of a methyl carbon having a `virtual_hydrogens` attribute of three is four. In contrast, the valence of a methyl carbon with an undefined `virtual_hydrogens` attribute is one.
 
-Implicit hydrogen counts are computed with the aid of Table 1. An atom whose `element` attribute appears in this table is considered an eligible atom. All other atoms, including those whose `element` attribute is undefined, are considered ineligible atoms.
+Only some atoms are eligible for implicit hydrogen counting. These are called *eligible atoms*. An atom becomes eligible by fulfilling two requirements: (1) its `virtual_hydrogen` attribute is undefined; and (2) its `element` attribute is associated with at least one *default valence*.
+
+A default valence is a value associated with an element that represents the number of hydrogens that can be attached to an isolated atom. Table 1 lists those elements possessing at least one default valence. All other elements have no default valences. The target valence of 4 for carbon, for example, means that a fully-saturated carbon atom will be bound to four hydrogen atoms. Likewise, a fully-saturated oxygen atom will be bound to two hydrogen atoms. However, iron has no default valences. Some elements such as nitrogen have multiple target valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the target valences three and five. Both ammonia and nitrogen pentahydride (NH~5~) are fully saturated forms of nitrogen according to Table 1.
 
 | Element | Target<br>Valence |
 | :-----: | :------------: |
@@ -143,9 +145,7 @@ Implicit hydrogen counts are computed with the aid of Table 1. An atom whose `el
 |   Ts    |       1        |
 : Target Valences
 
-Table 1 associates an eligible atom with an ordered list of *target valences*. A target valence defines the number of hydrogen atoms associated with a fully-saturated atom. For example, the target valence of 4 for carbon means that a fully-saturated carbon atom will be bound to four hydrogen atoms. Likewise, a fully-saturated oxygen atom will be bound to two hydrogen atoms. Some elements such as nitrogen are associated with multiple target valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the target valences three and five. Both ammonia and nitrogen pentahydride (NH~5~) are fully saturated forms of nitrogen according to Table 1.
-
-The procedure for computing the implicit hydrogen count for an atom (`a`) is defined in Algorithm 1.
+Given one or more default valences, *subvalence* can be computed. Subvalence is the number of hydrogens that can be added to an eligible atom without exceeding the lowest possible default valence. If no default valence less than a default valence exists, then the subvalence is zero. The subvalence for an eligible atom (`a`) can be computed with Algorithm 1.
 
 \begin{algorithm}[H]
   \SetKwInOut{Input}{input}
@@ -155,9 +155,9 @@ The procedure for computing the implicit hydrogen count for an atom (`a`) is def
   \caption{Compute implicit hydrogen count}
   
   \Input{An eligible atom $a$}
-  \Output{The implicit hydrogen count of $a$}
+  \Output{The subvalence of $a$}
   \Begin{
-    $v \leftarrow$ BondOrderSum($a$)\;
+    $v \leftarrow$ Valence($a$)\;
     $T \leftarrow$ TargetValences($a$)\;
     \For{$t \in T$}{
       $d \leftarrow t-v$\;
@@ -169,21 +169,29 @@ The procedure for computing the implicit hydrogen count for an atom (`a`) is def
   }
 \end{algorithm}
 
-The algorithm accepts an eligible atom `a` as input and returns its implicit hydrogen count as output. First, the valence (sum of bond orders) for `a` is computed. Next, the ordered list of target valences (`T`) is obtained from Table 1. For each target valence (`t`), the difference (`d`) between `t` and `v` is computed. If this difference is non-negative, `d` is returned as the implicit hydrogen count. If no suitable target valence can be found, zero is returned.
+The algorithm accepts an eligible atom `a` as input and returns its subvalence. First, the valence (sum of bond orders) for `a` is computed. Next, the ordered list of target valences (`T`) is obtained from Table 1. For each target valence (`t`), the difference (`d`) between `t` and `v` is computed. If this difference is non-negative, `d` is returned as the implicit hydrogen count. If no suitable target valence can be found, zero is returned.
 
-Consider an isolated atom having a `symbol` of "N". Its bond order sum is zero. Its target valences are 3 and 5. The difference `d` is found to be three (3 - 0). Therefore, the implicit hydrogen count of this atom is three.
+Consider an isolated atom having a `symbol` of "N" and an undefined `virtual_hydrogen` attribute. The atom's bond order sum is zero. Its default valences are 3 and 5. The difference `d` is found to be three (3 - 0). Therefore, subvalence of this atom is three.
 
-The carbon atom of acetaldehyde illustrates the effect of substitution. The bond order sum for the carbon atom is three (2 + 1). The first and only target valence is four. Subtracting three from four yields one, which is returned as the implicit hydrogen count.
+The carbon atom of acetaldehyde illustrates the effect of substitution. The valence for the carbon atom is three (2 + 1). The first and only default valence is four. Subtracting three from four yields one, which is returned as the atom's subvalence.
 
-The phosphorous atom in phosphorous acid (H3PO3) illustrates the use of Algorithm 1 for atoms with multiple target valences. In its hydrogen-elided form the formal bond order of the phosphorous-bearing atom is four (2 + 1 + 1). The first target valence is 3, but subtracting that value from four yields a negative number (-1). Continuing to the next target valence, 5, a difference of 1 is obtained. Therefore, the implicit hydrogen count of the phosphorous-bearing atom is reported as 1.
+The phosphorous atom in phosphorous acid (H3PO3) illustrates the use of Algorithm 1 for atoms with multiple target valences. Given an undefined `virtual_hydrogen` attribute, the atom's bond order sum is four (2 + 1 + 1). The first target valence is 3, but subtracting that value from four yields a negative number (-1). Continuing to the next default valence, 5, a difference of 1 is obtained. Therefore, the subvalence of the phosphorous-bearing atom is reported as 1.
 
-The bond order sum of some atoms exceeds the largest start valence. In these cases, the implicit hydrogen count is reported as zero. Consider sodium perchlorate (NaClO4). The chlorine-bearing atom has a bond order sum of seven (2 + 2 + 2 + 1). From Table 1, the only target valence for chlorine is one. Subtracting seven yields a negative number (-6). Therefore, the implicit hydrogen count is reported as zero. 
+The subvalence of some atoms exceeds the largest default valence. In these cases, subvalence is reported as zero. Consider sodium perchlorate (NaClO4). The chlorine atom has a bond order sum of seven (2 + 2 + 2 + 1). From Table 1, the only target valence for chlorine is one. Subtracting seven yields a negative number (-6). Therefore, the subvalence is reported as zero.
 
-Some bonding arrangements render implicit hydrogen calculation unworkable. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H2). We expect a hydrogen count at this atom of two. However, eliding the hydrogen atoms bound to the phosphorous-bearing atom yields an implicit hydrogen count of zero. First, a bond order sum of three is computed (2 + 1). Then, the first target valence from Table 1 is found to be 3. Because the difference between these two values is zero (3 - 3), Algorithm 1 returns an implicit hydrogen count of zero. In this and similar cases, hydrogen atoms must be explicitly expressed as either node/edge pairs or as a virtual hydrogen count.
+The subvalence for ineligible atoms is zero.
 
-[Figure: Example structures with implicit hydrogen calculations]
+# Computing Implicit Hydrogen Count
 
-Only those eligible atoms with an undefined `hydrogens` attribute are subject to implicit hydrogen counting. In other words, implicit hydrogen counting is disabled on atoms whose `hydrogens` attribute is defined. For example, the correct hydrogen count for hypophosphorous acid would be obtained by setting its `hydrogens` attribute to two.
+For unselected atoms, implicit hydrogen count equals subvalence. Consider an oxygen atom with undefined `virtual_hydrogens` attribute. Subvalence equals two and so does implicit hydrogen count. However, an oxygen atom with a `virtual_hydrogens` attribute of one will have an implicit hydrogen count of zero.
+
+For selected atoms, a modified procedure is used. If subvalence is greater than zero, then the implicit hydrogen count equals subvalence minus one. This subtraction models the unpaired electron that would would be required for delocalized bonding, or localized bonding if the atom were deselected. Consider a selected carbon atom in benzene whose `virtual_hydrogen` attribute is zero. Subvalence equals two, so implicit hydrogen count equals one (2 - 1).
+
+A selected atom with an undefined `virtual_hydrogens` attribute and subvalence equal to zero has an implicit hydrogen count of zero. The semantics of such a state may seem suspect. If an atom has no unpaired electrons, how can it participate in delocalized bonding? As will be explained in more detail later (Pruning), this situation can arise through gratuitous atom selection. Returning zero avoids miscalculation of the implicit hydrogen count.
+
+An implicit hydrogen count may or may not correlate with chemical intuition or the structures of known substances. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H2). Given that the phosphorous atom is encoded with an undefined `virtual_hydrogens` attribute, we might expect a virtual hydrogen count of two. However, the subvalence for this atom is found to be three (2 + 1 - 3). The implicit hydrogen count is therefore zero (3 - 3) rather than the expected two. Such atoms must be encoded with a defined `virtual_hydrogens` attribute.
+
+[Figure: Example structures with implicit hydrogen counts]
 
 # Atom Identifier
 
