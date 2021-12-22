@@ -442,9 +442,13 @@ A reader may report other kinds of optional errors, including:
 - Impossible valence. The valence at an `Atom` is impossibly high. For example, `C(C)(C)(C)(C)C`.
 - Impossible charge. An `Atom`'s charge gives it an apparent negative electron count. For example, `[C+7]`.
 
-# Pruning the Delocalization Subgraph
+# Pruning
 
-\[TODO\]
+As noted previously, a delocalization subgraph is invalid if no perfect matching can be found. The one exception is when a selected atom can be deleted from the delocalization subgraph through *pruning*. Pruning toggles the `selected` attribute of a selected atom, without changing the semantics of the molecular graph. Any atom whose subvalence equals zero can be safely pruned.
+
+Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience conflict with necessity. Consider furan represented as the string `c1ccco1`. Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation, `c1cccO1` leads to a delocalization subgraph with a perfect matching and is therefore preferred over the one with a selected atom.
+
+Writers are encouraged, but not required, to avoid gratuitous atom selection, but writers must always expect it.
 
 # Writing Dialect
 
