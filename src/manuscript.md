@@ -373,9 +373,15 @@ The `<union>` non-terminal consists of an optional `<bond>` non-terminal followe
 
 ![&lt;union&gt;.](../build/union.svg)
 
-The `<cut>` non-terminal can takes two forms. A digit terminal (`0`...`9`, inclusive) can be used. This allows for single-digit cuts. Two-digit cuts, supporting the indexes zero through 99 inclusive, are available through the alternative form. These single- or double-digit indexes serve to mark ring closure. For this reason, cut indexes must always occur in pairs. The mechanism of this pairing will be described in the next two sections.
+The `<cut>` non-terminal ("cut") can takes two forms. A digit terminal (`0`...`9`, inclusive) can be used. This allows for single-digit cut indexes. Two-digit cut indexes, supporting the values zero through 99 inclusive, are available through single- or double-digit indexes serve to mark ring closure.
 
 ![&lt;cut&gt;.](../build/cut.svg)
+
+A cut signifies the disconnection of an `Atom` from its neighbor. The most common use for cut is to encode a cycle. The cut index serves as a placeholder for the neighboring `Atom`, which is located by scanning either forward or backward along a string. If the number of previous appearances of the cut index is even, then the string is scanned right. Otherwise, the string is scanned left. Although often used for cycles, cuts can be used for any bond, regardless of cycle membership. The only requirement is that a cut must be paired with another cut having the same index.
+
+[Figure: Cut]
+
+To prevent overflow, a cut index may be reused provided that it appears to the right of its last paired appearance.
 
 An alternative to `<union>` within a sequence is the `<branch>` non-terminal ("branch"). Like `<union>`, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (`(` and `)`, respectively), the purpose of a branch is to define a subgraph. This subgraph is attached to the parent atom if the `<bond>` terminal is included. Alternative, the subgraph will be detached if the `<detached>` non-terminal appears. If neither `<bond>` nor `<detachment>` non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through elision.
 
@@ -389,15 +395,44 @@ Having defined these non-terminals, it's now possible to define a string as an o
 
 ![&lt;string&gt;.](../build/string.svg)
 
-# Reading Dialect
+# Reading Strings
 
 The goal of a Dialect reader is to transform a string input into a data structure output consistent with the string's content. The output data structure can take many forms. For example, a reader can merely validate a string by returning a boolean type. A more sophisticated reader can return a molecular graph capturing all `Atom` and `Bond` attributes and connectivity relationships.
 
-Dialect strings are read sequentially from the leftmost character to the rightmost character. The first character sets an initial reader state, and each subsequent character causes a state transition. The cumulative application of these state transitions yields the data structure to be returned.
+Dialect strings are read one character at a time starting at the leftmost character and finishing at the rightmost character. The first character sets an initial reader state, and each subsequent character causes a state transition. The cumulative application of these state transitions yields the data structure to be returned.
 
 Readers that capture `Atom`-`Atom` connectivity will typically maintain a reference to a *root atom*. The root atom is initially undefined. On reading the first complete `<atom>` non-terminal, the corresponding `Atom` is constructed and set as the root atom. Subsequently processing a complete `<union>`, `<branch>`, or `<split>` non-terminal triggers three changes: (1) a child `Atom` is constructed; (2) the child is connected to the current root atom, unless a `<detachment>` non-terminal intervenes; and (3) the root atom is replaced with the child atom.
 
-The presence of a `<branch>` non-terminal modifies this workflow.
+The presence of a branch adds some nuances over a union. The leading open parenthesis terminal (`(`) signifies that the current root atom will later be re-exposed. This operation can be supported by a stack. At the start of a branch, the current root is pushed to the stack. At the end of the branch, the stack is popped and its top value is assigned as the new root atom.
+
+[Figure: Stack for Branches]
+
+Further workflow adjustments can handle cuts. The necessary state can be maintained by a 100-element array. The first occurrence of a cut creates an entry in the array at the cut index consisting of the bond and the root atom. The second occurrence of a cut takes the entry at the cut index, attaching the atom in the entry to the current root atom. Either the leftmost or rightmost bond can be used to make the connection, provided they are *compatible*.
+
+[Figure: Array for Cuts]
+
+Two cut bonds are compatible if they possess the same `order` attributes, and their `state` attributes are complementary. Bonds with undefined `state` are always complementary. A bond with a defined `state` is complementary to any `Bond` with an undefined state, or a `Bond` with an opposing `state`. For example, an elided `Bond` is compatible with a single `Bond`. Likewise, two elided `Bond`s are compatible. A `Bond` with a `state` of `Up` is incompatible with another `Bond` with a `state` of `Up`, but compatible with one having a `state` of `Down`.
+
+[Figure: Bond Compatibility]
+
+Decoding atomic configuration from a string requires the order of attachment from each `Atom` to its neighbors to be recorded. Cuts are treated as if the neighboring atom itself were detected. In this regard, the first member of a cut pair requires special attention. The neighboring `Atom` won't be available until the paired cut index is found. Nevertheless, it must ultimately appear before the neighbors in subsequent unions, branches, and splits. This can be accomplished though the use of a placeholder or some other mechanism that preserves the overall relative order of attachment. No such special treatment is needed for the second member of a cut pair.
+
+[Figure: Order of Attachment]
+
+A reader must assume that any input string can contain errors, and take appropriate steps to report them. The most useful errors will report a specific cause. Some will also report one or more cursor indexes. The most common mandatory errors are:
+
+- Invalid character (position). An unexpected character was encountered. A list of acceptable characters is helpful, but not required.
+- Unexpected end-of-line. Input ended unexpectedly.
+- Unbalanced cut (position). A cut with a given index appears an odd number of times.
+- Incompatible cut bonds (position, position). The bonds to a pair of cuts are incompatible.
+- Delocalization subgraph lacks perfect matching. Before reporting this error, steps to remove ineligible atoms should be taken as described in the next section.
+- Partial parity bond not allowed (position). Neither terminal of a PPB possesses a double bond.
+
+A reader may report other kinds of optional errors, including:
+
+- Impossible isotope. A negative implied mass number results from the atom. For example, `[2C]`.
+- Impossible valence. The valence at an `Atom` is impossibly high. For example, `C(C)(C)(C)(C)C`.
+- Impossible charge. An `Atom`'s charge gives it an apparent negative electron count. For example, `[C+7]`.
 
 # Pruning the Delocalization Subgraph
 
