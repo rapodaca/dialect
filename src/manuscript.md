@@ -450,9 +450,17 @@ Pruning becomes necessary in cases of gratuitous atomic selection. This occurs w
 
 Writers are encouraged, but not required, to avoid gratuitous atom selection. Readers, however, must always be prepared to prune it away.
 
-# Writing Dialect
+# Writing Strings
 
-\[TODO\]
+Whereas a reader transforms a string into a data structure, the goal of a writer is the opposite: to transform a data structure into a valid string. This data structure will most commonly take the form of a molecular graph, but other forms are possible. Although a graph itself could be used as the basis for an input representation, a more primitive representation such as an adjacency list could also be used. For practical reasons, the input data structure is likely to resemble the output from a reader. Such an arrangement makes it possible to encode and decode strings with minimal intermediate translation.
+
+Regardless of the form taken by the input data structure, it must be traversable in *depth-first* order. A depth-first traversal operates over a set of nodes bound by a set of connectivity relationships, which are typically edges. Traversal proceeds by successively replacing each node as the center of focus, or root. Each new root is selected from the untraversed neighbors of the current root. Iteration eventually selects all nodes, at which point the traversal ends.
+
+[Figure: depth-first traversal]
+
+A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The `<atom>` and `<bond>` non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane as either `C` or `[CH4]`. Single bonds may be elided or not. Similarly, selection can be used or not for eligible atoms. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
+
+To account for the presence of branches and cycles within an input data structure, strings use the `<branch>` and `<cut>` non-terminals, respectively. Single-pass writers will only be capable of reliably detecting branches at their termination. ...
 
 # Reference Implementation
 
