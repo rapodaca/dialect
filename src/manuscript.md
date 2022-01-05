@@ -448,7 +448,7 @@ As noted previously, a delocalization subgraph is invalid if no perfect matching
 
 Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience conflict with necessity. Consider furan represented as the string `c1ccco1`. Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation, `c1cccO1` leads to a delocalization subgraph with a perfect matching and is therefore preferred over the one with a selected atom.
 
-Writers are encouraged, but not required, to avoid gratuitous atom selection, but writers must always expect it.
+Writers are encouraged, but not required, to avoid gratuitous atom selection. Readers, however, must always be prepared to prune it away.
 
 # Writing Dialect
 
