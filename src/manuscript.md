@@ -460,7 +460,15 @@ Regardless of the form taken by the input data structure, it must be traversable
 
 A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The `<atom>` and `<bond>` non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane as either `C` or `[CH4]`. Single bonds may be elided or not. Similarly, selection can be used or not for eligible atoms. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
 
-To account for the presence of branches and cycles within an input data structure, strings use the `<branch>` and `<cut>` non-terminals, respectively. Single-pass writers will only be capable of reliably detecting branches at their termination. ...
+The presence of branches within an input data structure is encoded via the `<branch>` data structure. A useful tool for this purpose is a *stack*. A stack is a data structure that allows items to be added individually and removed ("popped") in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
+
+[Figure: stack]
+
+Cycles are encoded using the `<cut>` non-terminal. This one- or two-digit integer replaces one terminal of a cycle closure bond. The challenge is to unambiguously supply these integers while allowing re-use to avoid overflow. This can be accomplished with a *pool*. A pool is a data structure that yields a numerical index given an ordered pairing of atomic identifiers. The numerical index will not be re-issued until the pool receives the corresponding reversed pairing.
+
+[Figure: pool]
+
+A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic identifiers as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
 
 # Reference Implementation
 
