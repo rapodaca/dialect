@@ -470,10 +470,6 @@ Cycles are encoded using the `<cut>` non-terminal. This one- or two-digit intege
 
 A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic identifiers as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
 
-# Reference Implementation
-
-\[TODO\]
-
 # Discussion
 
 \[TODO\]
