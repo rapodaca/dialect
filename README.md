@@ -1,6 +1,6 @@
 # Dialect
 
-A chemical line notation that is backward-compatible with SMILES. For an introduction, see [the blog post](https://depth-first.com/articles/2021/09/22/beyond-smiles/). A [reference implementation](https://github.com/rapodaca/dialect.rs) is available on GitHub.
+A chemical line notation that is a subset of SMILES. For an introduction, see [the blog post](https://depth-first.com/articles/2021/09/22/beyond-smiles/). A [reference implementation](https://github.com/rapodaca/dialect.rs) is available on GitHub.
 
 ## Goals
 
