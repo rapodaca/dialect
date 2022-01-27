@@ -472,7 +472,17 @@ A pool can be used by a writer in the following way. The presence of a cycle dur
 
 # Discussion
 
-\[TODO\]
+Dialect's main advantage as a molecular serialization format is high information density. The most common atom types can be represented with just one character. The worst case atom, using every available atomic attribute, requires 14 characters. The most common bond types can be encoded implicitly. In the worst case one character per bond is required.
+
+These metrics compare favorably with alternatives. Consider the molfile (V2000) format. 32 characters per atom are required in the best case, and 51 characters in the worst. All bonds, regardless of type, require between nine and 12 characters. Atomic charges and isotopes typically require additional characters.
+
+The small size of Dialect strings makes them attractive for several applications. In memory-constrained environments such as those found on handheld devices and network serialization, many more Dialect strings can be present than alternative encodings. In-memory structure search over large collections becomes feasible. Because a Dialect string often fits within one line on a terminal, it can be used for data entry in manual interactive shells such as a real-eval-print loops (REPLs) or notebooks.
+
+Another advantage is lossless serialization and deserialization. Another line notation, InChI, might appear to compete with Dialect in this sense. Although InChI can be read and written, the InChI Technical manual notes that InChI's value lies in molecular identification. The authors of InChI have repeatedly noted that InChI is not a solution to the molecular serialization problem. The reason presumably lies with the fact that both serialization and deserialization require intimate knowledge of the InChI canonicalization algorithm. To date, no third-party reader or writer of InChI has ever been released.
+
+Despite its information density, Dialect can faithfully encode and decode most of what chemists would consider "organic molecules." This is evidenced by the widespread presence of Dialect strings within large, public-facing databases such as PubChem, ChEMBL, ChEBI, and eMolecules.
+
+\[tradeoffs\]
 
 # Conclusion
 
