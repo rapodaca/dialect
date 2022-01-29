@@ -504,6 +504,12 @@ The availability of a minimal yet highly functional, fully-specified core langua
 
 # Conclusion
 
-\[TODO\]
+This paper describes Dialect, a subset of the widely-used SMILES line notation. Dialect's features are detailed at four levels: constitution; delocalization; conformation; and configuration. Constitutionally, Dialect can encode any molecule conforming to the valence bond model. In the event of undesired symmetry artifacts due to delocalization, Dialect offers a mitigation based in graph theory. Conformational isomerism of alkenes is supported by partial parity bonds. The configurations of tetracoordinate, stereogenic atoms are encoded through the use of a parity enumeration and conventions around its use.
+
+Dialect's syntax is described in detail through both graphical diagrams and a formal grammar. The latter method concisely summarizes the complete set of strings that could be considered valid Dialect representations. The formal grammar was deliberately structured to be used either directly with an automated parser generator or with a hand-written recursive-descent parser.
+
+The complete set of operations needed to interpret Dialect's syntax semantically are described in detail. This is a crucial component of the language's definition because Dialect achieves its information density largely by favoring convention over encoding. As an aid to difficult cases, guidelines for readers and writers are included.
+
+As a subset of SMILES, Dialect can be used with a wide range of SMILES software today. In this sense, Dialect may seem to offer nothing new or even of value. However, Dialect has been defined at a level of detail that SMILES never was. This difference makes it possible to use Dialect in unique ways. Open reference implementations and validation suites can now be developed and deployed. Families of extensions can be built, each one based on the same unambiguous foundation. Formal standardization becomes more feasible given detailed reference material on which to draw. Finally, it is only through the clear demarcation of boundaries that the frontier becomes visible.
 
 # References
