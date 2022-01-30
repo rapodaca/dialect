@@ -259,7 +259,7 @@ Given that conformational specification is distributed over three or more bonds,
 
 # Configuration
 
-The third major element of molecular representation is *configuration*. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits conformation to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. One of the four substituents may be a virtual hydrogen.
+The third major element of molecular representation is *configuration*. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits conformation to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. Here, "substituent" means an atomic neighbor; lone electron pairs are not considered substituents. One of the four substituents may be a virtual hydrogen. 
 
 A configuration is comprised of two components: an ordering of bonds to a central atom; and a *configurational descriptor*. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: `TH1` and `TH2`. For reasons that will soon become clear, these descriptors are also known as "clockwise" and "counterclockwise," respectively.
 
