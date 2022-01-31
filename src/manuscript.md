@@ -93,6 +93,10 @@ Whereas negative bond order is disallowed by definition, Dialect places no restr
 
 [FIGURE: LiCl2]
 
+# Bond Elision
+
+To promote compact string representations, Dialect supports *bond elision*. An single bond may be elided by marking it as such. An elided bond nevertheless has a bond order of one. A bond may be elided for one of two reasons. First, elided bonds are not written during serialization, allowing for increased information density. The second reason relates to a feature described in the next section.
+
 # Delocalization Subgraph
 
 A molecular representation based solely on the valence bond model can yield artifacts resulting from *delocalization induced molecular equality* (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their extensive history of controversy in organic chemistry.
@@ -107,11 +111,11 @@ A non-empty DS must possess a *perfect matching*. A matching is a subgraph in wh
 
 [Figure: Perfect Matching]
 
-Only some atoms are eligible for inclusion in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. All other atoms are ineligible and must not be added to a DS.
+Only some atoms are eligible for inclusion (or "selection") in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. All other atoms are ineligible and must not be added to a DS.
 
 To support the construction of a DS, eligible atoms carry a `selected` boolean attribute. Setting this attribute to `true`, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
 
-A bond will be added to the DS only if both of the following two conditions are met: (a) both terminals are selected; and (b) the bond itself is elided. No other bond will be added to the DS.
+A bond will be added to the DS only if both of the following conditions are met: (1) both terminals are selected; and (2) the bond itself is elided. No other bond will be added to the DS. This behavior makes it possible to exclude a specific bond from the DS by making its bond order explicit.
 
 A filled DS can be emptied through a two-step process of *deselection*. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A popular algorithm for matching, the Edmunds "blossom algorithm"[@edmunds65] has a time complexity of O(|E|V|2), where |E| is the number of edges and |V| is the number of nodes. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
 
@@ -446,7 +450,7 @@ A reader may report other kinds of optional errors, including:
 
 # Pruning
 
-As noted previously, a delocalization subgraph is invalid if no perfect matching can be found. The one exception is when a selected atom can be deleted from the delocalization subgraph through *pruning*. Pruning toggles the `selected` attribute of a selected atom, without changing the semantics of the molecular graph. Any atom whose subvalence equals zero can be safely pruned.
+As noted previously, a delocalization subgraph is invalid if no perfect matching can be found. The one exception is when a selected atom can be deleted from the delocalization subgraph through *pruning*. Pruning toggles the `selected` attribute of a selected atom, without changing the semantics of the molecular graph. Pruning can safely take place under two conditions: (1) an atom's subvalence equals zero; and (2) the atom is connected to no other selected atom through a non-elided bond.
 
 Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience conflict with necessity. Consider furan represented as the string `c1ccco1`. Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation, `c1cccO1` leads to a delocalization subgraph with a perfect matching and is therefore preferred over the one with a selected atom.
 
