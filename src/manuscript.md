@@ -51,7 +51,7 @@ Dialect's molecular representation system is based on four mutually-exclusive co
 - *Configuration*. The kind of stereoisomerism resulting from the arrangement of neighboring atoms in three-dimensional space. Dialect supports configurations for tetracoordinate atoms (those attached to four neighbors) having tetrahedral symmetry.
 - *Delocalization*. A type of bonding relationship in which electrons are distributed over two or more bonds, among three or more atoms, or across some combination of atoms and bonds. Dialect supports a limited form of delocalization operating over paths of alternating single and double bonds.
 
-For flexibility, Dialect also supports the atomic "extension" attribute. As will be shown, this attribute can be expressed either as an integer or as a bitmask to enable application-specific functionality.
+To support uses in fields other than organic chemistry, Dialect supports the atomic "extension" attribute. This enables the association of an atom or a group of atoms with arbitrary metadata.
 
 [FIGURE: Representative Dialect Examples together with Structures]
 
@@ -361,13 +361,11 @@ The `<charge>` production rule sets the `charge` attribute of a bracket atom. Th
 
 ![&lt;charge&gt;.](../build/charge.svg)
 
-The presence of an `<extension>` non-terminal sets the `extension` attribute of the corresponding bracket atom. A colon terminal (`:`) is followed by between to and four `<hex>` nonterminals. 
+The presence of an `<extension>` non-terminal sets the `extension` attribute of the corresponding bracket atom. A colon terminal (`:`) is followed by between to and four `<digit>` nonterminals. 
 
 ![&lt;extension&gt;.](../build/extension.svg)
 
-A `<hex>` non-terminal is in turn chosen from the non-terminals representing the hexadecimal digits (`0`...`9` and `a`...`f`). The `extension` attribute of a bracket atom will therefore assume a hexadecimal value between `0x0000` and `0xffff`, inclusive, given the presence of an `<extension>` non-terminal.
-
-![&lt;hex&gt;.](../build/hex.svg)
+A `<digit>` non-terminal is in turn chosen from the non-terminals representing the decimal digits (`0`...`9`). The `extension` attribute of a bracket atom will therefore assume a decimal value between `0` and `9999`, inclusive, given the presence of an `<extension>` non-terminal.
 
 ## Bond
 

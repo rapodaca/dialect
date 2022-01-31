@@ -2,8 +2,8 @@ const { Diagram, Terminal, NonTerminal, Optional } = require('../../lib/railroad
 
 module.exports = Diagram(
  Terminal(':'),
-  NonTerminal('hex'),
-  Optional(NonTerminal('hex')),
-  Optional(NonTerminal('hex')),
-  Optional(NonTerminal('hex'))
+  NonTerminal('digit'),
+  Optional(NonTerminal('digit')),
+  Optional(NonTerminal('digit')),
+  Optional(NonTerminal('digit'))
 )
