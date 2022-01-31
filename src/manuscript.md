@@ -113,7 +113,7 @@ To support the construction of a DS, eligible atoms carry a `selected` boolean a
 
 A bond will be added to the DS only if both of the following two conditions are met: (a) both terminals are selected; and (b) the bond itself is elided. No other bond will be added to the DS.
 
-A filled DS can be emptied through a two-step process of *deselection*. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds.
+A filled DS can be emptied through a two-step process of *deselection*. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A popular algorithm for matching, the Edmunds "blossom algorithm"[@edmunds65] has a time complexity of O(|E|V|2), where |E| is the number of edges and |V| is the number of nodes. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
 
 [Figure: deselection]
 
@@ -471,6 +471,8 @@ Cycles are encoded using the `<cut>` non-terminal. This one- or two-digit intege
 [Figure: pool]
 
 A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic identifiers as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
+
+Writers should carefully weigh the non-negligible costs of atoms selection. Algorithms for doing so sometimes involve the perceptions of cycles, and often exhibit superlinear time complexity. Very often a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In this sense atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
 
 # Discussion
 
