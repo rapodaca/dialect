@@ -6,7 +6,6 @@ module.exports = Diagram(
         Terminal('-'),
         Terminal('='),
         Terminal('#'),
-        Terminal('$'),
         Terminal('/'),
         Terminal('\\')
     )

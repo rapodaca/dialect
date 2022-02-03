@@ -129,7 +129,7 @@ The opposite operation can be accomplished with a *selection algorithm*. A selec
 
 In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called *implicit hydrogens*. Like a virtual hydrogen, an implicit hydrogen is monovalent, has only default attributes, and is present as an integer tally associated with a particular atom. But unlike a virtual hydrogen, the presence of an implicit hydrogen can only be deduced through computation. Implicit hydrogens are an integral yet invisible component of many molecular graphs.
 
-To support implicit hydrogen counting, Dialect uses the concept of *valence*. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, triple bonds three, and quadruple bonds four. Every other bond contributes one, as does each virtual hydrogen. For example, the valence of a methyl carbon having a `virtual_hydrogens` attribute of three is four. In contrast, the valence of a methyl carbon with an undefined `virtual_hydrogens` attribute is one.
+To support implicit hydrogen counting, Dialect uses the concept of *valence*. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, and triple bonds three. Every other bond contributes one, as does each virtual hydrogen. For example, the valence of a methyl carbon having a `virtual_hydrogens` attribute of three is four. In contrast, the valence of a methyl carbon with an undefined `virtual_hydrogens` attribute is one.
 
 Only some atoms are eligible for implicit hydrogen counting. These are called *eligible atoms*. An atom becomes eligible by fulfilling two requirements: (1) its `virtual_hydrogen` attribute is undefined; and (2) its `element` attribute is associated with at least one *default valence*.
 
@@ -283,7 +283,7 @@ This restriction places some constraints around the use of configuration. For ex
 
 [Figure: Invalid Uses of Configurational Descriptors]
 
-A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, quadruple, and partial parity bond types can all be present. The only requirement that must be satisfied is four substituents or, equivalently, three substituents and a virtual hydrogen.
+A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, and partial parity bond types can all be present. The only requirement that must be satisfied is four substituents or, equivalently, three substituents and a virtual hydrogen.
 
 It is sometimes useful to manipulate a configuration in a way that preserves the relative three-dimensional positioning of neighbor atoms. This process is called *transformation*. Five rules suffice to transform any configuration into any other:
 
@@ -371,9 +371,9 @@ A `<digit>` non-terminal is in turn chosen from the non-terminals representing t
 
 An `Atom` may be connected to zero or more neighbors through a `Bond`, encoded with the non-terminal `<bond>`.
 
-![&lt;extension;&gt;.](../build/bond.svg)
+![&lt;bond;&gt;.](../build/bond.svg)
 
-Six terminals are available (`-`, `=`, `#`, `$`, `/`, and `\`). The first four (`-`, `=`, `#`, `$`) set the `order` attribute of a `Bond` to `single`; `double`; `triple`; and `quadruple`, respectively. The last two, `/` and `\`, set the `order` attribute to `single` while also setting the `state` attribute to `Up` and `Down`, respectively.
+Five terminals are available (`-`, `=`, `#`, `/`, and `\`). The first three (`-`, `=`, `#`) set the `order` attribute of a `Bond` to `single`; `double`; and `triple`, respectively. The last two, `/` and `\`, set the `order` attribute to `single` while also setting the `state` attribute to `Up` and `Down`, respectively.
 
 ## Sequence
 
