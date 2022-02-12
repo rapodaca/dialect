@@ -319,9 +319,9 @@ The next atomic production rule, `<shortcut>` is a non-terminal comprised of the
 
 ![&lt;shortcut&gt;](../build/shortcut.svg)
 
-The third atomic production rule, `<selected_shortcut>` is a non-terminal comprised of the terminals: "b"; "c"; "n"; "o"; "p"; and "s". An `Atom` encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the `element` attribute and sets the `selected` attribute to `true`. All other attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously. Note that pruning may be required.
+The third atomic production rule, `<selection>` is a non-terminal comprised of the terminals: "b"; "c"; "n"; "o"; "p"; and "s". An `Atom` encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the `element` attribute and sets the `selected` attribute to `true`. All other attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously. Note that pruning may be required.
 
-![&lt;selected_shortcut&gt;.](../build/selected-shortcut.svg)
+![&lt;selection&gt;.](../build/selection.svg)
 
 The fourth, and most complex, atomic production rule is `<bracket>` ("bracket atom"). It can be used to set any atomic attribute other than `element` or `selected`. A bracket atom must be used when the `element` attribute of an `Atom` makes it ineligible for implicit hydrogen counting. Attributes not set within the `<bracket>` production rule will leave the corresponding atomic values in their default states.
 
@@ -335,7 +335,7 @@ The value of a bracket atom's `isotope` attribute is determined by the `<isotope
 
 ![&lt;digit&gt;.](../build/digit.svg)
 
-The values of a bracket atom's `element` and `selected` attributes are determined by the `<symbol>` production rule ("symbol"). Three non-terminal options are available: `<star>`; `<element>`; and `<selected_element>`.
+The values of a bracket atom's `element` and `selected` attributes are determined by the `<symbol>` production rule ("symbol"). Three non-terminal options are available: `<star>`; `<element>`; and `<selection>`.
 
 ![&lt;symbol&gt;.](../build/symbol.svg)
 
@@ -345,9 +345,7 @@ An `<element>` non-terminal found within a symbol assigns the `element` attribut
 
 ![&lt;element&gt;.](../build/element.svg)
 
-A `<selected_element>` non-terminal found within a symbol sets the atomic `selected` attribute to `true`. The corresponding `element` attribute is assigned by capitalizing the first character. For example, the terminal `as` would assign the atomic `element` and `selected` attributes to the values `As` and `true`, respectively.
-
-![&lt;selected_element&gt;.](../build/selected-element.svg)
+A `<selection>` non-terminal found within a symbol sets the atomic `selected` attribute to `true`. The corresponding `element` attribute is assigned by capitalization. For example, the terminal `p` would assign the atomic `element` and `selected` attributes to the values `P` and `true`, respectively.
 
 The `stereodescriptor` attribute of a bracket atom is determined by the `<stereodescriptor>` non-terminal. Allowed values are "@" and "@@", representing `TH1` (counterclockwise) and `TH2` (clockwise) tetrahedral configurations, respectively.
 

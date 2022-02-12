@@ -3,11 +3,11 @@
 <union>             ::= <bond>? ( <cut> | <sequence> )
 <branch>            ::= "(" ( <detachment> | <bond> )? <sequence> ")"
 <split>             ::= <detachment> <sequence>
-<atom>              ::= <star> | <shortcut> | <selected_shortcut> | <bracket>
+<atom>              ::= <star> | <shortcut> | <selection> | <bracket>
 <bracket>           ::= "[" <isotope>? <symbol> <stereodescriptor>?
                          <virtual_hydrogen>? <charge>? <extension>? "]"
 <isotope>           ::= <non_zero> <digit>? <digit>?
-<symbol>            ::= <star> | <element> | <selected_element>
+<symbol>            ::= <star> | <element> | <selection>
 <virtual_hydrogen>  ::= "H" <non_zero>?
 <charge>            ::= ( "+" | "-" ) <non_zero>?
 <extension>         ::= ":" <digit>? <digit>? <digit>? <digit>
@@ -17,7 +17,7 @@
 <detachment>        ::= "."
 <shortcut>          ::= "B" "r"? | "C" "l"? | "N" | "O" | "P" | "S"
                       | "F" | "I" | "A" "t" | "T" "s"
-<selected_shortcut> ::= "b" | "c" | "n" | "o" | "p" | "s"
+<selection>         ::= "b" | "c" | "n" | "o" | "p" | "s"
 <element>           ::= "A" ( "c" | "g" | "l" | "m" | "r" | "s" | "t" | "u" )
                       | "B" ( "a" | "e" | "h" | "i" | "k" | "r" )?
                       | "C" ( "a" | "d" | "e" | "f" | "l" | "m" | "n" | "o"
@@ -40,7 +40,6 @@
                       | "s" )
                       | "U" | "V" | "W" | "Xe" | "Y" "b"?
                       | "Z" ( "n" | "r" )
-<selected_element>  ::= "a" "s" | "b" | "c" | "n" | "o" | "p" | "s" "e"?
 <bond>              ::= "-" | "=" | "#" | | "/" | "\\"
 <non_zero>          ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <digit>             ::= "0" | <non_zero>

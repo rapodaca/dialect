@@ -5,6 +5,6 @@ module.exports = Diagram(
     0,
     NonTerminal('star'),
     NonTerminal('element'),
-    NonTerminal('selected_element')
+    NonTerminal('selection')
   )
 );
