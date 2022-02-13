@@ -297,6 +297,10 @@ It is sometimes useful to manipulate a configuration in a way that preserves the
 
 It is an error to assign a stereodescriptor to any atom that is not tetracoordinate, or which has more than one virtual hydrogen.
 
+Not all tetracoordinate atoms will be *stereocenters*. A stereocenter is an atom whose "ligand permutation produces stereoisomers," as defined by Mislow and Siegel.[@mislow1984] In the context of Dialect, a stereocenter must be tetracoordinate. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
+
+Special handling is required for *undefined stereocenters*. A stereocenter is undefined if it lacks a stereodescriptor. Omitting a stereodescriptor conveys to readers that no information about the stereocenter's configuration is known. The configuration could correspond to `TH1` or `TH2`. Alternatively, a mixture of configurations may be present. This interpretation is consistent with the one used by molfile format.[@ctfileFormats]
+
 # Syntax
 
 A Dialect string ("string") is a sequence of one or more UTF-8 characters encoding one or more molecular graphs. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
