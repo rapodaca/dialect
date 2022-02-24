@@ -1,5 +1,5 @@
 ---
-title: "Dialect: A Dialect of the SMILES Language"
+title: "Dialect: A Subset of the SMILES Language"
 author:
   - "Richard L. Apodaca^[rapodaca@metamolecular.com]"
 bibliography: citations.bib
@@ -32,9 +32,9 @@ The ongoing lack of a comprehensive SMILES documentation suite has caused severa
 
 The lack of a detailed, comprehensive, and widely-implemented SMILES specification also hampers broader data integrity efforts. The FAIR Guiding Principles [@wilkinson2016] identify four qualities essential for extracting maximum utility from published scholarly data: *F*indability; *A*ccessibility; *I*nteroperability; and *R*eusability. Interoperability in particular requires that "(meta)data" use a formal, accessible, shared, and broadly applicable language for knowledge representation." Although SMILES may be a shared, accessible, and broadly applicable language, its formal underpinnings leave room for improvement.
 
-This situation has persisted long enough that the notion of a SMILES "standard" may not currently be practical. A dozen or more slightly different implementations are now in use. None of them, not even the one developed by Daylight, can be considered a reference standard. SMILES has become a collection of dialects, some of which are better documented than others.
+This situation has persisted long enough that the notion of a SMILES "standard" may not currently be feasible. A dozen or more slightly different implementations are now in use. None of them, not even the one developed by Daylight, can be considered a reference standard. Some have introduced extensions not recognized by the others, contributing to language "drift" while compounding the already formidable difficulties faced by implementors. Other implementations claim SMILES compatibility while ignoring certain aspects of the original specification. Although SMILES may underpin modern chemical information exchange, the foundations of this system are weathered and showing signs of stress.
 
-A more practical goal than creating a standard would be to merely document any SMILES dialect in sufficient detail that it could be reduced to a software implementation, a goal that to my knowledge has never been accomplished. Here I describe an attempt to address this problem "Dialect." This paper presents Dialect from three perspectives: as a system for molecular representation; as a text-based language; and as a specification for software intended to communicate chemical structures across organizational and temporal boundaries. 
+This paper attempts to address all of these issues with Dialect, a fully-specified subset of the SMILES language. Dialect takes as it starting point the version of SMILES first described in the primary literature by David Weininger. In those cases where the original work is incomplete, self-contradictory, inaccurate, misleading, or ambiguous, an effort has been made to offer a solution compatible with the original design and intent of SMILES. The following sections present Dialect from three perspectives: as a system for molecular representation; as a text-based language; and as a specification for software intended to convey chemical structure information across organizational and temporal boundaries.
 
 # Goals, Design, and Tradeoffs
 
