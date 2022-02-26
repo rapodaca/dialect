@@ -147,8 +147,6 @@ A default valence is a value associated with an element that represents the numb
 |   Cl    |       1        |
 |   Br    |       1        |
 |   I     |       1        |
-|   At    |       1        |
-|   Ts    |       1        |
 : Target Valences
 
 Given one or more default valences, *subvalence* can be computed. Subvalence is the number of hydrogens that can be added to an eligible atom without exceeding the lowest possible default valence. If no default valence less than a default valence exists, then the subvalence is zero. The subvalence for an eligible atom (`a`) can be computed with Algorithm 1.
@@ -319,7 +317,7 @@ The first atomic production rule, `<star>`, is a non-terminal whose only possibl
 
 ![&lt;star&gt;.](../build/star.svg)
 
-The next atomic production rule, `<shortcut>` is a non-terminal comprised of the terminal element symbols: "B"; "C"; "N"; "O"; "P"; "S"; "F"; "Cl"; "Br"; "I"; "At"; "Ts"; "P"; and "S". An `Atom` encoded in this way ("shortcut atom") assigns the corresponding symbol to the `element` attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
+The next atomic production rule, `<shortcut>` is a non-terminal comprised of the terminal element symbols: "B"; "C"; "N"; "O"; "P"; "S"; "F"; "Cl"; "Br"; and "I". An `Atom` encoded in this way ("shortcut atom") assigns the corresponding symbol to the `element` attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
 
 ![&lt;shortcut&gt;](../build/shortcut.svg)
 

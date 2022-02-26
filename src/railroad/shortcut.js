@@ -11,7 +11,5 @@ module.exports = Diagram(
     Terminal('S'),
     Terminal('F'),
     Terminal('I'),
-    Sequence(Terminal('A'), Terminal('t')),
-    Sequence(Terminal('T'), Terminal('s'))
   )
 )
