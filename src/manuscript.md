@@ -353,7 +353,7 @@ The `stereodescriptor` attribute of a bracket atom is determined by the `<stereo
 
 ![&lt;stereodescriptor&gt;.](../build/stereodescriptor.svg)
 
-The `virtual_hydrogens` attribute of a bracket atom is controlled by the `<virtual_hydrogen>` non-terminal. This non-terminal is comprised of the terminal `H` followed by an optional non-zero digit (`1`...`9`). A digit appearing after the `H` terminal sets the atomic `virtual_hydrogen` property to the corresponding value. If a digit does not appear, the `virtual_hydrogen` atomic property is set to one.
+The `virtual_hydrogens` attribute of a bracket atom is controlled by the `<virtual_hydrogen>` non-terminal. This non-terminal is comprised of the terminal `H` followed by an optional non-zero digit (`0`...`9`). A digit appearing after the `H` terminal sets the atomic `virtual_hydrogen` property to the corresponding value. If a digit does not appear, the `virtual_hydrogen` atomic property is set to one.
 
 ![&lt;virtual_hydrogen&gt;.](../build/virtual-hydrogen.svg)
 

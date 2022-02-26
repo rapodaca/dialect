@@ -3,6 +3,6 @@ const { Diagram, Terminal, NonTerminal, Optional } = require('../../lib/railroad
 module.exports = Diagram(
   Terminal('H'),
   Optional(
-    NonTerminal('non_zero')
+    NonTerminal('digit')
   )
 )

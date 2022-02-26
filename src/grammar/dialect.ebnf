@@ -8,7 +8,7 @@
                          <virtual_hydrogen>? <charge>? <extension>? "]"
 <isotope>           ::= <non_zero> <digit>? <digit>?
 <symbol>            ::= <star> | <element> | <selection>
-<virtual_hydrogen>  ::= "H" <non_zero>?
+<virtual_hydrogen>  ::= "H" <digit>?
 <charge>            ::= ( "+" | "-" ) <non_zero>?
 <extension>         ::= ":" <digit>? <digit>? <digit>? <digit>
 <cut>               ::= <digit> | "%" <non_zero> <digit>
