@@ -301,7 +301,7 @@ Special handling is required for *undefined stereocenters*. A stereocenter is un
 
 # Syntax
 
-A Dialect string ("string") is a sequence of one or more UTF-8 characters encoding one or more molecular graphs. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
+A Dialect string ("string") is a UTF-encoded sequence of zero or more characters chosen from the set: `A`; `B`; `C`; `D`; `E`; `F`; `G`; `H`; `I`; `K`; `L`; `M`; `N`; `O`; `P`; `R`; `S`; `T`; `U`; `V`; `W`; `X`; `Y`; `Z`; `a`; `b`; `c`; `d`; `e`; `f`; `g`; `h`; `i`; `k`; `l`; `m`; `n`; `o`; `p`; `r`; `s`; `t`; `u`; `v`; `0`; `1`; `2`; `3`; `4`; `5`; `6`; `7`; `8`; `9`; `+`; `-`; `.`; `%`; `@`; `*`; `[`; `]`; `/`; `\`; `=`; and `#`. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
 
 Strings conform to an *LL(1) grammar*. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR.[@parr2014] The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
 
