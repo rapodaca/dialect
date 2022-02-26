@@ -177,7 +177,7 @@ The algorithm accepts an eligible atom `a` as input and returns its subvalence. 
 
 Consider an isolated atom having a `symbol` of "N" and an undefined `virtual_hydrogen` attribute. The atom's bond order sum is zero. Its default valences are 3 and 5. The difference `d` is found to be three (3 - 0). Therefore, subvalence of this atom is three.
 
-The carbon atom of acetaldehyde illustrates the effect of substitution. The valence for the carbon atom is three (2 + 1). The first and only default valence is four. Subtracting three from four yields one, which is returned as the atom's subvalence.
+The cabonly carbon atom of acetaldehyde illustrates the effect of substitution. The valence is three (2 + 1). The first and only default valence for carbon is four. Subtracting three from four yields one, which is returned as the atom's subvalence.
 
 The phosphorous atom in phosphorous acid (H3PO3) illustrates the use of Algorithm 1 for atoms with multiple target valences. Given an undefined `virtual_hydrogen` attribute, the atom's bond order sum is four (2 + 1 + 1). The first target valence is 3, but subtracting that value from four yields a negative number (-1). Continuing to the next default valence, 5, a difference of 1 is obtained. Therefore, the subvalence of the phosphorous-bearing atom is reported as 1.
 
