@@ -111,7 +111,7 @@ A non-empty DS must possess a *perfect matching*. A matching is a subgraph in wh
 
 [Figure: Perfect Matching]
 
-Only some atoms are eligible for inclusion (or "selection") in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. All other atoms are ineligible and must not be added to a DS.
+Only some atoms are eligible for inclusion (or "selection") in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. Atoms may be selected regardless of cycle membership. All other atoms are ineligible and must not be added to a DS.
 
 To support the construction of a DS, eligible atoms carry a `selected` boolean attribute. Setting this attribute to `true`, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
 
