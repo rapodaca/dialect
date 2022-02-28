@@ -523,7 +523,7 @@ Dialect also resolve some internal contradictions within SMILES. The article rep
 | unbracketed hydrogen atom | maybe | no |
 | acyclic atom selection | maybe | yes |
 | atoms with elements As and Se are selectable | yes | no |
-| non-elided bonds between selected atoms are added to Delocalization Subgraph | maybe | no |
+| non-elided bonds may be promoted during selection | maybe | no |
 : Some Differences between SMILES and Dialect
 
 # Discussion
