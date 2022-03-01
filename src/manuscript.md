@@ -446,11 +446,17 @@ A reader may report other kinds of optional errors, including:
 
 # Pruning
 
-As noted previously, a delocalization subgraph is invalid if no perfect matching can be found. The one exception is when a selected atom can be deleted from the delocalization subgraph through *pruning*. Pruning toggles the `selected` attribute of a selected atom, without changing the semantics of the molecular graph. Pruning can safely take place under two conditions: (1) an atom's subvalence equals zero; and (2) the atom is connected to no other selected atom through a non-elided bond.
+As noted previously, a delocalization subgraph is invalid if it lacks a perfect matching. The one exception is when a selected atom can be deleted from the delocalization subgraph through *pruning*. Pruning unsets the `selected` attribute of a selected atom without corresponding promotion of any attached bonds.
 
-Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience conflict with necessity. Consider furan represented as the string `c1ccco1`. Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation, `c1cccO1` leads to a delocalization subgraph with a perfect matching and is therefore preferred over the one with a selected atom.
+An atom must be pruned if its subvalence equals zero. None of the bonds to such an atom can be promoted without altering the atom's `charge` attribute. Pruning the atom ensures the stability of its `charge` attribute, without interfering with bond promotion elsewhere. Viewed from another perspective, an atom with zero subvalence lacks unpaired electrons - at least within the narrow boundaries of the Dialect valence model. Such atoms can only form double bonds through changes to atomic charge. 
 
-Writers are encouraged, but not required, to avoid gratuitous atom selection. Readers, however, must always be prepared to prune it away.
+If a selected atom bears a non-zero `charge` attribute, subvalence is computed using the isoelectronic element's default valences. For example, a selected nitrogen atom with a charge of +1 would use the default valences for carbon. A selected phosphorous atom with a charge of -1 would use the default valences of sulfur. And so on. If no default valences are found in this way (e.g., `[c+2]`), a reader must generate an error. Writers must not encode such atoms.
+
+[Figure: Prunable Atoms and Gratuitous Selection]
+
+Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience overrides necessity. Consider furan represented as the string `c1ccco1`. Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation, `c1cccO1` leads to a delocalization subgraph with a perfect matching and hydrogen counts consistent with the original encoding.
+
+Writers are encouraged, but not required, to avoid gratuitous atom selection. Readers, however, must always be prepared to prune.
 
 # Writing Strings
 
