@@ -59,7 +59,7 @@ Dialect's system of representation is based on the *molecular graph* concept.[@b
 
 A Dialect molecule consists of a graph with zero or more nodes and zero or more edges. The "empty molecule", devoid of atoms and bonds, is allowed. Dialect imposes no upper bound on the number of atoms or bonds. However, practical limitations related to memory, storage, and CPU time will likely limit the size of molecules in practice.
 
-The edges of a molecular graph are defined as a set of unordered pairs of non-identical nodes. This definition has three important consequences. First, *loops* are not allowed. A loop is an edge joining a node to itself. Second, *parallel edges* are disallowed. Edges are said to be parallel if they connect the same two nodes. Third, edges are *undirected*. An undirected edge ascribes no meaning to the order in which its two nodes are given. Thus, the undirected edge between nodes A and B is identical to to the undirected edge between nodes B and A.
+The edges of a Dialect molecular graph are defined as a set of unordered pairs of non-identical nodes. The practical consequences of this are threefold. First, *loops* are not allowed. A loop is an edge joining a node to itself. Second, edges are *undirected*. An undirected edge is equivalent to another edge whose terminals are swapped. An undirected edge between nodes A and B is therefore identical to an undirected edge between nodes B and A. Third, *parallel edges* are disallowed. Edges are said to be parallel if they connect the same two nodes.
 
 A molecular graph contains one or more *connected components*. A connected component is a graph in which any two vertices are connected to each other by at least one path. Dialect places no restriction on the number of connected components, although practical limitations are likely to impose one.
 
@@ -211,13 +211,11 @@ Organic chemistry uses the parity descriptors *entgegen* (*E*) and zusammen (*Z*
 
 Dialect takes a different approach by introducing **partial parity bonds** (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. At least two PPBs must flank the double bond.
 
-A PPB possesses three attributes: `source`, `target`, and `state`. The `source` and `target` attributes are the identifiers assigned to the PPB's beginning and end terminals, respectively. The atom with the same identifier of a PPB's `source` attribute is called its *source*. The atom with the same identifier as a PPB's `target` attribute is called its *target*. The `state` attribute is an enumeration comprised of the values `Up` and `Down`.
-
 [Figure: Partial Parity Bond]
 
-The PPB `state` attribute refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates on a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `id` attribute appears to the left of the terminal with the higher atomic `id` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
+To support this system, each bond carries a nullable `state` attribute. When present, the `state` attribute may assume one of the two values `Up` or `Down`. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `id` attribute appears to the left of the terminal with the higher atomic `id` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
 
-[Figure: Interpreting Partial Bonds]
+[Figure: Interpreting Partial Parity Bonds]
 
 The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the identifiers for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
 
