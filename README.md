@@ -21,9 +21,9 @@ To ensure maximum compatibility of Dialect-branded readers and writers, certain 
 - to prescribe any particular style of string
 - to prescribe or require any form of canonicalization
 - to maintain compatibility with any single SMILES implementation (e.g., Daylight Toolkit, OpenEye, or JChem).
-- to specify any extensions whatsoever, except to exemplify ways in which extensions can be created
-- to preserve any terminology or concepts used to describe SMILES
-- to leave any aspect of Dialect, regardless of perceived size, undefined
+- to define a path for base language extensions, other than new element symbols
+- to preserve any terminology or concepts used to define SMILES
+- to leave any aspect of Dialect, regardless of perceived importance, undefined
 
 ## FAQ
 
