@@ -429,6 +429,8 @@ Decoding atomic configuration from a string requires the order of attachment fro
 
 [Figure: Order of Attachment]
 
+Readers must not assume that detachment (the period character, `.`) implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the single molecule propane can be encoded using the string `C1C.C1`.
+
 A reader must assume that any input string can contain errors, and take appropriate steps to report them. The most useful errors will report a specific cause. Some will also report one or more cursor indexes. The most common mandatory errors are:
 
 - Invalid character (position). An unexpected character was encountered. A list of acceptable characters is helpful, but not required.
@@ -436,7 +438,7 @@ A reader must assume that any input string can contain errors, and take appropri
 - Unbalanced cut (position). A cut with a given index appears an odd number of times.
 - Incompatible cut bonds (position, position). The bonds to a pair of cuts are incompatible.
 - Delocalization subgraph lacks perfect matching. Before reporting this error, steps to remove ineligible atoms should be taken as described in the next section.
-- Partial parity bond not allowed (position). Neither terminal of a PPB possesses a double bond.
+- Partial parity bond not allowed (position). Neither terminal of a PPB possesses a double bond. Strings such as `C/C` and `C\\C` contain isolated PPBs, which are invalid. A reader encountering such strings must report an error.
 
 A reader may report other kinds of optional errors, including:
 
