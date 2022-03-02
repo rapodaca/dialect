@@ -23,7 +23,7 @@ To ensure maximum compatibility of Dialect-branded readers and writers, certain 
 - to maintain compatibility with any single SMILES implementation (e.g., Daylight Toolkit, OpenEye, or JChem).
 - to define a path for base language extensions, other than new element symbols
 - to preserve any terminology or concepts used to define SMILES
-- to leave any aspect of Dialect, regardless of perceived importance, undefined
+- to leave any aspect of Dialect undefined, regardless of perceived importance
 
 ## FAQ
 
