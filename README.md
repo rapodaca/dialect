@@ -18,6 +18,7 @@ To ensure maximum compatibility of Dialect-branded readers and writers, certain 
 
 - to add any feature to SMILES
 - to support SMARTS, SMIRKS, Reaction SMILES, or SMILES File compatibility
+- to preserve any aspect of SMILES that is ambiguous, redundant, or self-contradictory
 - to prescribe any particular style of string
 - to prescribe or require any form of canonicalization
 - to maintain compatibility with any single SMILES implementation (e.g., Daylight Toolkit, OpenEye, or JChem).
