@@ -431,6 +431,10 @@ Decoding atomic configuration from a string requires the order of attachment fro
 
 Readers must not assume that detachment (the period character, `.`) implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the single molecule propane can be encoded using the string `C1C.C1`.
 
+The partial parity bond model is unusual in that it spreads conformational information over multiple bonds. Regardless, readers must report as an error any string containing an isolated PPB (e.g., `C/C`). Beyond this check, generating (*E*) and (*Z*) stereodescriptors from PPBs is not a straightforward process. Performing such a conversion requires a method capable of translating PPB into a localized bond descriptor. One approach is to first consider the parity of each double bond terminal individually. A separate step would then relate the individual terminal parities to a double bond conformation parity. This intermediate parity can then be used to perform the final conversion.
+
+[PPB to localized descriptor]
+
 A reader must assume that any input string can contain errors, and take appropriate steps to report them. The most useful errors will report a specific cause. Some will also report one or more cursor indexes. The most common mandatory errors are:
 
 - Invalid character (position). An unexpected character was encountered. A list of acceptable characters is helpful, but not required.
@@ -483,6 +487,10 @@ A pool can be used by a writer in the following way. The presence of a cycle dur
 The encoding of cuts is likely to pose special challenges for writers. For a cut across a PPB, care must be taken to report the correct parity. Consider *trans*-cyclooctene. The correct encoding accounts for the reverse in parity at the left-hand side (e.g., `C\1C=C/CCCCC/1`). Moreover, the double-encoding of the PPB bond type can lead to inconsistencies that must be reported by a reader (e.g., the invalid string `C/1C=C/CCCCC/1`). Such errors can be avoided by encoding the bond type of one side or the other side of a cut, but not both. (e.g., `C\1C=C/CCCCC/1` or `C1C=C/CCCCC/1`). A cut across a bond attached to an atom with a stereodescriptor must take bond ordering into consideration. For example, the string `O[C@H]1NC1` encodes the same absolute configuration as the string `O[C@H](C1)N1`, but the *opposite* configuration as `O[C@H](N1)C1`. 
 
 [Figure: Difficult Cuts]
+
+The presence of conformational restriction about a double bond presents a special challenge to writers. Few other molecular graph systems distribute a conformation descriptor over two or more bonds the way that PPBs does. Instead, descriptors are more likely to be localized at the double bond. Producing the necessary PPBs from a descriptor localized at the double bond is likely to be non-trivial. An approach to the reverse problem was presented previously (Reading Strings section). That approach can also be adapted to the reverse problem.
+
+[Figure: writing conformation]
 
 Writers should carefully weigh the non-negligible costs of atom selection. Algorithms for doing so sometimes involve the perceptions of cycles, and often exhibit superlinear time complexity. Very often a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In this sense atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
 
