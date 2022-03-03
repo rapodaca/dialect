@@ -301,17 +301,28 @@ A Dialect string ("string") is a UTF-encoded sequence of zero or more characters
 
 Strings conform to an *LL(1) grammar*. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR.[@parr2014] The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
 
-Rather than present the Dialect formal grammar here, however, a series of *railroad diagrams* will be used instead. A railroad diagram represents the rules for constructing valid strings for a language graphically. Construction begins at the origin, advancing only over rightward-curving lines until the rightmost destination is reached. Both origin and destination are depicted with the double pipe symbol (`||`). Lines passing through a terminal (bounded by an oval) add characters to the string. Lines passing through a non-terminal (bounded by a square) expand to the named diagram. The graphical nature of railroad diagrams allows them to be readily understood by experts and non-experts alike.
+Dialect's formal grammar is presented as a series of *production rules* (aka "productions"). A production rule defines a transformation allowed under the grammar. These transformations collectively define the set of valid Dialect strings. Production rules can be used in the forward direction, when writing a string, or in the reverse direction, when reading a string. 
+
+A production rule is composed of two kinds of elements: *terminals* and *non-terminals*. A terminal is a character literal (e.g., "A"). A non-terminal is a reference to another production rule. This reference occurs through a name, which appears to the left of a separator (`::=`) in a production rule. To the right of a separator appear the allowed terminals and non-terminals for the rule.
+
+For example, consider a hypothetical language composed of variable-length sequences of the lowercase letter "a". Such a language could be cast as the following two production rules:
+
+```
+<text> ::= <a>*
+<a>    ::= "a"
+```
+
+The quantifier (`*`) indicates that a text in this language consists of a sequence of zero or more instances of the production `<a>`. This production in turn is defined as the lowercase letter "a". Therefore, valid texts in this language include the empty string, `a`, `aa`, and `aaaaaa` to name a few.
 
 ## Atom
 
-As noted previously, Dialect's representation is centered on `Atom`. The non-terminal `<atom>` offers four alternatives.
+Atoms carry most of the information in a Dialect string. The non-terminal `<atom>` is a selection among four alternatives.
 
 ```
 <atom> ::= <star> | <shortcut> | <selection> | <bracket>
 ```
 
-The first atomic production rule, `<star>`, is a non-terminal whose only possible representation is the asterisk character (`*`). This "star atom" represents and `Atom` in which every attribute is assigned the corresponding default value. The implicit hydrogen count of a star atom is zero.
+The first atomic non-terminal, `<star>`, can assume one terminal value, the asterisk character (`*`). This "star atom" represents an `Atom` in which every attribute assumes its default value. The implicit hydrogen count of a star atom is zero.
 
 `<star> ::= "*"`
 
@@ -322,20 +333,20 @@ The next atomic production rule, `<shortcut>` is a non-terminal selected from th
              | "I"
 ```
 
-The third atomic production rule, `<selection>` is a non-terminal selected from the list: "b"; "c"; "n"; "o"; "p"; and "s". An `Atom` encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the `element` attribute and sets the `selected` attribute to `true`. All other attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously. Pruning may be required.
+The third atomic production rule, `<selection>` is a non-terminal selected from the list: "b"; "c"; "n"; "o"; "p"; and "s". An `Atom` encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the `element` attribute and sets the `selected` attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
 
 ```
 <selection> ::= "b" | "c" | "n" | "o" | "p" | "s"
 ```
 
-The fourth and most complex atomic production rule is `<bracket>` ("bracket atom"). It can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an `Atom` makes it ineligible for implicit hydrogen counting. Attributes not set within the `<bracket>` production rule will leave the corresponding atomic values in their default states.
+The fourth and most complex atomic production rule is `<bracket>` ("bracket atom"). A bracket atom can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an `Atom` makes it ineligible for implicit hydrogen counting. Attributes not set within the `<bracket>` production rule will leave the corresponding atomic values in their default states.
 
 ```
 <bracket> ::= "[" <isotope>? <symbol> <stereodescriptor>?
               <virtual_hydrogen>? <charge>? <extension>? "]"
 ```
 
-The value of a bracket atom's `isotope` attribute is determined by the `<isotope>` non-terminal. It consists of between one and three digits encoding the integers 0-999. Leading zeros are disregarded when assigning the value of the `isotope` attribute. In other words, "001" and "1" are considered equivalent expressions of the value 1.
+The value of a bracket atom's `isotope` attribute is determined by the optional `<isotope>` non-terminal. It consists of between one and three digits encoding the integers 0-999. Leading zeros are disregarded when assigning the value of the `isotope` attribute. In other words, "007" and "7" are considered equivalent expressions of the value 7.
 
 ```
 <isotope> ::= <digit> <digit>? <digit>?
@@ -347,9 +358,9 @@ The values of a bracket atom's `element` and `selected` attributes are determine
 <symbol> ::= <star> | <element> | <selection>
 ```
 
-Choosing the `<star>` non-terminal within a symbol leaves the atomic `element` and `selected` attributes as their default values (`undefined` and `false`, respectively).
+The `<star>` non-terminal leaves the atomic `element` and `selected` attributes in their default values (`undefined` and `false`, respectively).
 
-An `<element>` non-terminal found within a symbol assigns the `element` attribute to the corresponding value while leaving the `selected` attribute as its default value. Given the large number of choices within the `<element>` non-terminal, its production rule below only presents the first several. For a complete list of alternative, see the EBNF grammar in the Supporting Information.
+The `<element>` non-terminal option assigns the atomic `element` attribute to the corresponding value while leaving the `selected` attribute as its default value. Given the large number of choices within the `<element>` non-terminal, the following production rule only defines the first several. For a complete list of alternative, see the full grammar in the Supporting Information.
 
 ```
 <element> ::= "A" ( "c" | "g" | "l" | "m" | "r" | "s" | "t" | "u" )
@@ -359,25 +370,25 @@ An `<element>` non-terminal found within a symbol assigns the `element` attribut
 
 A `<selection>` non-terminal found within a symbol sets the atomic `selected` attribute to `true`. The corresponding `element` attribute is assigned by capitalization. For example, the terminal `p` would assign the atomic `element` and `selected` attributes to the values `P` and `true`, respectively.
 
-The `stereodescriptor` attribute of a bracket atom is determined by the `<stereodescriptor>` non-terminal. Allowed values are "@" and "@@", representing `TH1` (counterclockwise) and `TH2` (clockwise) tetrahedral configurations, respectively.
+The `stereodescriptor` attribute of a bracket atom is determined by the `<stereodescriptor>` non-terminal. Allowed values are "@" and "@@", representing counterclockwise clockwise tetrahedral configurations, respectively.
 
 ```
 <stereodescriptor> ::= "@" "@"?
 ```
 
-The `virtual_hydrogens` attribute of a bracket atom is controlled by the `<virtual_hydrogen>` non-terminal. This non-terminal is comprised of the terminal `H` followed by an optional digit. A digit appearing after the `H` terminal sets the atomic `virtual_hydrogen` property to the corresponding value. A digit of 0 (`H0`) sets the `virtual_hydrogen` attribute to zero. If no digit is present, `virtual_hydrogen` is set to one.
+The `virtual_hydrogens` attribute of a bracket atom is controlled by the `<virtual_hydrogen>` non-terminal. This non-terminal is comprised of the terminal `H` followed by an optional `<digit>` non-terminal. A digit appearing after the `H` terminal sets the atomic `virtual_hydrogen` property to the corresponding value. A digit of 0 (i.e., `H0`) sets the `virtual_hydrogen` attribute to zero. If no digit is present, `virtual_hydrogen` is set to one.
 
 ```
 <virtual_hydrogen> ::= "H" <digit>?
 ```
 
-The `<charge>` production rule sets the `charge` attribute of a bracket atom. This non terminal begins with either the plus or minus terminals (`+`, `-`, respectively) and ends with an optional digit. A missing digit defaults to the value `1`. So `+` becomes `+1` and `-` becomes `-1`. A digit of zero (e.g., `+0` or `-0`) sets the `charge` attribute to zero.
+The `<charge>` production rule sets the `charge` attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (`+`, `-`, respectively) and ends with an optional `<digit>` non-terminal. A missing digit defaults causes the atomic `charge` attribute to be set to one. In other words, `+` sets the `charge` attribute to one and `-` sets it to minus one. A digit of zero (e.g., `+0` or `-0`) sets the `charge` attribute to zero.
 
 ```
 <charge> ::= ( "+" | "-" ) <digit>?
 ```
 
-The presence of an `<extension>` non-terminal sets the `extension` attribute of the corresponding bracket atom. A colon terminal (`:`) is followed by one, two, three, or four `<digit>` nonterminals. The resulting `extension` attribute will therefore assume a value between 0 and 9999, inclusive. As with the `isotope` attribute, leading zeros are disregarded. In other words, the extensions `0007`, `007`, and `7` are all considered equivalent.
+The presence of an `<extension>` non-terminal sets the atomic `extension` attribute. If a colon terminal (`:`) is present, it must be followed by one, two, three, or four `<digit>` nonterminals. The resulting `extension` attribute must therefore assume a value between 0 and 9999, inclusive. As with the `isotope` attribute, leading zeros are disregarded. The extensions `0007`, `007`, and `7` are all considered equivalent.
 
 ```
 <extension> ::= ":" <digit>? <digit>? <digit>? <digit>
@@ -391,7 +402,7 @@ An `Atom` may be connected to zero or more neighbors through a `Bond`, encoded w
 <bond> ::= "-" | "=" | "#" | | "/" | "\"
 ```
 
-Five terminals are available (`-`, `=`, `#`, `/`, and `\`). The first three (`-`, `=`, `#`) set the `order` attribute of a `Bond` to `single`; `double`; and `triple`, respectively. The last two, `/` and `\`, set the `order` attribute to `single` while also setting the `state` attribute to `Up` and `Down`, respectively.
+Five variants are available (`-`, `=`, `#`, `/`, and `\`). The first three (`-`, `=`, `#`) set the `order` attribute of a `Bond` to `single`; `double`; and `triple`, respectively. The last two, `/` and `\`, set the `order` attribute to `single` while also setting the `state` attribute to `Up` and `Down`, respectively.
 
 ## Sequence
 
@@ -401,15 +412,15 @@ An `Atom` may be assigned zero or more children through the `<sequence>` non-ter
 <sequence> ::= <atom> ( <union> | <branch> | <split> )*
 ```
 
-The appearance of the `<sequence>` non-terminal within the non-terminal itself is an example of recursion. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in `<sequence>` is allowed. Right recursion also occurs within the `<union>` and `<branch>` non-terminals.
-
 The `<union>` non-terminal consists of an optional `<bond>` non-terminal followed by a mandatory non-terminal selected from the list: `<cut>` or `<sequence>`. If either of these latter non-terminals are detected but `<bond>` is not, bond elision is used. 
 
 ```
 <union> ::= <bond>? ( <cut> | <sequence> )
 ```
 
-The `<cut>` non-terminal ("cut") can takes two forms. A digit terminal (`0`...`9`, inclusive) can be used. This allows for single-digit cut indexes. Two-digit cut indexes, supporting the values zero through 99 inclusive, are available through single- or double-digit indexes serve to mark ring closure.
+A sequence can contain a union, which in turn can contain a sequence. This is an example of recursion, transitive though it may be. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in `<sequence>` is allowed. Right recursion also occurs within the `<union>` and `<branch>` non-terminals.
+
+The `<cut>` non-terminal ("cut") can takes two forms. A digit non-terminal can be used. This allows for single-digit cut indexes. Two-digit cut indexes, supporting the values zero through 99 inclusive, are available through single- or double-digit indexes serve to mark ring closure.
 
 ```
 <cut> ::= <digit> | "%" <digit> <digit>
@@ -421,7 +432,7 @@ A cut signifies the disconnection of an `Atom` from its neighbor. The most commo
 
 To prevent overflow, a cut index may be reused provided that it appears to the right of its last paired appearance.
 
-An alternative to `<union>` within a sequence is the `<branch>` non-terminal ("branch"). Like `<union>`, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (`(` and `)`, respectively), the purpose of a branch is to define a subgraph. This subgraph is attached to the parent atom if the `<bond>` terminal is included. Alternative, the subgraph will be detached if the `<detached>` non-terminal appears. If neither `<bond>` nor `<detachment>` non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through elision.
+An alternative to `<union>` within a sequence is the `<branch>` non-terminal ("branch"). Like union, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (`(` and `)`, respectively), branch encodes a sequence that may or may not be attached to its parent. Attachment occurs if the `<bond>` non-terminal is included. Alternatively, the subgraph will be detached if the `<detachment>` non-terminal appears. If neither `<bond>` nor `<detachment>` non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through an elided bond.
 
 ```
 <branch> ::= "(" ( <detachment> | <bond> )? <sequence> ")"
@@ -433,10 +444,10 @@ The third option for associating a parent Atom with a child within a sequence is
 <split> ::= <detachment> <sequence>
 ```
 
-Having defined these non-terminals, it's now possible to define a string as an optional sequence. In other words, a Dialect string is comprised of one or more sequences. A string without sequences encodes a molecular graph of zero nodes and zero edges.
+Having defined sequence, it's now possible to define a string as an optional sequence. In other words, a Dialect string is either empty or contains a sequence. A string without a sequence encodes a molecular graph of zero nodes and zero edges.
 
 ```
-<string> ::= <sequence>?
+<string> ::= <sequence>+
 ```
 
 # Reading Strings
