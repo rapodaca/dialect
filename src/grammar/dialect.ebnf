@@ -1,4 +1,4 @@
-<string>            ::= <sequence>+
+<string>            ::= <sequence>?
 <sequence>          ::= <atom> ( <union> | <branch> | <split> )*
 <union>             ::= <bond>? ( <cut> | <sequence> )
 <branch>            ::= "(" ( <detachment> | <bond> )? <sequence> ")"

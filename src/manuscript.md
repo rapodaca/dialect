@@ -447,7 +447,7 @@ The third option for associating a parent Atom with a child within a sequence is
 Having defined sequence, it's now possible to define a string as an optional sequence. In other words, a Dialect string is either empty or contains a sequence. A string without a sequence encodes a molecular graph of zero nodes and zero edges.
 
 ```
-<string> ::= <sequence>+
+<string> ::= <sequence>?
 ```
 
 # Reading Strings
