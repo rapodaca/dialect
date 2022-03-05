@@ -63,6 +63,50 @@ The edges of a Dialect molecular graph are defined as a set of unordered pairs o
 
 A molecular graph contains one or more *connected components*. A connected component is a graph in which any two vertices are connected to each other by at least one path. Dialect places no restriction on the number of connected components, although practical limitations are likely to impose one.
 
+# Data Model
+
+Dialect uses several abstractions collectively known as the *data model*. The data model defines data types and relationships between them for the purpose of lossless molecular representation.
+
+The data model is expressed in terms of a small set of *primitives*. A primitive is an irreducible data type. The following table enumerates Dialects primitives.
+
+| Name | Description | Values |
+| --- | --- | --- |
+| `Option<Type>` | Optional value | `None`, `Type` |
+| `Index` | Unsigned integer | 0...2<sup>32</sup> |
+| `Ten` | Integer count | 0..10 |
+| `PlusMinusTen` | Integer count | -9...10 |
+| `Thousand` | Integer count | 0...1000  |
+| `Element` | IUPAC-approved element symbol | `Ac`, `Ag`, `Al`, ... `Zn` |
+| `HydrogenCount` | Hydrogen count | `Implicit`, `Ten`               |
+| `Configuration` | Configurational descriptor  | `Clockwise`, |
+|                 |                             | `Counterclockwise` |
+| `boolean` | Boolean | `true`, `false` |
+: Data Model Primitives
+
+The following table defines atomic attributes. Not all combinations of values ("atomic state") are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created.
+
+| Attribute | Description | Type  | Default  |
+| --- | --- | --- | --- |
+| `index` | A unique identifier | `Index` | - |
+| `isotope` | Sum of proton and | `Option<Thousand>` | `None` |
+|           | neutron counts    |                    |        |
+| `element` | Elemental symbol | `Option<Element>` | `None` |
+| `hydrogens` | Hydrogen count | `HydrogenCount` | 0 |
+| `configuration` | Configurational |`Option<Configuration>` | `None` |
+|                 | descriptor | | |
+| `charge` | Formal charge | `PlusMinusTen` | 0 |
+| `extension` | Application | `Option<Thousand>` | `None` |
+| | -specific data | | |
+| `selected` | Whether the atom | `boolean` | `false` |
+|            | is selected |          |           |         |
+: Atomic Attributes
+
+Three restrictions apply to atomic state:
+
+1. The value of `index` must be unique over the molecular graph.
+2. If `hydrogens` equals `Implicit`, then `isotope`, `configuration`, `charge`, and `extension` must equal their default values. Furthermore, `element` must equal one of `B`; `C`; `N`; `O`; `P`; `S`; `F`; `Cl`; `Br`; `I`.
+3. If `selected` equals `true`, then `element` must equal one of: `B`; `C`; `N`; `O`; `P`; or `S`.
+
 # Constitution
 
 A Dialect molecule is described at the lowest level by its constitution. Constitution consists of a set of atomic nuclei (nodes), a set of pairwise bonding relationships between them (edges), and those attributes needed to associate every valence electron with a specific node or edge. Constitution excludes attributes related to stereochemistry, or any other feature whose attributes extend over more than one atom or bond.
