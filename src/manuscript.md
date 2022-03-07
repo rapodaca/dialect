@@ -80,12 +80,8 @@ The data model is expressed in terms of a small set of *primitives*. A primitive
 | `HydrogenCount` | Hydrogen count | `Implicit`, `Ten`               |
 | `Configuration` | Configurational descriptor  | `Clockwise`, |
 |                 |                             | `Counterclockwise` |
-| `BondType`     | Bond type | `Elided`, |
-|                 |          | `Single`, |
-|                 |          | `Double`, |
-|                 |          | `Triple`, |
-|                 |          | `Up`,     |
-|                 |          | `Down`    |
+| `Direction`     | Conformational descriptor   | `Up`,  |
+|                 |                             | `Down` |
 | `boolean` | Boolean | `true`, `false` |
 : Data Model Primitives
 
@@ -122,22 +118,17 @@ The following table enumerates the attributes associated with bonds.
 |          | Atom | | |
 | `target` | Index of target | `Index` | - |
 |          | Atom | | |
-| `type`  | Bond type | `BondType` | `Elided` |
+| `order`  | Bond order | `Three` | 1 |
+| `direction` | Conformational descriptor | `Option<Direction>` | `None`
 : Bond Attributes
 
-The `type` attribute of a bond can be expressed as an enumeration. Each variant is associated with an integer bond order and state. The meaning of these attributes will be discussed in the next sections.
+The following restrictions apply to bond state:
 
-| Bond Type | Bond Order | State |
-| --- | --- | --- |
-| `Elided` | 1 | `None` |
-| `Single` | 1 | `None` |
-| `Double` | 2 | `None` |
-| `Triple` | 3 | `None` |
-| `Up`     | 1 | `Up` |
-| `Down`   | 1 | `Down` |
-: Bond Type
+1. The value of `index must be unique over the molecular graph.
+2. The `source` and `target` attributes must reference valid atomic `index` attributes.
+3. If `direction` is non-default (any value other than `None`), `order` must equal 1.
 
-The data model provides a link between syntax and semantics. Dialect-compatible software may, of course, use any internal data model. Dialect implementations should, however, ensure that their internal data model is consistent with the one provided here.
+The data model provides a link between syntax and semantics. Dialect-compatible software may, of course, use any suitable internal data model. Dialect implementations must, however, ensure that their internal data model is consistent with the one provided here.
 
 # Constitution
 
