@@ -80,6 +80,12 @@ The data model is expressed in terms of a small set of *primitives*. A primitive
 | `HydrogenCount` | Hydrogen count | `Implicit`, `Ten`               |
 | `Configuration` | Configurational descriptor  | `Clockwise`, |
 |                 |                             | `Counterclockwise` |
+| `BondType`     | Bond type | `Elided`, |
+|                 |          | `Single`, |
+|                 |          | `Double`, |
+|                 |          | `Triple`, |
+|                 |          | `Up`,     |
+|                 |          | `Down`    |
 | `boolean` | Boolean | `true`, `false` |
 : Data Model Primitives
 
@@ -106,6 +112,32 @@ Three restrictions apply to atomic state:
 1. The value of `index` must be unique over the molecular graph.
 2. If `hydrogens` equals `Implicit`, then `isotope`, `configuration`, `charge`, and `extension` must equal their default values. Furthermore, `element` must equal one of `B`; `C`; `N`; `O`; `P`; `S`; `F`; `Cl`; `Br`; `I`.
 3. If `selected` equals `true`, then `element` must equal one of: `B`; `C`; `N`; `O`; `P`; or `S`.
+
+The following table enumerates the attributes associated with bonds.
+
+| Attribute | Description | Type | Default |
+| --- | --- | --- | --- |
+| `index` | A unique identifier | `Index` | - |
+| `source` | Index of source | `Index` | - |
+|          | Atom | | |
+| `target` | Index of target | `Index` | - |
+|          | Atom | | |
+| `type`  | Bond type | `BondType` | `Elided` |
+: Bond Attributes
+
+The `type` attribute of a bond can be expressed as an enumeration. Each variant is associated with an integer bond order and state. The meaning of these attributes will be discussed in the next sections.
+
+| Bond Type | Bond Order | State |
+| --- | --- | --- |
+| `Elided` | 1 | `None` |
+| `Single` | 1 | `None` |
+| `Double` | 2 | `None` |
+| `Triple` | 3 | `None` |
+| `Up`     | 1 | `Up` |
+| `Down`   | 1 | `Down` |
+: Bond Type
+
+The data model provides a link between syntax and semantics. Dialect-compatible software may, of course, use any internal data model. Dialect implementations should, however, ensure that their internal data model is consistent with the one provided here.
 
 # Constitution
 
