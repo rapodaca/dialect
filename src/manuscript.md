@@ -51,7 +51,7 @@ Dialect's molecular representation system is based on four mutually-exclusive co
 
 To support uses in fields other than organic chemistry, Dialect supports the atomic "extension" attribute. This enables the association of an atom or a group of atoms with arbitrary metadata.
 
-[FIGURE: Representative Dialect Examples together with Structures]
+![Representative Dialect Examples with Structures](svg/placeholder.svg)
 
 # Molecular Graph
 
@@ -144,11 +144,11 @@ Electron counting in Dialect is based on the well-known *valence bond model* (VB
 
 A simplified algorithm for electron counting can be summarized as follows. A molecular graph starts as a set of atoms, where each atom consists of a nucleus (as described above) and an integer electron count equal to the atomic number of the atom's element. Two nodes (nuclei) are selected as the terminals of a bond. From each atom, the same positive electron count is deducted. The total electron count deducted from each atom is simultaneously credited to the bond's electron count. For example, if each atom contributes one electron to a bond, then the bond's electron count will increment by two.
 
-[FIGURE: Generalized Valence Bond Electron Counting]
+![Generalized Valence Bond Electron Counting. Two unconnected nodes are chosen for bonding (left). One electron is subtracted from each atom, and both electrons are added to the bond's count (right).](svg/placeholder.svg)
 
 For convenience, the actual model used by Dialect differs slightly from the above description. Neither nodes nor edges carry an explicit electron count attribute. Instead, edges carry a `bond_order` attribute, and nodes carry a `charge` attribute. Bond order equals electron count divided by two. Formal charge equals the number of electrons gained or lost due to ionizations events outside of bond formation. Gaining an electron decrements the `charge` attribute, whereas losing an electron increments it. If no electrons are gained or lost to ionization outside of bond formation, the formal charge equals zero. 
 
-[FIGURE: Dialect's Electron Counting Shorthand]
+![Electron counting shorthand. Rather than explicit electron counts, atoms and bonds possess charge and order attributes. The atomic charge attribute captures deviations from generalized counting.](svg/placeholder.svg)
 
 From these rules follow some important consequences. For example, bond order must be an integer greater than zero. This follows from the definition of bond formation. The electron count deducted from each atom is *n*, an integer greater than zero. Given bond formation deducts an equal number of electrons from each atom, the total number of electrons associated with the newly-formed bond is 2*n*. By definition, bond order is the bond's electron count divided by two, therefore *n* is the bond order. Fractional, negative, and zero bond orders are all disallowed by Dialect for this reason.
 
@@ -156,7 +156,7 @@ Dialect imposes an upper limit of three on formal bond order. The relative scarc
 
 Whereas negative bond order is disallowed by definition, Dialect places no restrictions on *hypervalence*. Hypervalence occurs when an atom undergoes enough bonding operations to leave it with a negative implied valence electron count. Consider lithium, which possesses one valence electron. Formation of one single bond leaves lithium with zero implied valence electrons. Application of a second bond formation leaves lithium with a zero charge and an implied valence electron count of -1. Such an arrangement may be physically meaningless, but Dialect explicitly supports it. Software using Dialect may or may not reject such species for semantic reasons.
 
-[FIGURE: LiCl2]
+![Hypervalence. Depletion of atomic electron count through excessive bonding. Hypervalent atoms are valid by default, although chemically nonsensical.](svg/placeholder.svg)
 
 # Bond Elision
 
@@ -166,7 +166,7 @@ To promote compact string representations, Dialect supports *bond elision*. An s
 
 A molecular representation based solely on the valence bond model can yield artifacts resulting from *delocalization induced molecular equality* (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their extensive history of controversy in organic chemistry.
 
-[Figure: DIME]
+![Delocalization-induced molecular equality (DIME). Two chemically equivalent molecular graphs differ on the basis of delocalization.](svg/placeholder.svg)
 
 DIME can interfere with *canonicalization*, or the selection of a single representation for a molecular graph. The presence of multiple equivalent molecular graphs differing only in the placement of single and double bonds complicates selection rules and invariants, which must be adapted to account for the artificial asymmetry.
 
@@ -174,7 +174,7 @@ To eliminate DIME and thereby streamline canonicalization, Dialect representatio
 
 A non-empty DS must possess a *perfect matching*. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
 
-[Figure: Perfect Matching]
+![Perfect Matching. A subgraph with all of the nodes of its parent, but in which all nodes have degree one.](svg/placeholder.svg)
 
 Only some atoms are eligible for inclusion (or "selection") in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. Atoms may be selected regardless of cycle membership. All other atoms are ineligible and must not be added to a DS.
 
@@ -184,11 +184,11 @@ A bond will be added to the DS only if both of the following conditions are met:
 
 A filled DS can be emptied through a two-step process of *deselection*. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A popular algorithm for matching, the Edmunds "blossom algorithm"[@edmunds65] has a time complexity of O(|E|V|2), where |E| is the number of edges and |V| is the number of nodes. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
 
-[Figure: deselection]
+![Deselection. Unsetting the atomic selected flag with simultaneous promotion of matching bonds.](svg/placeholder.svg)
 
 The opposite operation can be accomplished with a *selection algorithm*. A selection algorithm selects two or more eligible atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of "aromaticity." A double bond between two selected atoms may or may not be elided, depending on the application.
 
-[Figure: selection algorithm]
+![Selection Algorithm. Those atoms with bonds contributing to DIME are added to the delocalization subgraph.](svg/placeholder.svg)
 
 # Implicit Hydrogens and Subvalence
 
@@ -260,7 +260,7 @@ A selected atom with an undefined `virtual_hydrogens` attribute and subvalence e
 
 An implicit hydrogen count may or may not correlate with chemical intuition or the structures of known substances. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H2). Given that the phosphorous atom is encoded with an undefined `virtual_hydrogens` attribute, we might expect a virtual hydrogen count of two. However, the subvalence for this atom is found to be three (2 + 1 - 3). The implicit hydrogen count is therefore zero (3 - 3) rather than the expected two. Such atoms must be encoded with a defined `virtual_hydrogens` attribute.
 
-[Figure: Example structures with implicit hydrogen counts]
+![Implicit hydrogen count. The number of hydrogens is set algorithmically.](svg/placeholder.svg)
 
 # Atom Identifier
 
@@ -274,15 +274,15 @@ The second major component of molecular representation in Dialect is *conformati
 
 Organic chemistry uses the parity descriptors *entgegen* (*E*) and zusammen (*Z*) to label conformational parity. This system is based on prioritization of the atoms neighboring the double bond. One pattern of priority yields the *E* parity, and the other yields *Z*. Conveniently, the parity descriptor can be localized at the double bond.
 
-[Figure: E and Z]
+![Traditional conformational stereodescriptors.](svg/placeholder.svg)
 
 Dialect takes a different approach by introducing **partial parity bonds** (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. At least two PPBs must flank the double bond.
 
-[Figure: Partial Parity Bond]
+![Partial parity bond. Bond conformational parity is distributed over two or more bonds.](svg/placeholder.svg)
 
 To support this system, each bond carries a nullable `state` attribute. When present, the `state` attribute may assume one of the two values `Up` or `Down`. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `id` attribute appears to the left of the terminal with the higher atomic `id` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
 
-[Figure: Interpreting Partial Parity Bonds]
+![Interpreting partial parity bonds.](svg/placeholder.svg)
 
 The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the identifiers for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
 
@@ -290,13 +290,13 @@ An analogous procedure assigns relative coordinates to a neighbor of the right t
 
 In some cases the placement of a terminal neighbor can be deduced from the placement of a sibling, without the presence of an explicit PPB. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
 
-[Figure: Implied Neighbor Placement]
+![Implied neighbor placement. Bond states can be omitted when inferrable.](svg/placeholder.svg)
 
 The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
 
 Consider the encoding of PPBs for (*E*)-2-butene. Assume that identifiers are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are placed on the basis of succession. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
 
-[Figure: Assigning PPBs to (*E*)-2-butene]
+![Assigning partial parity bonds to *trans*-2-butene.](svg/placeholder.svg)
 
 In a similar manner assigned PPBs can be decoded. The process starts by placing Atom 1 to the left of Atom 2 along the x-axis. The PPB between the left terminal and its neighbor (Atom 0) uses the `Up` state. The neighbor precedes the left terminal, so Atom 0 should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor (Atom 3) uses the `Up` state. The neighbor (Atom 3) succeeds the right terminal (Atom 2). Therefore, Atom 3 is placed in the upper right quadrant. This results in the expected conformation (*E*).
 
@@ -304,7 +304,7 @@ The above procedures assume that all PPBs are expressed in *normal form*. In nor
 
 Consider (*E*)-2-butene. The PPB spanning atoms 0 and 1 will typically be encoded as the tuple `(0, 1, Up)` because this orientation tracks the order of atom identifiers. However, the PPB can be equivalently encoded as the tuple `(1, 0, Down)`. Before this representation can be used, it must first be inverted into the equivalent form represented by the tuple `(0, 1, Up)`.
 
-[Figure: PPB inversion]
+![Partial parity bond inversion. State must be inverted for bonds not expressed in normal form.](svg/placeholder.svg)
 
 The distributed nature of conformational encoding means that several additive error states are possible:
 
@@ -314,15 +314,15 @@ The distributed nature of conformational encoding means that several additive er
 
 A reader that detects one of these error conditions must abort the molecular graph being read and report the error state. It is possible for a conformation to be both overspecified and underspecified.
 
-[Figure: Error States]
+![Error bond states. Because conformational descriptions are defined over three or more bonds, a variety of error states are possible.](svg/placeholder.svg)
 
 An exception to the underspecification rule applies in the case of conjugated polyenes. In this case a double bond with a terminal bearing a PPB does not require the opposing terminal to also bear a neighbor with a PPB. If the opposing terminal lacks neighbors, no error is generated and reading continues normally. If the opposing terminal has at least one neighbor, the bond to it need not be a PPB. In either case the conformation of the double bond in question remains undefined.
 
-[Figure: Error State Exceptions]
+![Error state exceptions. Conjugated dienes sharing a common PPB can lead to exceptional cases.](svg/placeholder.svg)
 
 Given that conformational specification is distributed over three or more bonds, some conformations will be difficult or possible to represent. Cyclooctatetraene offers an example. Although the (E, E, E, E) conformation is accessible, the (Z, E, E, E) conformation is not. This problem arises because the same PPB encodes a partial conformation of two different double bonds.
 
-[Figure: Cyclooctatetraene]
+![Cyclooctatetraene. Some double bond conformations are not expressable.](svg/placeholder.svg)
 
 # Configuration
 
@@ -332,17 +332,17 @@ A configuration is comprised of two components: an ordering of bonds to a centra
 
 The descriptors `TH1` and `TH2` restrict neighboring atoms to the vertices of a tetrahedron whose center is the central atom. First, the mate of the first bond to the central atom is placed at an arbitrary vertex. Then shift the frame of reference by sighting along the first bond from the neighbor toward the central atom. Finally, arrange the remaining neighbors using the ordering of bonds to the central atom. For the `TH1` descriptor, use a counterclockwise distribution. For the `TH2` descriptor, use a clockwise distribution.
 
-[Figure: Configurational Descriptor]
+![Configurational descriptor. Configuration is either encoded or reconstructed using the same model.](svg/placeholder.svg)
 
 If an atom bears one virtual hydrogen and three substituents, a modified procedure is used. The virtual hydrogen is first placed at an arbitrary vertex of the tetrahedron. The tetrahedron is then oriented along the axis pointing from the virtual hydrogen to the center. Neighbor atoms are then distributed in a counterclockwise (`TH1`) or clockwise (`TH2`) pattern to the remaining vertices.
 
-[Figure: Configurational Descriptor with Virtual Hydrogen]
+![Configurational descriptor with one virtual hydrogen. In this case, hydrogen assumes the role of the first substituent.](svg/placeholder.svg)
 
 The association of a configurational descriptor with an atom implies a neighbor count of either four if no virtual hydrogens are present, or three if exactly one virtual hydrogen is present. In any other context, the use of a configurational descriptor is considered an error.
 
 This restriction places some constraints around the use of configuration. For example, the use of `TH1` and `TH2` descriptors with the elongated tetrahedron of allenes and other cumulenes might seem valid. However, this use is invalid because the central atom lacks four substituents. Similarly, it is invalid to consider lone pairs for placement within the tetrahedral template. Chiral sulfoxides represent a class of molecules in which such features are present.
 
-[Figure: Invalid Uses of Configurational Descriptors]
+![Invalid uses of configurational descriptors. Only configuration about four-coordinate tetrahedral atoms is supported.](svg/placeholder.svg)
 
 A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, and partial parity bond types can all be present. The only requirement that must be satisfied is four substituents or, equivalently, three substituents and a virtual hydrogen.
 
@@ -495,7 +495,7 @@ The `<cut>` non-terminal ("cut") can takes two forms. A digit non-terminal can b
 
 A cut signifies the disconnection of an `Atom` from its neighbor. The most common use for cut is to encode a cycle. The cut index serves as a placeholder for the neighboring `Atom`, which is located by scanning either forward or backward along a string. If the number of previous appearances of the cut index is even, then the string is scanned right. Otherwise, the string is scanned left. Although often used for cycles, cuts can be used for any bond, regardless of cycle membership. The only requirement is that a cut must be paired with another cut having the same index.
 
-[Figure: Cut]
+![Cut. Each cycle yields a bond that must be cut.](svg/placeholder.svg)
 
 To prevent overflow, a cut index may be reused provided that it appears to the right of its last paired appearance.
 
@@ -531,21 +531,21 @@ The presence of a branch adds some nuances over a union. The leading open parent
 
 Further workflow adjustments can handle cuts. The necessary state can be maintained by a 100-element array. The first occurrence of a cut creates an entry in the array at the cut index consisting of the bond and the root atom. The second occurrence of a cut takes the entry at the cut index, attaching the atom in the entry to the current root atom. Either the leftmost or rightmost bond can be used to make the connection, provided they are *compatible*.
 
-[Figure: Array for Cuts]
+![Array for cuts. The array's fixed length reflects the syntactic constraint on cut index.](svg/placeholder.svg)
 
 Two cut bonds are compatible if they possess the same `order` attributes, and their `state` attributes are complementary. Bonds with undefined `state` are always complementary. A bond with a defined `state` is complementary to any `Bond` with an undefined state, or a `Bond` with an opposing `state`. For example, an elided `Bond` is compatible with a single `Bond`. Likewise, two elided `Bond`s are compatible. A `Bond` with a `state` of `Up` is incompatible with another `Bond` with a `state` of `Up`, but compatible with one having a `state` of `Down`.
 
-[Figure: Bond Compatibility]
+![Bond compatibility. Two non-elided bonds across a cut must have compatible `order` and `direction` attributes.](svg/placeholder.svg)
 
 Decoding atomic configuration from a string requires the order of attachment from each `Atom` to its neighbors to be recorded. Cuts are treated as if the neighboring atom itself were detected. In this regard, the first member of a cut pair requires special attention. The neighboring `Atom` won't be available until the paired cut index is found. Nevertheless, it must ultimately appear before the neighbors in subsequent unions, branches, and splits. This can be accomplished though the use of a placeholder or some other mechanism that preserves the overall relative order of attachment. No such special treatment is needed for the second member of a cut pair.
 
-[Figure: Order of Attachment]
+![Order of attachment. A placeholder target index preserves the order of attachment.](svg/placeholder.svg)
 
 Readers must not assume that detachment (the period character, `.`) implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the single molecule propane can be encoded using the string `C1C.C1`.
 
 The partial parity bond model is unusual in that it spreads conformational information over multiple bonds. Regardless, readers must report as an error any string containing an isolated PPB (e.g., `C/C`). Beyond this check, generating (*E*) and (*Z*) stereodescriptors from PPBs is not a straightforward process. Performing such a conversion requires a method capable of translating PPB into a localized bond descriptor. One approach is to first consider the parity of each double bond terminal individually. A separate step would then relate the individual terminal parities to a double bond conformation parity. This intermediate parity can then be used to perform the final conversion.
 
-[PPB to localized descriptor]
+![Localized configurational descriptor. Such a representation can be useful when bridging Dialect to other representations.](svg/placeholder.svg)
 
 A reader must assume that any input string can contain errors, and take appropriate steps to report them. The most useful errors will report a specific cause. Some will also report one or more cursor indexes. The most common mandatory errors are:
 
@@ -570,7 +570,7 @@ An atom must be pruned if its subvalence equals zero. None of the bonds to such 
 
 If a selected atom bears a non-zero `charge` attribute, subvalence is computed using the isoelectronic element's default valences. For example, a selected nitrogen atom with a charge of +1 would use the default valences for carbon. A selected phosphorous atom with a charge of -1 would use the default valences of sulfur. And so on. If no default valences are found in this way (e.g., `[c+2]`), a reader must generate an error. Writers must not encode such atoms.
 
-[Figure: Prunable Atoms and Gratuitous Selection]
+![Gratuitous selection.](svg/placeholder.svg)
 
 Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience overrides necessity. Consider furan represented as the string `c1ccco1`. Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation, `c1cccO1` leads to a delocalization subgraph with a perfect matching and hydrogen counts consistent with the original encoding.
 
@@ -582,27 +582,27 @@ Whereas a reader transforms a string into a data structure, the goal of a writer
 
 Regardless of the form taken by the input data structure, it must be traversable in *depth-first* order. A depth-first traversal operates over a set of nodes bound by a set of connectivity relationships, which are typically edges. Traversal proceeds by successively replacing each node as the center of focus, or root. Each new root is selected from the untraversed neighbors of the current root. Iteration eventually selects all nodes, at which point the traversal ends.
 
-[Figure: depth-first traversal]
+![Depth-first traversal](svg/placeholder.svg)
 
 A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The `<atom>` and `<bond>` non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane as either `C` or `[CH4]`. Single bonds may be elided or not. Similarly, selection can be used or not for eligible atoms. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
 
 The presence of branches within an input data structure is encoded via the `<branch>` data structure. A useful tool for this purpose is a *stack*. A stack is a data structure that allows items to be added individually and removed ("popped") in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
 
-[Figure: stack]
+![Stack for branch assembly.](svg/placeholder.svg)
 
 Cycles are encoded using the `<cut>` non-terminal. This one- or two-digit integer replaces one terminal of a cycle closure bond. The challenge is to unambiguously supply these integers while allowing re-use to avoid overflow. This can be accomplished with a *pool*. A pool is a data structure that yields a numerical index given an ordered pairing of atomic identifiers. The numerical index will not be re-issued until the pool receives the corresponding reversed pairing.
 
-[Figure: pool]
+![Pool for assigning cut indexes.](svg/placeholder.svg)
 
 A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic identifiers as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
 
 The encoding of cuts is likely to pose special challenges for writers. For a cut across a PPB, care must be taken to report the correct parity. Consider *trans*-cyclooctene. The correct encoding accounts for the reverse in parity at the left-hand side (e.g., `C\1C=C/CCCCC/1`). Moreover, the double-encoding of the PPB bond type can lead to inconsistencies that must be reported by a reader (e.g., the invalid string `C/1C=C/CCCCC/1`). Such errors can be avoided by encoding the bond type of one side or the other side of a cut, but not both. (e.g., `C\1C=C/CCCCC/1` or `C1C=C/CCCCC/1`). A cut across a bond attached to an atom with a stereodescriptor must take bond ordering into consideration. For example, the string `O[C@H]1NC1` encodes the same absolute configuration as the string `O[C@H](C1)N1`, but the *opposite* configuration as `O[C@H](N1)C1`. 
 
-[Figure: Difficult Cuts]
+![Difficult cuts.](svg/placeholder.svg)
 
 The presence of conformational restriction about a double bond presents a special challenge to writers. Few other molecular graph systems distribute a conformation descriptor over two or more bonds the way that PPBs does. Instead, descriptors are more likely to be localized at the double bond. Producing the necessary PPBs from a descriptor localized at the double bond is likely to be non-trivial. An approach to the reverse problem was presented previously (Reading Strings section). That approach can also be adapted to the reverse problem.
 
-[Figure: writing conformation]
+![Writing partial parity bonds through a localized conformation descriptor.](svg/placeholder.svg)
 
 Writers should carefully weigh the non-negligible costs of atom selection. Algorithms for doing so sometimes involve the perceptions of cycles, and often exhibit superlinear time complexity. Very often a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In this sense atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
 
