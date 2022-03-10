@@ -333,19 +333,19 @@ Given that conformational specification is distributed over three or more bonds,
 
 The third major element of molecular representation is *configuration*. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. Here, "substituent" means an atomic neighbor; lone electron pairs are not considered substituents. One of the four substituents may be a virtual hydrogen.
 
-A configuration is comprised of two components: an ordering of bonds to a central atom; and a *configurational descriptor*. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: `TH1` and `TH2`. For reasons that will soon become clear, these descriptors are also known as "clockwise" and "counterclockwise," respectively.
+A configuration is comprised of two components: an ordering of bonds to a central atom; and a *configurational descriptor*. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: `Counterclockwise` and `Clockwise`. The context for the terms "counterclockwise" and "clockwise" will be explained shortly.
 
-The descriptors `TH1` and `TH2` restrict neighboring atoms to the vertices of a tetrahedron whose center is the central atom. First, the mate of the first bond to the central atom is placed at an arbitrary vertex. Then shift the frame of reference by sighting along the first bond from the neighbor toward the central atom. Finally, arrange the remaining neighbors using the ordering of bonds to the central atom. For the `TH1` descriptor, use a counterclockwise distribution. For the `TH2` descriptor, use a clockwise distribution.
+The descriptors `Counterclockwise` and `Clockwise` restrict neighboring atoms to the vertices of a tetrahedron whose center is the central atom. First, the mate of the first bond to the central atom is placed at an arbitrary vertex. Then shift the frame of reference by sighting along the first bond from the neighbor toward the central atom. Finally, arrange the remaining neighbors using the ordering of bonds to the central atom. For the `Counterclockwise` variant, use a counterclockwise distribution. For the `Clockwise` variant, use a clockwise distribution.
 
 ![Configurational descriptor. Configuration is either encoded or reconstructed using the same model.](svg/placeholder.svg)
 
-If an atom bears one virtual hydrogen and three substituents, a modified procedure is used. The virtual hydrogen is first placed at an arbitrary vertex of the tetrahedron. The tetrahedron is then oriented along the axis pointing from the virtual hydrogen to the center. Neighbor atoms are then distributed in a counterclockwise (`TH1`) or clockwise (`TH2`) pattern to the remaining vertices.
+If an atom bears one virtual hydrogen and three substituents, a modified procedure is used. The virtual hydrogen is first placed at an arbitrary vertex of the tetrahedron. The tetrahedron is then oriented along the axis pointing from the virtual hydrogen to the center. Neighbor atoms are then distributed in a counterclockwise (`Counterclockwise`) or clockwise (`Clockwise`) pattern to the remaining vertices.
 
 ![Configurational descriptor with one virtual hydrogen. In this case, hydrogen assumes the role of the first substituent.](svg/placeholder.svg)
 
 The association of a configurational descriptor with an atom implies a neighbor count of either four if no virtual hydrogens are present, or three if exactly one virtual hydrogen is present. In any other context, the use of a configurational descriptor is considered an error.
 
-This restriction places some constraints around the use of configuration. For example, the use of `TH1` and `TH2` descriptors with the elongated tetrahedron of allenes and other cumulenes might seem valid. However, this use is invalid because the central atom lacks four substituents. Similarly, it is invalid to consider lone pairs for placement within the tetrahedral template. Chiral sulfoxides represent a class of molecules in which such features are present.
+This restriction places some constraints around the use of configuration. For example, the assignment of stereodescriptors to central carbon atom of allenes and other cumulenes might seem like a reasonable extension. However, to do so is an error because the central atom lacks four substituents. Similarly, lone pairs must not take the place of atomic substituents, as might be the case with sulfoxides for example.
 
 ![Invalid uses of configurational descriptors. Only configuration about four-coordinate tetrahedral atoms is supported.](svg/placeholder.svg)
 
@@ -365,7 +365,7 @@ It is an error to assign a stereodescriptor to any atom that is not tetracoordin
 
 Not all tetracoordinate atoms will be *stereocenters*. A stereocenter is an atom whose "ligand permutation produces stereoisomers," as defined by Mislow and Siegel.[@mislow1984] In the context of Dialect, a stereocenter must be tetracoordinate. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
 
-Special handling is required for *undefined stereocenters*. A stereocenter is undefined if it lacks a stereodescriptor. Omitting a stereodescriptor conveys to readers that no information about the stereocenter's configuration is known. The configuration could correspond to `TH1` or `TH2`. Alternatively, a mixture of configurations may be present. This interpretation is consistent with the one used by molfile format.[@ctfileFormats]
+Special handling is required for *undefined stereocenters*. A stereocenter is undefined if it lacks a stereodescriptor. Omitting a stereodescriptor conveys to readers that no information about the stereocenter's configuration is known. This could imply that either a single configuration or a configurational mixture are present. This interpretation is consistent with the one used by molfile format.[@ctfileFormats]
 
 # Syntax
 
