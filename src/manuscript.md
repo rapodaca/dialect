@@ -279,7 +279,7 @@ Organic chemistry uses the parity descriptors *entgegen* (*E*) and zusammen (*Z*
 
 ![Traditional conformational stereodescriptors.](svg/placeholder.svg)
 
-Dialect takes a different approach by introducing **partial parity bonds** (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. At least two PPBs must flank the double bond.
+Dialect takes a different approach by introducing *partial parity bonds* (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. At least two PPBs must flank the double bond.
 
 ![Partial parity bond. Bond conformational parity is distributed over two or more bonds.](svg/placeholder.svg)
 
