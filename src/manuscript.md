@@ -119,6 +119,8 @@ The following table enumerates the attributes associated with bonds.
 | `target` | Index of target | `Index` | - |
 |          | Atom | | |
 | `order`  | Bond order | `Three` | 1 |
+| `elided` | Whether the bond | `boolean` | `false` |
+|          | is elided. | | |
 | `direction` | Conformational descriptor | `Option<Direction>` | `None`
 : Bond Attributes
 
@@ -127,6 +129,7 @@ The following restrictions apply to bond state:
 1. The value of `index must be unique over the molecular graph.
 2. The `source` and `target` attributes must reference valid atomic `index` attributes.
 3. If `direction` is non-default (any value other than `None`), `order` must equal 1.
+4. If the value of `elided` is `true`, the values of `order` and `direction` must equal 1 and `None`, respectively.
 
 The data model provides a link between syntax and semantics. Dialect-compatible software may, of course, use any suitable internal data model. Dialect implementations must, however, ensure that their internal data model is consistent with the one provided here.
 
