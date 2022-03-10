@@ -265,11 +265,11 @@ An implicit hydrogen count may or may not correlate with chemical intuition or e
 
 ![Implicit hydrogen count. The number of hydrogens is set algorithmically.](svg/placeholder.svg)
 
-# Atom Identifier
+# Atom Index
 
-To support the assignment and interpretation stereochemical features, each node is assigned a sequential, unique, non-negative integer `id` attribute ("identifier"). The value of an atom's identifier equals zero for a molecular's graph's first atom. The identifier for each subsequently-added atom equals the order (node count) of the graph prior to the addition. For example, the identifier for the second atom is one, the identifier for the third atom is two, and so on. There is no upper bound on the value of the identifier, although practical limitations of computer hardware and software will likely impose one.
+To support the assignment and interpretation stereochemical features, each node is assigned a sequential, unique, non-negative integer `index` attribute ("index"). The value of an atom's index equals zero for a molecular's graph's first atom. The index for each subsequently-added atom equals the order (node count) of the graph prior to the addition. For example, the index for the second atom is one, the index for the third atom is two, and so on. The maximum value of an atomic index is 2<sup>32</sup> - 1.
 
-Identifiers impose an ordering over the atoms in a molecular graph. An atom with an identifier less than another atom is said to *precede* it. An atom with an identifier grater than another atom *succeeds* it. No special significance is ascribed to the atom whose identifier is zero, except that every other atom succeeds it.
+Indexes impose an ordering over the atoms in a molecular graph. An atom with an index less than another atom is said to *precede* it. An atom with an index grater than another atom *succeeds* it. No special significance is ascribed to the atom whose index is zero, except that every other atom succeeds it.
 
 # Conformation
 
@@ -283,11 +283,11 @@ Dialect takes a different approach by introducing **partial parity bonds** (PPB)
 
 ![Partial parity bond. Bond conformational parity is distributed over two or more bonds.](svg/placeholder.svg)
 
-To support this system, each bond carries a nullable `state` attribute. When present, the `state` attribute may assume one of the two values `Up` or `Down`. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `id` attribute appears to the left of the terminal with the higher atomic `id` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
+To support this system, each bond carries a nullable `state` attribute. When present, the `state` attribute may assume one of the two values `Up` or `Down`. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `index` attribute appears to the left of the terminal with the higher atomic `index` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
 
 ![Interpreting partial parity bonds.](svg/placeholder.svg)
 
-The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the identifiers for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
+The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the indexes for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
 
 An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place the neighbor to the upper right given an `Up` state, or to the lower right given a `Down` state. Reverse these assignments if the right terminal succeeds its neighbor.
 
@@ -297,7 +297,7 @@ In some cases the placement of a terminal neighbor can be deduced from the place
 
 The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
 
-Consider the encoding of PPBs for (*E*)-2-butene. Assume that identifiers are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are placed on the basis of succession. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
+Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are placed on the basis of succession. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
 
 ![Assigning partial parity bonds to *trans*-2-butene.](svg/placeholder.svg)
 
@@ -305,7 +305,7 @@ In a similar manner assigned PPBs can be decoded. The process starts by placing 
 
 The above procedures assume that all PPBs are expressed in *normal form*. In normal form, a PPB's source precedes it target. In other words, `source` is less than `target`. If a PPB is not in normal form, it must be *inverted* before quadrants can be assigned. Inversion swaps the values of `source` and target attributes while simultaneously toggling the `state` attribute. Inversion occurs in two contexts: conjugated polyenes and cycles. In the case of polyenes, the same PPB carries partial conformation for at least two different double bond systems. In the case of cycles, non-normal PPBs can be generated at bonds forming cycles. However, readers and writers must be capable of inverting PPBs wherever they appear.
 
-Consider (*E*)-2-butene. The PPB spanning atoms 0 and 1 will typically be encoded as the tuple `(0, 1, Up)` because this orientation tracks the order of atom identifiers. However, the PPB can be equivalently encoded as the tuple `(1, 0, Down)`. Before this representation can be used, it must first be inverted into the equivalent form represented by the tuple `(0, 1, Up)`.
+Consider (*E*)-2-butene. The PPB spanning atoms 0 and 1 will typically be encoded as the tuple `(0, 1, Up)` because this orientation tracks the order of atom index. However, the PPB can be equivalently encoded as the tuple `(1, 0, Down)`. Before this representation can be used, it must first be inverted into the equivalent form represented by the tuple `(0, 1, Up)`.
 
 ![Partial parity bond inversion. State must be inverted for bonds not expressed in normal form.](svg/placeholder.svg)
 
@@ -593,11 +593,11 @@ The presence of branches within an input data structure is encoded via the `<bra
 
 ![Stack for branch assembly.](svg/placeholder.svg)
 
-Cycles are encoded using the `<cut>` non-terminal. This one- or two-digit integer replaces one terminal of a cycle closure bond. The challenge is to unambiguously supply these integers while allowing re-use to avoid overflow. This can be accomplished with a *pool*. A pool is a data structure that yields a numerical index given an ordered pairing of atomic identifiers. The numerical index will not be re-issued until the pool receives the corresponding reversed pairing.
+Cycles are encoded using the `<cut>` non-terminal. This one- or two-digit integer replaces one terminal of a cycle closure bond. The challenge is to unambiguously supply these integers while allowing re-use to avoid overflow. This can be accomplished with a *pool*. A pool is a data structure that yields a numerical index given an ordered pairing of atomic indexes. The numerical index will not be re-issued until the pool receives the corresponding reversed pairing.
 
 ![Pool for assigning cut indexes.](svg/placeholder.svg)
 
-A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic identifiers as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
+A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic indexes as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
 
 The encoding of cuts is likely to pose special challenges for writers. For a cut across a PPB, care must be taken to report the correct parity. Consider *trans*-cyclooctene. The correct encoding accounts for the reverse in parity at the left-hand side (e.g., `C\1C=C/CCCCC/1`). Moreover, the double-encoding of the PPB bond type can lead to inconsistencies that must be reported by a reader (e.g., the invalid string `C/1C=C/CCCCC/1`). Such errors can be avoided by encoding the bond type of one side or the other side of a cut, but not both. (e.g., `C\1C=C/CCCCC/1` or `C1C=C/CCCCC/1`). A cut across a bond attached to an atom with a stereodescriptor must take bond ordering into consideration. For example, the string `O[C@H]1NC1` encodes the same absolute configuration as the string `O[C@H](C1)N1`, but the *opposite* configuration as `O[C@H](N1)C1`. 
 
