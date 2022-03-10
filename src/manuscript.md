@@ -197,9 +197,9 @@ The opposite operation can be accomplished with a *selection algorithm*. A selec
 
 In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called *implicit hydrogens*. Like a virtual hydrogen, an implicit hydrogen is monovalent, has only default attributes, and is present as an integer tally associated with a particular atom. But unlike a virtual hydrogen, the presence of an implicit hydrogen can only be deduced through computation. Implicit hydrogens are an integral yet invisible component of many molecular graphs.
 
-To support implicit hydrogen counting, Dialect uses the concept of *valence*. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, and triple bonds three. Every other bond contributes one, as does each virtual hydrogen. For example, the valence of a methyl carbon having a `virtual_hydrogens` attribute of three is four. In contrast, the valence of a methyl carbon with an undefined `virtual_hydrogens` attribute is one.
+To support implicit hydrogen counting, Dialect uses the concept of *valence*. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, and triple bonds three. Every other bond contributes one, as does each virtual hydrogen. For example, the valence of a methyl carbon having a `hydrogens` attribute of three is four. In contrast, the valence of a methyl carbon with a `hydrogens` attribute of `Implicit` is one.
 
-Only some atoms are eligible for implicit hydrogen counting. These are called *eligible atoms*. An atom becomes eligible by fulfilling two requirements: (1) its `virtual_hydrogen` attribute is undefined; and (2) its `element` attribute is associated with at least one *default valence*.
+Only some atoms are eligible for implicit hydrogen counting. These are called *eligible atoms*. An atom becomes eligible by fulfilling two requirements: (1) its `hydrogens` attribute equals `Implicit`; and (2) its `element` attribute is associated with at least one *default valence*.
 
 A default valence is a value associated with an element that represents the number of hydrogens that can be attached to an isolated atom. Table 1 lists those elements possessing at least one default valence. All other elements have no default valences. The target valence of 4 for carbon, for example, means that a fully-saturated carbon atom will be bound to four hydrogen atoms. Likewise, a fully-saturated oxygen atom will be bound to two hydrogen atoms. However, iron has no default valences. Some elements such as nitrogen have multiple target valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the target valences three and five. Both ammonia and nitrogen pentahydride (NH~5~) are fully saturated forms of nitrogen according to Table 1.
 
@@ -243,11 +243,11 @@ Given one or more default valences, *subvalence* can be computed. Subvalence is 
 
 The algorithm accepts an eligible atom `a` as input and returns its subvalence. First, the valence (sum of bond orders) for `a` is computed. Next, the ordered list of target valences (`T`) is obtained from Table 1. For each target valence (`t`), the difference (`d`) between `t` and `v` is computed. If this difference is non-negative, `d` is returned as the implicit hydrogen count. If no suitable target valence can be found, zero is returned.
 
-Consider an isolated atom having a `symbol` of "N" and an undefined `virtual_hydrogen` attribute. The atom's bond order sum is zero. Its default valences are 3 and 5. The difference `d` is found to be three (3 - 0). Therefore, subvalence of this atom is three.
+Consider an isolated atom having a `symbol` of "N" and a `hydrogens` attribute of `Implicit`. The atom's bond order sum is zero. Its default valences are 3 and 5. The difference `d` is found to be three (3 - 0). Therefore, subvalence of this atom is three.
 
-The carbon carbon atom of acetaldehyde illustrates the effect of substitution. Valence is three (2 + 1). The first and only default valence for carbon is four. Subtracting three from four yields one, which is returned as the atom's subvalence.
+The carbonyl carbon atom of acetaldehyde illustrates the effects of substitution and multiple bonding. This atom uses implicit hydrogen counting (`hydrogens` equals `Implicit`). Valence is therefore three (2 + 1). The first and only default valence for carbon is four. Subtracting three from four yields one, which is returned as the atom's subvalence.
 
-The phosphorous atom in phosphorous acid (H3PO3) illustrates the use of Algorithm 1 for atoms with multiple target valences. Given an undefined `virtual_hydrogen` attribute, the atom's bond order sum is four (2 + 1 + 1). The first target valence is 3, but subtracting that value from four yields a negative number (-1). Continuing to the next default valence, 5, a difference of 1 is obtained. Therefore, the subvalence of the phosphorous-bearing atom is reported as 1.
+The phosphorous atom in phosphorous acid (H3PO3) illustrates the use of Algorithm 1 for atoms with multiple target valences. Given a `hydrogens` attribute of `Implicit`, the atom's bond order sum is four (2 + 1 + 1). The first target valence is 3, but subtracting that value from four yields a negative number (-1). Continuing to the next default valence, 5, a difference of 1 is obtained. Therefore, the subvalence of the phosphorous-bearing atom is reported as 1.
 
 The subvalence of some atoms exceeds the largest default valence. In these cases, subvalence is reported as zero. Consider sodium perchlorate (NaClO4). The chlorine atom has a bond order sum of seven (2 + 2 + 2 + 1). From Table 1, the only target valence for chlorine is one. Subtracting seven yields a negative number (-6). Therefore, the subvalence is reported as zero.
 
@@ -255,13 +255,13 @@ The subvalence for ineligible atoms is zero.
 
 # Computing Implicit Hydrogen Count
 
-For unselected atoms, implicit hydrogen count equals subvalence. Consider an oxygen atom with undefined `virtual_hydrogens` attribute. Subvalence equals two and so does implicit hydrogen count. However, an oxygen atom with a `virtual_hydrogens` attribute of one will have an implicit hydrogen count of zero.
+For unselected atoms, implicit hydrogen count equals subvalence. Consider an oxygen atom with a `hydrogens` attribute of `Implicit`. Subvalence equals two and so does implicit hydrogen count. However, an oxygen atom with a `hydrogens` attribute equal to one will have an implicit hydrogen count of zero.
 
-For selected atoms, a modified procedure is used. If subvalence is greater than zero, then the implicit hydrogen count equals subvalence minus one. This subtraction models the unpaired electron that would would be required for delocalized bonding, or localized bonding if the atom were deselected. Consider a selected carbon atom in benzene whose `virtual_hydrogen` attribute is zero. Subvalence equals two, so implicit hydrogen count equals one (2 - 1).
+For selected atoms, a modified procedure is used. If subvalence is greater than zero, then the implicit hydrogen count equals subvalence minus one. This subtraction models the unpaired electron that would would be required for delocalized bonding, or localized bonding if the atom were deselected. Consider a selected carbon atom in benzene whose `hydrogens` attribute equals `Implicit`. Subvalence equals two, so implicit hydrogen count equals one (2 - 1).
 
-A selected atom with an undefined `virtual_hydrogens` attribute and subvalence equal to zero has an implicit hydrogen count of zero. The semantics of such a state may seem suspect. If an atom has no unpaired electrons, how can it participate in delocalized bonding? As will be explained in more detail later (Pruning), this situation can arise through gratuitous atom selection. Returning zero avoids miscalculation of the implicit hydrogen count.
+A selected atom with a `hydrogens` attribute of `Implicit` and subvalence equal to zero has an implicit hydrogen count of zero. The semantics of such a state may seem suspect. If an atom has no unpaired electrons, how can it participate in delocalized bonding? As will be explained in more detail later (Pruning), this situation can arise through gratuitous atom selection. Returning zero avoids miscalculation of the implicit hydrogen count.
 
-An implicit hydrogen count may or may not correlate with chemical intuition or the structures of known substances. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H2). Given that the phosphorous atom is encoded with an undefined `virtual_hydrogens` attribute, we might expect a virtual hydrogen count of two. However, the subvalence for this atom is found to be three (2 + 1 - 3). The implicit hydrogen count is therefore zero (3 - 3) rather than the expected two. Such atoms must be encoded with a defined `virtual_hydrogens` attribute.
+An implicit hydrogen count may or may not correlate with chemical intuition or experimental data. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H2). We might expect the implicit hydrogen count to equal the experimentally-determined hydrogen count (2). However, the subvalence for the phosphorous atom is found to be three (2 + 1 - 3). The implicit hydrogen count is therefore zero (3 - 3) rather than the expected two. Similar atoms must be encoded using virtual hydrogens.
 
 ![Implicit hydrogen count. The number of hydrogens is set algorithmically.](svg/placeholder.svg)
 
@@ -446,7 +446,7 @@ The `stereodescriptor` attribute of a bracket atom is determined by the `<stereo
 <stereodescriptor> ::= "@" "@"?
 ```
 
-The `virtual_hydrogens` attribute of a bracket atom is controlled by the `<virtual_hydrogen>` non-terminal. This non-terminal is comprised of the terminal `H` followed by an optional `<digit>` non-terminal. A digit appearing after the `H` terminal sets the atomic `virtual_hydrogen` property to the corresponding value. A digit of 0 (i.e., `H0`) sets the `virtual_hydrogen` attribute to zero. If no digit is present, `virtual_hydrogen` is set to one.
+The `hydrogens` attribute of a bracket atom is controlled by the `<virtual_hydrogen>` non-terminal. This non-terminal is comprised of the terminal `H` followed by an optional `<digit>` non-terminal. A digit appearing after the `H` terminal sets `hydrogens` to the corresponding virtual hydrogen count. A digit of 0 (i.e., `H0`) sets the `hydrogens` attribute to zero. If no digit is present, `hydrogens` is set to one.
 
 ```
 <virtual_hydrogen> ::= "H" <digit>?
