@@ -464,6 +464,8 @@ The presence of an `<extension>` non-terminal sets the atomic `extension` attrib
 <extension> ::= ":" <digit>? <digit>? <digit>? <digit>
 ```
 
+Should an optional bracket non-terminal not be present, the atom must retain its corresponding default value. For example, the bracket `[C@H+]` lacks the `<isotope>` non-terminal so the value of the `isotope` attribute will remain as `None`. Similarly, the bracket `[13CH+]` lacks the `<stereodescriptor>` non-terminal, so the corresponding `configuration` attribute remains `None`.
+
 ## Bond
 
 An `Atom` may be connected to zero or more neighbors through a `Bond`, encoded with the non-terminal `<bond>`.
