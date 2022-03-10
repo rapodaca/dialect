@@ -476,7 +476,7 @@ An `Atom` may be connected to zero or more neighbors through a `Bond`, encoded w
 <bond> ::= "-" | "=" | "#" | | "/" | "\"
 ```
 
-Five variants are available (`-`, `=`, `#`, `/`, and `\`). The first three (`-`, `=`, `#`) set the `order` attribute of a `Bond` to `single`; `double`; and `triple`, respectively. The last two, `/` and `\`, set the `order` attribute to `single` while also setting the `state` attribute to `Up` and `Down`, respectively.
+Five variants are available (`-`, `=`, `#`, `/`, and `\`). The first three (`-`, `=`, `#`) set the `order` attribute of a `Bond` to 1; 2; or 3, respectively. The last two variants, `/` and `\`, set the `order` attribute to 1 while also setting the `state` attribute to `Up` and `Down`, respectively.
 
 ## Sequence
 
