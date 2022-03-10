@@ -107,7 +107,7 @@ Three restrictions apply to atomic state:
 
 1. The value of `index` must be unique over the molecular graph.
 2. If `hydrogens` equals `Implicit`, then `isotope`, `configuration`, `charge`, and `extension` must equal their default values. Furthermore, `element` must equal one of `B`; `C`; `N`; `O`; `P`; `S`; `F`; `Cl`; `Br`; `I`.
-3. If `selected` equals `true`, then `element` must equal one of: `B`; `C`; `N`; `O`; `P`; or `S`.
+3. If `selected` equals `true`, then `element` must equal one of: `C`; `N`; `O`; `P`; or `S`.
 
 The following table enumerates the attributes associated with bonds.
 
@@ -179,7 +179,7 @@ A non-empty DS must possess a *perfect matching*. A matching is a subgraph in wh
 
 ![Perfect Matching. A subgraph with all of the nodes of its parent, but in which all nodes have degree one.](svg/placeholder.svg)
 
-Only some atoms are eligible for inclusion (or "selection") in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S` may be added. Additionally an atom having an undefined `element` value is also eligible. Atoms may be selected regardless of cycle membership. All other atoms are ineligible and must not be added to a DS.
+Only some atoms are eligible for inclusion (or "selection") in a DS. Atoms whose `element` values are one of `C`, `N`, `O`, `P`, or `S`, or `None`, may be selected &mdash; regardless of cycle membership. Atoms having other `element` values must not be selected.
 
 To support the construction of a DS, eligible atoms carry a `selected` boolean attribute. Setting this attribute to `true`, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
 
@@ -403,10 +403,10 @@ The next atomic production rule, `<shortcut>` is a non-terminal selected from th
              | "I"
 ```
 
-The third atomic production rule, `<selection>` is a non-terminal selected from the list: "b"; "c"; "n"; "o"; "p"; and "s". An `Atom` encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the `element` attribute and sets the `selected` attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
+The third atomic production rule, `<selection>` is a non-terminal selected from the list: "c"; "n"; "o"; "p"; and "s". An `Atom` encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the `element` attribute and sets the `selected` attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
 
 ```
-<selection> ::= "b" | "c" | "n" | "o" | "p" | "s"
+<selection> ::= "c" | "n" | "o" | "p" | "s"
 ```
 
 The fourth and most complex atomic production rule is `<bracket>` ("bracket atom"). A bracket atom can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an `Atom` makes it ineligible for implicit hydrogen counting. Attributes not set within the `<bracket>` production rule will leave the corresponding atomic values in their default states.
