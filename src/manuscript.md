@@ -285,31 +285,31 @@ Dialect takes a different approach by introducing *partial parity bonds* (PPB). 
 
 ![Partial parity bond. Bond conformational parity is distributed over two or more bonds.](svg/placeholder.svg)
 
-To support this system, each bond carries a nullable `state` attribute. When present, the `state` attribute may assume one of the two values `Up` or `Down`. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `index` attribute appears to the left of the terminal with the higher atomic `index` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the state of its PPB bond.
+To support this system, each bond carries a nullable `direction` attribute ("direction"). When present, this attribute may assume one of the two values `Up` or `Down`. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest `index` attribute appears to the left of the terminal with the higher atomic `index` attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the `index` attribute and the direction of its PPB bond.
 
 ![Interpreting partial parity bonds.](svg/placeholder.svg)
 
-The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the indexes for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond state is `Up`, or to the lower left if the bond state is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
+The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the indexes for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond direction is `Up`, or to the lower left if the bond direction is `Down`. If the terminal succeeds its neighbor, reverse these assignments.
 
-An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place the neighbor to the upper right given an `Up` state, or to the lower right given a `Down` state. Reverse these assignments if the right terminal succeeds its neighbor.
+An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place the neighbor to the upper right given an `Up` direction, or to the lower right given a `Down` direction. Reverse these assignments if the right terminal succeeds its neighbor.
 
 In some cases the placement of a terminal neighbor can be deduced from the placement of a sibling, without the presence of an explicit PPB. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
 
-![Implied neighbor placement. Bond states can be omitted when inferrable.](svg/placeholder.svg)
+![Implied neighbor placement. Bond directions can be omitted when inferrable.](svg/placeholder.svg)
 
 The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
 
-Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are placed on the basis of succession. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB state of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB state of 'Up'.
+Consider the encoding of PPBs for (*E*)-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are placed on the basis of succession. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB direction of 'Up'. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB direction of 'Up'.
 
 ![Assigning partial parity bonds to *trans*-2-butene.](svg/placeholder.svg)
 
-In a similar manner assigned PPBs can be decoded. The process starts by placing Atom 1 to the left of Atom 2 along the x-axis. The PPB between the left terminal and its neighbor (Atom 0) uses the `Up` state. The neighbor precedes the left terminal, so Atom 0 should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor (Atom 3) uses the `Up` state. The neighbor (Atom 3) succeeds the right terminal (Atom 2). Therefore, Atom 3 is placed in the upper right quadrant. This results in the expected conformation (*E*).
+In a similar manner assigned PPBs can be decoded. The process starts by placing Atom 1 to the left of Atom 2 along the x-axis. The PPB between the left terminal and its neighbor (Atom 0) uses the `Up` direction. The neighbor precedes the left terminal, so Atom 0 should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor (Atom 3) uses the `Up` direction. The neighbor (Atom 3) succeeds the right terminal (Atom 2). Therefore, Atom 3 is placed in the upper right quadrant. This results in the expected conformation (*E*).
 
-The above procedures assume that all PPBs are expressed in *normal form*. In normal form, a PPB's source precedes it target. In other words, `source` is less than `target`. If a PPB is not in normal form, it must be *inverted* before quadrants can be assigned. Inversion swaps the values of `source` and target attributes while simultaneously toggling the `state` attribute. Inversion occurs in two contexts: conjugated polyenes and cycles. In the case of polyenes, the same PPB carries partial conformation for at least two different double bond systems. In the case of cycles, non-normal PPBs can be generated at bonds forming cycles. However, readers and writers must be capable of inverting PPBs wherever they appear.
+The above procedures assume that all PPBs are expressed in *normal form*. In normal form, a PPB's source precedes it target. In other words, `source` is less than `target`. If a PPB is not in normal form, it must be *inverted* before quadrants can be assigned. Inversion swaps the values of `source` and target attributes while simultaneously toggling the `direction` attribute. Inversion occurs in two contexts: conjugated polyenes and cycles. In the case of polyenes, the same PPB carries partial conformation for at least two different double bond systems. In the case of cycles, non-normal PPBs can be generated at bonds forming cycles. However, readers and writers must be capable of inverting PPBs wherever they appear.
 
 Consider (*E*)-2-butene. The PPB spanning atoms 0 and 1 will typically be encoded as the tuple `(0, 1, Up)` because this orientation tracks the order of atom index. However, the PPB can be equivalently encoded as the tuple `(1, 0, Down)`. Before this representation can be used, it must first be inverted into the equivalent form represented by the tuple `(0, 1, Up)`.
 
-![Partial parity bond inversion. State must be inverted for bonds not expressed in normal form.](svg/placeholder.svg)
+![Partial parity bond inversion. Direction must be inverted for bonds not expressed in normal form.](svg/placeholder.svg)
 
 The distributed nature of conformational encoding means that several additive error states are possible:
 
@@ -476,7 +476,7 @@ An `Atom` may be connected to zero or more neighbors through a `Bond`, encoded w
 <bond> ::= "-" | "=" | "#" | | "/" | "\"
 ```
 
-Five variants are available (`-`, `=`, `#`, `/`, and `\`). The first three (`-`, `=`, `#`) set the `order` attribute of a `Bond` to 1; 2; or 3, respectively. The last two variants, `/` and `\`, set the `order` attribute to 1 while also setting the `state` attribute to `Up` and `Down`, respectively.
+Five variants are available (`-`, `=`, `#`, `/`, and `\`). The first three (`-`, `=`, `#`) set the `order` attribute of a `Bond` to 1; 2; or 3, respectively. The last two variants, `/` and `\`, set the `order` attribute to 1 while also setting the `direction` attribute to `Up` and `Down`, respectively.
 
 ## Sequence
 
@@ -540,7 +540,7 @@ Further workflow adjustments can handle cuts. The necessary state can be maintai
 
 ![Array for cuts. The array's fixed length reflects the syntactic constraint on cut index.](svg/placeholder.svg)
 
-Two cut bonds are compatible if they possess the same `order` attributes, and their `state` attributes are complementary. Bonds with undefined `state` are always complementary. A bond with a defined `state` is complementary to any `Bond` with an undefined state, or a `Bond` with an opposing `state`. For example, an elided `Bond` is compatible with a single `Bond`. Likewise, two elided `Bond`s are compatible. A `Bond` with a `state` of `Up` is incompatible with another `Bond` with a `state` of `Up`, but compatible with one having a `state` of `Down`.
+Two cut bonds are compatible if they possess the same `order` attributes, and their `direction` attributes are complementary. Bonds with undefined `direction` are always complementary. A bond with a defined `direction` is complementary to any `Bond` with an undefined state, or a `Bond` with an opposing `direction`. For example, an elided `Bond` is compatible with a single `Bond`. Likewise, two elided `Bond`s are compatible. A `Bond` with a `direction` of `Up` is incompatible with another `Bond` with a `direction` of `Up`, but compatible with one having a `direction` of `Down`.
 
 ![Bond compatibility. Two non-elided bonds across a cut must have compatible `order` and `direction` attributes.](svg/placeholder.svg)
 
