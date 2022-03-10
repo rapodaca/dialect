@@ -167,7 +167,7 @@ To promote compact string representations, Dialect supports *bond elision*. An s
 
 # Delocalization Subgraph
 
-A molecular representation based solely on the valence bond model can yield artifacts resulting from *delocalization induced molecular equality* (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their extensive history of controversy in organic chemistry.
+A molecular representation based solely on the valence bond model can yield artifacts resulting from *delocalization induced molecular equality* (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their ambiguity.[@randic2018;@kerber2006]
 
 ![Delocalization-induced molecular equality (DIME). Two chemically equivalent molecular graphs differ on the basis of delocalization.](svg/placeholder.svg)
 
