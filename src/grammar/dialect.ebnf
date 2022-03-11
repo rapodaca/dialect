@@ -5,12 +5,11 @@
 <split>             ::= <detachment> <sequence>
 <atom>              ::= <star> | <shortcut> | <selection> | <bracket>
 <bracket>           ::= "[" <isotope>? <symbol> <stereodescriptor>?
-                         <virtual_hydrogen>? <charge>? <extension>? "]"
+                         <virtual_hydrogen>? <charge>? "]"
 <isotope>           ::= <digit> <digit>? <digit>?
 <symbol>            ::= <star> | <element> | <selection>
 <virtual_hydrogen>  ::= "H" <digit>?
 <charge>            ::= ( "+" | "-" ) <digit>?
-<extension>         ::= ":" <digit>? <digit>? <digit>? <digit>
 <cut>               ::= <digit> | "%" <digit> <digit>
 <stereodescriptor>  ::= "@" "@"?
 <star>              ::= "*"

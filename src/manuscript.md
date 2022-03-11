@@ -99,8 +99,6 @@ The following table defines atomic attributes. Not all combinations of values ("
 | `configuration` | Configurational |`Option<Configuration>` | `None` |
 |                 | descriptor | | |
 | `charge` | Formal charge | `PlusMinusTen` | 0 |
-| `extension` | Application | `Option<Thousand>` | `None` |
-| | -specific data | | |
 | `selected` | Whether the atom | `boolean` | `false` |
 |            | is selected |          |           |         |
 : Atomic Attributes
