@@ -67,7 +67,7 @@ A molecular graph contains one or more *connected components*. A connected compo
 
 Dialect uses several abstractions collectively known as the *data model*. The data model defines data types and relationships between them for the purpose of lossless molecular representation.
 
-The data model is expressed in terms of a small set of *primitives*. A primitive is an irreducible data type. The following table enumerates Dialects primitives.
+The data model is expressed in terms of a small set of *primitives*. A primitive is an irreducible data type. Dialects primitives are summarized in Table 1.
 
 | Name | Description | Values |
 | --- | --- | --- |
@@ -85,7 +85,7 @@ The data model is expressed in terms of a small set of *primitives*. A primitive
 | `boolean` | Boolean | `true`, `false` |
 : Data Model Primitives
 
-The following table defines atomic attributes. Not all combinations of values ("atomic state") are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created.
+Table 2 summarizes atomic attributes. Not all combinations of values ("atomic state") are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created.
 
 | Attribute | Description | Type  | Default  |
 | --- | --- | --- | --- |
@@ -107,7 +107,7 @@ Three restrictions apply to atomic state:
 2. If `hydrogens` equals `Implicit`, then `isotope`, `configuration`, and `charge` must equal their default values. Furthermore, `element` must equal one of `B`; `C`; `N`; `O`; `P`; `S`; `F`; `Cl`; `Br`; `I`.
 3. If `selected` equals `true`, then `element` must equal one of: `C`; `N`; `O`; `P`; or `S`.
 
-The following table enumerates the attributes associated with bonds.
+Bond attributes are summarized in Table 3.
 
 | Attribute | Description | Type | Default |
 | --- | --- | --- | --- |
@@ -199,7 +199,7 @@ To support implicit hydrogen counting, Dialect uses the concept of *valence*. Va
 
 Only some atoms are eligible for implicit hydrogen counting. These are called *eligible atoms*. An atom becomes eligible by fulfilling two requirements: (1) its `hydrogens` attribute equals `Implicit`; and (2) its `element` attribute is associated with at least one *default valence*.
 
-A default valence is a value associated with an element that represents the number of hydrogens that can be attached to an isolated atom. Table 1 lists those elements possessing at least one default valence. All other elements have no default valences. The target valence of 4 for carbon, for example, means that a fully-saturated carbon atom will be bound to four hydrogen atoms. Likewise, a fully-saturated oxygen atom will be bound to two hydrogen atoms. However, iron has no default valences. Some elements such as nitrogen have multiple target valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the target valences three and five. Both ammonia and nitrogen pentahydride (NH~5~) are fully saturated forms of nitrogen according to Table 1.
+A default valence is a value associated with an element that represents the number of hydrogens that can be attached to an isolated atom. Table 1 lists those elements possessing at least one default valence. All other elements have no default valences. The target valence of 4 for carbon, for example, means that a fully-saturated carbon atom will be bound to four hydrogen atoms. Likewise, a fully-saturated oxygen atom will be bound to two hydrogen atoms. However, iron has no default valences. Some elements such as nitrogen have multiple target valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the target valences three and five. Both ammonia and nitrogen pentahydride (NH~5~) are fully saturated forms of nitrogen according to Table 4.
 
 | Element | Target<br>Valence |
 | :-----: | :------------: |
