@@ -51,8 +51,6 @@ Dialect's molecular representation system is based on four mutually-exclusive co
 - *Configuration*. The kind of stereoisomerism resulting from the arrangement of neighboring atoms in three-dimensional space. Dialect supports configurations for tetracoordinate atoms (those attached to four neighbors) having tetrahedral symmetry.
 - *Delocalization*. A type of bonding relationship in which electrons are distributed over two or more bonds, among three or more atoms, or across some combination of atoms and bonds. Dialect supports a limited form of delocalization operating over paths of alternating single and double bonds.
 
-To support uses in fields other than organic chemistry, Dialect supports the atomic "extension" attribute. This enables the association of an atom or a group of atoms with arbitrary metadata.
-
 ![Representative Dialect Examples with Structures](svg/placeholder.svg)
 
 # Molecular Graph
@@ -106,7 +104,7 @@ The following table defines atomic attributes. Not all combinations of values ("
 Three restrictions apply to atomic state:
 
 1. The value of `index` must be unique over the molecular graph.
-2. If `hydrogens` equals `Implicit`, then `isotope`, `configuration`, `charge`, and `extension` must equal their default values. Furthermore, `element` must equal one of `B`; `C`; `N`; `O`; `P`; `S`; `F`; `Cl`; `Br`; `I`.
+2. If `hydrogens` equals `Implicit`, then `isotope`, `configuration`, and `charge` must equal their default values. Furthermore, `element` must equal one of `B`; `C`; `N`; `O`; `P`; `S`; `F`; `Cl`; `Br`; `I`.
 3. If `selected` equals `true`, then `element` must equal one of: `C`; `N`; `O`; `P`; or `S`.
 
 The following table enumerates the attributes associated with bonds.
@@ -413,7 +411,7 @@ The fourth and most complex atomic production rule is `<bracket>` ("bracket atom
 
 ```
 <bracket> ::= "[" <isotope>? <symbol> <stereodescriptor>?
-              <virtual_hydrogen>? <charge>? <extension>? "]"
+              <virtual_hydrogen>? <charge>? "]"
 ```
 
 The value of a bracket atom's `isotope` attribute is determined by the optional `<isotope>` non-terminal. It consists of between one and three digits encoding the integers 0-999. Leading zeros are disregarded when assigning the value of the `isotope` attribute. In other words, "007" and "7" are considered equivalent expressions of the value 7.
@@ -456,12 +454,6 @@ The `<charge>` production rule sets the `charge` attribute of a bracket atom. Th
 
 ```
 <charge> ::= ( "+" | "-" ) <digit>?
-```
-
-The presence of an `<extension>` non-terminal sets the atomic `extension` attribute. If a colon terminal (`:`) is present, it must be followed by one, two, three, or four `<digit>` nonterminals. The resulting `extension` attribute must therefore assume a value between 0 and 9999, inclusive. As with the `isotope` attribute, leading zeros are disregarded. The extensions `0007`, `007`, and `7` are all considered equivalent.
-
-```
-<extension> ::= ":" <digit>? <digit>? <digit>? <digit>
 ```
 
 Should an optional bracket non-terminal not be present, the atom must retain its corresponding default value. For example, the bracket `[C@H+]` lacks the `<isotope>` non-terminal so the value of the `isotope` attribute will remain as `None`. Similarly, the bracket `[13CH+]` lacks the `<stereodescriptor>` non-terminal, so the corresponding `configuration` attribute remains `None`.
@@ -615,7 +607,7 @@ Writers must ensure that all selected atoms can be deselected. Consider pyrrole,
 
 # SMILES Compatibility
 
-To maximize compatibility with contemporary software, Dialect is based on the SMILES language. Given the widespread adoption of "SMILES," arriving at a specific definition of the language is surprisingly challenging. No single document completely specifies SMILES syntax and semantics. The first description of the SMILES language in the primary literature is contained within a 1988 article (referenced here as "the article").[@weininger1988] The article, by its own admission, is incomplete: "... isomeric SMILES \[defined in the book chapter as covering isotopism, conformation, configuration, and extension\ (p. 91)] is not otherwise covered in this paper." (p. 34). Weininger later refined and expanded SMILES in a 2003 book chapter,[@weininger2008] referred to here as "the book chapter." A third major source of information is the Daylight Theory Manual (referred to here as "the manual"), a website operated by Daylight Chemical Information Systems, Inc.[@daylightTheory] Information about SMILES is also contained in various software packages and associated documentation, slide decks, websites, mailing lists, and private communications.
+To maximize compatibility with contemporary software, Dialect is based on the SMILES language. Given the widespread adoption of "SMILES," arriving at a specific definition of the language is surprisingly challenging. No single document completely specifies SMILES syntax and semantics. The first description of the SMILES language in the primary literature is contained within a 1988 article (referenced here as "the article").[@weininger1988] The article, by its own admission, is incomplete: "... isomeric SMILES \[defined in the book chapter as covering isotopism, conformation, and configuration (p. 91)\] is not otherwise covered in this paper." (p. 34). Weininger later refined and expanded SMILES in a 2003 book chapter,[@weininger2008] referred to here as "the book chapter." A third major source of information is the Daylight Theory Manual (referred to here as "the manual"), a website operated by Daylight Chemical Information Systems, Inc.[@daylightTheory] Information about SMILES is also contained in various software packages and associated documentation, slide decks, websites, mailing lists, and private communications.
 
 For the purpose of providing a foundation for Dialect, "SMILES" was defined as the language described in the article and the book chapter. All other sources &mdash; irrespective of quality or apparent claim to authority &mdash; were considered out of scope. The manual was disregarded because it merely recapitulated material in the article and chapter, and due to the possibility of future alteration. The remaining sources were disregarded due to lack of authority, poor accessibility, or both. This narrow focus simplifies the task of evaluating compatibility between Dialect and SMILES. However, it does not provide a method for testing compatibility due to the lack of an authoritative SMILES compliance suite.
 
@@ -627,7 +619,7 @@ The article implies that comma (`,`) is either an element symbol or a valid SMIL
 
 The book chapter defines a recursive grammar for branching which, perhaps without the knowledge of the author, results in multiple branching (p. 86). Dialect disallows the multiple branching constructs, including for example `*((*))*` and `*(((*)))*`.
 
-"Reaction SMILES" is an extension described in the book chapter (p. 89), but disallowed in Dialect. Specifically, the greater than symbol (`>`) is not a valid Dialect character. This precludes strings such as `*>>*` in Dialect.
+"Reaction SMILES" is an extension described in the book chapter (p. 89), but disallowed in Dialect. Specifically, the greater than symbol (`>`) is not a valid Dialect character. This precludes strings such as `*>>*` in Dialect. Furthermore, Dialect lacks the "map" attribute, used for atom-atom mapping in reactions, and its accompanying syntax.
 
 Dialect only supports two stereodescriptors, encoded as `@` and `@@`. The book chapter provides a recursive grammar for stereodescriptors that allows multi-symbol descriptors such as `@@@` and `@@@@` (p. 94). The book chapter also discusses non-tetrahedral descriptors including `@AL1`, `@AL2`, `@1`, and `@SP1`. None of these are supported by Dialect. Nor does Dialect support the application of the `@` and `@@` tetracoordinate stereodescriptors to odd cumulenes as described in the book chapter. Although some of these forms of configuration are supported today, it's unusual to find them all supported. The reason is simple: in the context in which SMILES is most often used, these forms of stereochemistry are rare. To support them places a burden on implementors with little payoff.
 
@@ -637,7 +629,7 @@ It's not clear whether SMILES allows a virtual hydrogen count on hydrogen itself
 
 The book chapter ascribes ambiguous meaning to detachments: "... In terms of the valence model being represented, the dot literally represents a bond of formal order zero: the atoms on either side of the dot are explicitly not bonded to each other." (p. 88). The state of not being bonded and the state of having a zero-order bond are not necessarily equivalent.[@clark2011] To be clear, Dialect explicitly disallows the zero bond order interpretation of detachments and the dot character.
 
-SMILES assigns no explicit upper or lower bounds to numerical atomic attributes. These boundaries are nevertheless crucial for implementors, who often seek a data type just large enough to prevent underflow or overflow. For this reason, Dialect sets both upper and lower bounds on the following atomic attributes: isotope (0 <= value < 1000); charge (-10, < value < 10); virtual hydrogen ("hcount", 0 <= value < 10); and extension ("map", 0 <= value < 1000). Although it might be argued that lower bounds on physical quantities such as isotope and hcount should be obvious in SMILES, the lack of specificity in SMILES forces implementors to complete work that should have been done by the language's creator.
+SMILES assigns no explicit upper or lower bounds to numerical atomic attributes. These boundaries are nevertheless crucial for implementors, who often seek a data type just large enough to prevent underflow or overflow. For this reason, Dialect sets both upper and lower bounds on the following atomic attributes: isotope (0 <= value < 1000); charge (-10, < value < 10); and virtual hydrogen ("hcount", 0 <= value < 10). Although it might be argued that lower bounds on physical quantities such as isotope and hcount should be obvious in SMILES, the lack of specificity in SMILES forces implementors to complete work that should have been done by the language's creator.
 
 Dialect provides a few semantic clarifications not fully addressed in SMILES. A detailed algorithm for determining implicit hydrogen count is provided, together with the required valence table. Unlike SMILES, Dialect explicitly considers the case of computing implicit hydrogens on selected atoms. Dialect also provides detailed algorithms, absent in SMILES, for selection and deselection. These are based in graph theory rather than the ambiguous and overloaded chemical concept of "aromaticity" used in SMILES. Uniquely, Dialect introduces the concepts of "pruning" and "gratuitous selection." Neither the paper nor the book chapter indicate those bonds that can be promoted during deselection, but Dialect does. Finally, Dialect syntax is based on a formal grammar and tooling rooted in decades of computer science research, whereas SMILES syntax is based for the most part on imprecise natural language descriptions.
 
@@ -651,6 +643,7 @@ Dialect also resolves some internal contradictions within SMILES. The article re
 | comma symbol (`,`) | maybe | no |
 | multiple branching e.g., `*((*))*`) | yes | no |
 | reactions using greater than symbol (`>`) | yes | no |
+| atomic "map" attribute | yes | no |
 | extended stereodescriptors e.g., `@@@`, `@@@@`, `@AL1`, `@1`, and `@SP1` | yes | no |
 | use of stereodescriptors on odd cumulene centers | yes | no |
 | virtual hydrogen count on hydrogen | no | yes |
@@ -677,9 +670,7 @@ Despite its information density, Dialect can faithfully encode and decode most o
 
 Dialect's compact representation requires some tradeoffs regarding expressiveness. Extended bonding beyond the delocalization subgraph is not supported. This limitation excludes many types of molecule, including organometallics and delocalization-stabilized ions. Zero-order bonds are not supported, making it difficult to accurately encode coordination complexes. Only four-coordinate, tetrahedral stereocenters can be encoded, excluding many forms of chirality, including helical chirality, all forms of non-tetrahedral stereochemistry, and lone-pair tetrahedral centers. Conformational restrictions beyond the isolated double bond are not supported, which excludes important molecules such as those exhibiting atropisomerism. Other formats such as CDXML and molfile support enhanced stereochemical features enabling the differentiation of various kinds of partial stereochemical information, but Dialect does not.
 
-Applications requiring features beyond those supported by Dialect can use the atomic extension field. This integer field allows atoms to be individually associated with one of ten thousand unique labels whose values range from 0 to 9999, inclusive. When used with an application-specific dictionary, the extension field allows atoms to carry a wide range of additional attributes. Readers must report the contents of this field, allowing extension code to capture extension values for later use.
-
-Broader expansion of Dialect's capabilities could be possible through *metaformats*. A metaformat embeds one or more Dialect strings within a surrounding serialization format. As noted previously, SMILES itself defines a reaction metaformat, using the greater than symbol (`>`) to separate reactant, agent, and product molecules. In a similar manner, two- or three-dimensional coordinates could be associated with each atom through a metaformat that includes a dictionary mapping atomic index to coordinate. Collections of atoms could likewise be encoded to replicate the enhanced stereochemistry features of other formats. And so on. However, the utility of such extensions should be weighed against Dialect's main value proposition: high information density. An application attempting to use a verbose metaformat may benefit from adopting better-suited format instead.
+Broader expansion of Dialect's capabilities could be possible through *metaformats*. A metaformat embeds one or more Dialect strings within a surrounding serialization format.For example, two- or three-dimensional coordinates could be associated with each atom through a metaformat that includes a dictionary mapping atomic index to coordinate. Collections of atoms or bonds could likewise be encoded to replicate the enhanced stereochemistry features of other formats. And so on. However, the utility of such extensions should be weighed against Dialect's main value proposition: high information density. An application attempting to use a verbose metaformat may benefit from adopting better-suited format instead.
 
 Setting aside the many technical and usability issues a metaformat would raise, versioning is likely to play an important role. Dialect itself lacks any mechanism to convey the concept of version. This stands in contrast to InChI, which not only encodes a version identifier, but has done so from its first release. Adding a version identifier would, unfortunately, break compatibility with the large number of existing SMILES software. Metaformats offer an opportunity to address this limitation.
 
