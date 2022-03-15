@@ -26,7 +26,7 @@
 
 \maketitle
 
-\section{Introduction}
+\section*{Introduction}
 
 Simplified Molecular Input Line Entry System (SMILES) was first described by Weininger in 1988.\cite{weininger:1988} As a line notation,\cite{wiswesser:1968} SMILES represents molecules as single line character sequences, or strings. SMILES strings can be read and written algorithmically, and can be canonicalized\cite{weininger:1989,oBoyle:2012} to yield unique molecular identifiers.
 
@@ -50,7 +50,7 @@ This situation has persisted long enough that the notion of a SMILES "standard" 
 
 This paper attempts to resolve these these issues with Dialect, a fully-specified subset of the SMILES language. The following sections present Dialect from three perspectives: as a compact system for molecular representation; as a text-based language; and as a specification for software intended to convey chemical structure information across organizational and temporal boundaries.
 
-\section{Goals, Design, and Tradeoffs}
+\section*{Goals, Design, and Tradeoffs}
 
 Dialect's purpose is to solve the \textit{molecular serialization} problem. Serialization refers to the process of translating a data structure into a format that can be transmitted over a communication channel for later reconstruction. Serializations utility lies in enabling general-purpose devices and networks to convey complex pieces of domain-specific information. Receiver and recipient may be separated by time, space, or both. Molecular serialization extends the concept of serialization to molecular structure.
 
@@ -82,7 +82,7 @@ The edges of a Dialect molecular graph are defined as a set of unordered pairs o
 
 A molecular graph contains one or more \textit{connected components}. A connected component is a graph in which any two vertices are connected to each other by at least one path. Dialect places no restriction on the number of connected components, although practical limitations are likely to impose one.
 
-\section{Data Model}
+\section*{Data Model}
 
 Dialect uses several abstractions collectively known as the \textit{data model}. The data model defines data types and relationships between them for the purpose of lossless molecular representation.
 
@@ -149,7 +149,7 @@ The following restrictions apply to bond state:
 
 The data model provides a link between syntax and semantics. Dialect-compatible software may, of course, use any suitable internal data model. Dialect implementations must, however, ensure that their internal data model is consistent with the one provided here.
 
-\section{Constitution}
+\section*{Constitution}
 
 A Dialect molecule is described at the lowest level by its constitution. Constitution consists of a set of atomic nuclei (nodes), a set of pairwise bonding relationships between them (edges), and those attributes needed to associate every valence electron with a specific node or edge. Constitution excludes attributes related to stereochemistry, or any other feature whose attributes extend over more than one atom or bond.
 
@@ -192,11 +192,11 @@ Whereas negative bond order is disallowed by definition, Dialect places no restr
     \label{fig:hypervalence}
 \end{figure}
 
-\section{Bond Elision}
+\section*{Bond Elision}
 
 To promote compact string representations, Dialect supports \textit{bond elision}. An single bond may be elided by marking it as such. An elided bond nevertheless has a bond order of one. A bond may be elided for one of two reasons. First, elided bonds are not written during serialization, allowing for increased information density. The second reason relates to a feature described in the next section.
 
-\section{Delocalization Subgraph}
+\section*{Delocalization Subgraph}
 
 A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME occurs in a molecular graph when one or more equivalent representations exist, each one differing from the original only in the distribution of single and double bonds. DIME may be recognized as "resonance" or "aromaticity," but those terms are avoided here due to their ambiguity.\cite{randic2018,kerber2006}
 
@@ -244,7 +244,7 @@ The opposite operation can be accomplished with a \textit{selection algorithm}. 
     \label{fig:selection}
 \end{figure}
 
-\section{Implicit Hydrogens and Subvalence}
+\section*{Implicit Hydrogens and Subvalence}
 
 In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called \textit{implicit hydrogens}. Like a virtual hydrogen, an implicit hydrogen is monovalent, has only default attributes, and is present as an integer tally associated with a particular atom. But unlike a virtual hydrogen, the presence of an implicit hydrogen can only be deduced through computation. Implicit hydrogens are an integral yet invisible component of many molecular graphs.
 
@@ -313,7 +313,7 @@ The valence of some atoms exceeds the largest default valence. In these cases, s
 
 The subvalence for ineligible atoms is zero.
 
-\section{Computing Implicit Hydrogen Count}
+\section*{Computing Implicit Hydrogen Count}
 
 For unselected atoms, implicit hydrogen count equals subvalence. Consider an oxygen atom with a \ttt{hydrogens} attribute of \ttt{Implicit}. Subvalence equals two and so does implicit hydrogen count. However, an oxygen atom with a \ttt{hydrogens} attribute equal to one will have an implicit hydrogen count of zero.
 
@@ -330,13 +330,13 @@ An implicit hydrogen count may or may not correlate with chemical intuition or e
     \label{fig:implicit-hydrogen-count}
 \end{figure}
 
-\section{Atom Index}
+\section*{Atom Index}
 
 To support the assignment and interpretation stereochemical features, each node is assigned a sequential, unique, non-negative integer \ttt{index} attribute ("index"). The value of an atom's index equals zero for a molecular's graph's first atom. The index for each subsequently-added atom equals the order (node count) of the graph prior to the addition. For example, the index for the second atom is one, the index for the third atom is two, and so on. The maximum value of an atomic index is 2\textsuperscript{32} - 1.
 
 Indexes impose an ordering over the atoms in a molecular graph. An atom with an index less than another atom is said to \textit{precede} it. An atom with an index grater than another atom \textit{succeeds} it. No special significance is ascribed to the atom whose index is zero, except that every other atom succeeds it.
 
-\section{Conformation}
+\section*{Conformation}
 
 The second major component of molecular representation in Dialect is \textit{conformation}. Conformation is a rotational restriction about one or more bonds. Dialect limits conformation to just one of many possible types: rotational restrictions occurring at individual double bonds.
 
@@ -439,7 +439,7 @@ Given that conformational specification is distributed over three or more bonds,
     \label{fig:cyclooctatetraene}
 \end{figure}
 
-\section{Configuration}
+\section*{Configuration}
 
 The third major element of molecular representation is \textit{configuration}. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. Here, "substituent" means an atomic neighbor; lone electron pairs are not considered substituents. One of the four substituents may be a virtual hydrogen.
 
@@ -499,7 +499,7 @@ Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is 
 
 Special handling is required for \textit{undefined stereocenters}. A stereocenter is undefined if it lacks a stereodescriptor. Omitting a stereodescriptor conveys to readers that no information about the stereocenter's configuration is known. This could imply that either a single configuration or a configurational mixture are present. This interpretation is consistent with the one used by molfile format.\cite{ctfileFormats}
 
-\section{Syntax}
+\section*{Syntax}
 
 A Dialect string ("string") is a UTF-encoded sequence of zero or more characters chosen from the set: \ttt{A}; \ttt{B}; \ttt{C}; \ttt{D}; \ttt{E}; \ttt{F}; \ttt{G}; \ttt{H}; \ttt{I}; \ttt{K}; \ttt{L}; \ttt{M}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{R}; \ttt{S}; \ttt{T}; \ttt{U}; \ttt{V}; \ttt{W}; \ttt{X}; \ttt{Y}; \ttt{Z}; \ttt{a}; \ttt{b}; \ttt{c}; \ttt{d}; \ttt{e}; \ttt{f}; \ttt{g}; \ttt{h}; \ttt{i}; \ttt{k}; \ttt{l}; \ttt{m}; \ttt{n}; \ttt{o}; \ttt{p}; \ttt{r}; \ttt{s}; \ttt{t}; \ttt{u}; \ttt{v}; \ttt{0}; \ttt{1}; \ttt{2}; \ttt{3}; \ttt{4}; \ttt{5}; \ttt{6}; \ttt{7}; \ttt{8}; \ttt{9}; \ttt{+}; \ttt{-}; \ttt{.}; \ttt{\%}; \ttt{@}; \ttt{*}; \ttt{[}; \ttt{]}; \ttt{/}; \ttt{\char`\\}; \ttt{=}; and \ttt{\#}. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
 
@@ -518,7 +518,7 @@ Consider a hypothetical language composed of variable-length sequences of the lo
 
 The quantifier (\ttt{*}) indicates that a text in this language consists of a sequence of zero or more instances of the production \ttt{<a>}. This production in turn is defined as the lowercase letter "a". Therefore, valid texts in this language include the empty string, \ttt{a}, \ttt{aa}, and \ttt{aaaaaa} to name a few.
 
-\subsection{Atom}
+\subsection*{Atom}
 
 Atoms carry most of the information in a Dialect string. The non-terminal \ttt{<atom>} is a selection among four alternatives.
 
@@ -595,7 +595,7 @@ The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket 
 
 Should an optional bracket non-terminal not be present, the atom must retain its corresponding default value. For example, the bracket "[C@H+]" lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket "[13CH+]" lacks the \ttt{<stereodescriptor>} non-terminal, so the corresponding \ttt{configuration} attribute remains \ttt{None}.
 
-\subsection{Bond}
+\subsection*{Bond}
 
 An \ttt{Atom} may be connected to zero or more neighbors through a \ttt{Bond}, encoded with the non-terminal \ttt{<bond>}.
 
@@ -605,7 +605,7 @@ An \ttt{Atom} may be connected to zero or more neighbors through a \ttt{Bond}, e
 
 Five terminals are available ("-", "=", "\#", "/", and "\textbackslash"). The first three ("-", "=", and "\#") set the \ttt{order} attribute of a \ttt{Bond} to 1; 2; or 3, respectively. The last two terminals, "/" and "\textbackslash", set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
 
-\subsection{Sequence}
+\subsection*{Sequence}
 
 An \ttt{Atom} may be assigned zero or more children through the \ttt{<sequence>} non-terminal ("sequence"). A sequence starts with a required \ttt{<atom>} non-terminal. If no allowed non-terminals follow, the corresponding \ttt{Atom} will have no children. Allowed non-terminals are chosen from the list: \ttt{<union>}; \ttt{<branch>}; and \ttt{<sequence>}.
 
@@ -657,7 +657,7 @@ Having defined sequence, it's now possible to define a string as an optional seq
 <string> ::= <sequence>?
 \end{lstlisting}
 
-\section{Reading Strings}
+\section*{Reading Strings}
 
 The goal of a Dialect reader is to transform a string input into a data structure output consistent with the string's content. The output data structure can take many forms. For example, a reader can merely validate a string by returning a boolean type. A more sophisticated reader can return a molecular graph capturing all \ttt{Atom} and \ttt{Bond} attributes and connectivity relationships.
 
@@ -731,7 +731,7 @@ A reader may also report optional errors, including:
     \item{Impossible charge. An \ttt{Atom}'s charge gives it an apparent negative electron count. For example, "[C+7]".}
 \end{enumerate}
 
-\section{Pruning}
+\section*{Pruning}
 
 As noted previously, a delocalization subgraph is invalid if it lacks a perfect matching. The one exception is when a selected atom can be deleted from the delocalization subgraph through \textit{pruning}. Pruning unsets the \ttt{selected} attribute of a selected atom without corresponding promotion of any attached bonds.
 
@@ -750,7 +750,7 @@ Pruning becomes necessary in cases of gratuitous atomic selection. This occurs w
 
 Writers are encouraged, but not required, to avoid gratuitous atom selection. Readers, however, must always be prepared to prune.
 
-\section{Writing Strings}
+\section*{Writing Strings}
 
 Whereas a reader transforms a string into a data structure, the goal of a writer is the opposite: to transform a data structure into a valid string. This data structure will most commonly take the form of a molecular graph, but other forms are possible. Although a graph itself could be used as the basis for an input representation, a more primitive representation such as an adjacency list could also be used. For practical reasons, the input data structure is likely to resemble the output from a reader. Such an arrangement makes it possible to encode and decode strings with minimal intermediate translation.
 
@@ -807,7 +807,7 @@ Writers should carefully weigh the non-negligible costs of atom selection. Algor
 
 Writers must ensure that all selected atoms can be deselected. Consider pyrrole, erroneously encoded as the string "n1cccc1". The nitrogen atom can not be pruned because its subvalence is 1 (3 - 2). The DS therefore contains all five atoms and all five bonds. A perfect matching does not exist. A reader receiving such a string must report an error. To avoid this outcome, a writer can consume the subvalence by adding a virtual hydrogen, as in the string "[nH]1cccc1". The subvalence of nitrogen in this case is zero, so the atom can be pruned. Doing so leaves a DS with four nodes, four edges, and a perfect matching. Readers will consider the string valid. Nevertheless, the larger question of gratuitous selection remains.
 
-\section{SMILES Compatibility}
+\section*{SMILES Compatibility}
 
 To maximize compatibility with contemporary software, Dialect is based on the SMILES language. Given the widespread adoption of "SMILES," arriving at a specific definition of the language is surprisingly challenging. No single document completely specifies SMILES syntax and semantics. The first description of the SMILES language in the primary literature is contained within a 1988 article (referenced here as "the article").\cite{weininger:1988} The article, by its own admission, is incomplete: "... isomeric SMILES [defined in the book chapter as covering isotopism, conformation, and configuration (p. 91)] is not otherwise covered in this paper." (p. 34). Weininger later refined and expanded SMILES in a 2003 book chapter,\cite{weininger2008} referred to here as "the book chapter." A third major source of information is the Daylight Theory Manual (referred to here as "the manual"), a website operated by Daylight Chemical Information Systems, Inc.\cite{daylightTheory} Information about SMILES is also contained in various software packages and associated documentation, slide decks, websites, mailing lists, and private communications.
 
@@ -866,7 +866,7 @@ Dialect also resolves some internal contradictions within SMILES. The article re
     \label{table:feature-comparison}
 \end{table}
 
-\section{Discussion}
+\section*{Discussion}
 
 Dialect's main advantage as a molecular serialization format is high information density. The most common atom types can be represented with just one character. The worst case atom, using every available atomic attribute, requires 14 characters. The most common bond types can be encoded implicitly. In the worst case one character per bond is required.
 
@@ -888,7 +888,7 @@ The most noteworthy feature of Dialect is its compatibility with SMILES. Contemp
 
 The availability of a minimal yet highly functional, fully-specified core language offers many opportunities to improve data quality. One of the most important will be a reference implementation, the design and source code of which will be discussed later. A freely-available reference implementation in turn makes automated validation suites possible. These suites can improve data quality by reporting syntax and semantic differences among implementations, preferably before release. A reference implementation taken together with the guidelines for readers and writers in this paper should make it possible to write software that conforms to a very high level of precision, regardless of programming language or paradigm. Given verified implementations, performance optimizations can be considered. The existence of a core language specification should also aid standardization efforts, either for Dialect itself, or SMILES. Finally, the development of better line notations is only possible given a thorough understanding of the scope and limitations of existing options. Here, metaformats could offer a bridge from the present to the future.
 
-\section{Conclusion}
+\section*{Conclusion}
 
 This paper describes Dialect, a subset of the widely-\-used SMILES line notation. Dialect's features are detailed at four levels: constitution; delocalization; conformation; and configuration. Constitutionally, Dialect can encode any molecule conforming to the valence bond model. In the event of undesired symmetry artifacts due to delocalization, Dialect offers a mitigation based in graph theory. Conformational isomerism of alkenes is supported by partial parity bonds. The configurations of tetracoordinate, stereogenic atoms are encoded through the use of a parity enumeration and conventions around its use.
 
