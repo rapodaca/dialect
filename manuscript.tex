@@ -550,26 +550,26 @@ Atoms carry most of the information in a Dialect string. The non-terminal \ttt{<
 <atom> ::= <star> | <shortcut> | <selection> | <bracket>
 \end{lstlisting}
 
-The first atomic non-terminal, \ttt{<star>}, can assume one terminal value, the asterisk character (\ttt{*}). This "star atom" represents an \ttt{Atom} in which every attribute assumes its default value. The implicit hydrogen count of a star atom is zero.
+The first atomic non-terminal, \ttt{<star>}, can assume one terminal value, the asterisk character (\ttt{*}). This "star atom" represents an atom in which every attribute assumes its default value. The implicit hydrogen count of a star atom is zero.
 
 \begin{lstlisting}
 <star> ::= "*"
 \end{lstlisting}
 
-The next atomic production rule, \ttt{<shortcut>} is a non-terminal selected from the list: "B"; "C"; "N"; "O"; "P"; "S"; "F"; "Cl"; "Br"; and "I". An \ttt{Atom} encoded in this way ("shortcut atom") assigns the corresponding symbol to the \ttt{elemen} attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
+The next atomic production rule, \ttt{<shortcut>} is a non-terminal selected from the list: "B"; "C"; "N"; "O"; "P"; "S"; "F"; "Cl"; "Br"; and "I". An atom encoded in this way ("shortcut atom") assigns the corresponding symbol to the \ttt{element} attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
 
 \begin{lstlisting}
 <shortcut> ::= "B" "r"? | "C" "l"? | "N" | "O" | "P"
              | "S" | "F" | "I"
 \end{lstlisting}
 
-The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: "c"; "n"; "o"; "p"; and "s". An \ttt{Atom} encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the \ttt{element} attribute and sets the \ttt{selected} attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
+The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: "c"; "n"; "o"; "p"; and "s". An atom encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the \ttt{element} attribute and sets the \ttt{selected} attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
 
 \begin{lstlisting}
 <selection> ::= "c" | "n" | "o" | "p" | "s"
 \end{lstlisting}
 
-The fourth and most complex atomic production rule is \ttt{<bracket>} ("bracket atom"). A bracket atom can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an \ttt{Atom} makes it ineligible for implicit hydrogen counting. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
+The fourth and most complex atomic production rule is \ttt{<bracket>} ("bracket atom"). A bracket atom can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an atom makes it ineligible for implicit hydrogen counting. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
 
 \begin{lstlisting}
 <bracket> ::= "[" <isotope>? <symbol> <stereodescriptor>?
@@ -621,17 +621,17 @@ Should an optional bracket non-terminal not be present, the atom must retain its
 
 \subsection*{Bond}
 
-An \ttt{Atom} may be connected to zero or more neighbors through a \ttt{Bond}, encoded with the non-terminal \ttt{<bond>}.
+An atom may be connected to zero or more neighbors through a bond, encoded with the non-terminal \ttt{<bond>}.
 
 \begin{lstlisting}
 <bond> ::= "-" | "=" | "#" | | "/" | "\"
 \end{lstlisting}
 
-Five terminals are available ("-", "=", "\#", "/", and "\textbackslash"). The first three ("-", "=", and "\#") set the \ttt{order} attribute of a \ttt{Bond} to 1; 2; or 3, respectively. The last two terminals, "/" and "\textbackslash", set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
+Five terminals are available ("-", "=", "\#", "/", and "\textbackslash"). The first three ("-", "=", and "\#") set the \ttt{order} attribute of a bond to 1; 2; or 3, respectively. The last two terminals, "/" and "\textbackslash", set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
 
 \subsection*{Sequence}
 
-An \ttt{Atom} may be assigned zero or more children through the \ttt{<sequence>} non-terminal ("sequence"). A sequence starts with a required \ttt{<atom>} non-terminal. If no allowed non-terminals follow, the corresponding \ttt{Atom} will have no children. Allowed non-terminals are chosen from the list: \ttt{<union>}; \ttt{<branch>}; and \ttt{<sequence>}.
+An atom may be assigned zero or more children through the \ttt{<sequence>} non-terminal ("sequence"). A sequence starts with a required \ttt{<atom>} non-terminal. If no allowed non-terminals follow, the corresponding atom will have no children. Allowed non-terminals are chosen from the list: \ttt{<union>}; \ttt{<branch>}; and \ttt{<sequence>}.
 
 \begin{lstlisting}
 <sequence> ::= <atom> ( <union> | <branch> | <split> )*
@@ -651,7 +651,7 @@ The \ttt{<cut>} non-terminal ("cut") can takes two forms. A digit non-terminal c
 <cut> ::= <digit> | "%" <digit> <digit>
 \end{lstlisting}
 
-A cut signifies the disconnection of an \ttt{Atom} from its neighbor. The most common use for cut is to encode a cycle. The cut index serves as a placeholder for the neighboring \ttt{Atom}, which is located by scanning either forward or backward along a string. If the number of previous appearances of the cut index is even, then the string is scanned right. Otherwise, the string is scanned left. Although often used for cycles, cuts can be used for any bond, regardless of cycle membership. The only requirement is that a cut must be paired with another cut having the same index.
+A cut signifies the disconnection of an atom from its neighbor. The most common use for cut is to encode a cycle. The cut index serves as a placeholder for the neighboring atom, which is located by scanning either forward or backward along a string. If the number of previous appearances of the cut index is even, then the string is scanned right. Otherwise, the string is scanned left. Although often used for cycles, cuts can be used for any bond, regardless of cycle membership. The only requirement is that a cut must be paired with another cut having the same index.
 
 \begin{figure}
     \centering
@@ -669,7 +669,7 @@ An alternative to \ttt{<union>} within a sequence is the \ttt{<branch>} non-term
              <sequence> ")"
 \end{lstlisting}
 
-The third option for associating a parent Atom with a child within a sequence is the \ttt{<split>} non-terminal ("split"). A split is a sequence of \ttt{<detachment>} and \ttt{<sequence>} non-terminals. The `<detachment>` non-terminal serves the same purpose as it does within a branch: the prevent the bonding of the parent \ttt{Atom} with a child.
+The third option for associating a parent Atom with a child within a sequence is the \ttt{<split>} non-terminal ("split"). A split is a sequence of \ttt{<detachment>} and \ttt{<sequence>} non-terminals. The `<detachment>` non-terminal serves the same purpose as it does within a branch: the prevent the bonding of the parent atom with a child.
 
 \begin{lstlisting}
 <split> ::= <detachment> <sequence>
@@ -683,11 +683,11 @@ Having defined sequence, it's now possible to define a string as an optional seq
 
 \section*{Reading Strings}
 
-The goal of a Dialect reader is to transform a string input into a data structure output consistent with the string's content. The output data structure can take many forms. For example, a reader can merely validate a string by returning a boolean type. A more sophisticated reader can return a molecular graph capturing all \ttt{Atom} and \ttt{Bond} attributes and connectivity relationships.
+The goal of a Dialect reader is to transform a string input into a data structure output consistent with the string's content. The output data structure can take many forms. For example, a reader can merely validate a string by returning a boolean type. A more sophisticated reader can return a molecular graph capturing all atom and bond attributes and connectivity relationships.
 
 Dialect strings are read one character at a time starting at the leftmost character and finishing at the rightmost character. The first character sets an initial reader state, and each subsequent character causes a state transition. The cumulative application of these state transitions yields the data structure to be returned.
 
-Readers that capture \ttt{Atom}-\ttt{Atom} connectivity will typically maintain a reference to a \textit{root atom}. The root atom is initially undefined. On reading the first complete \ttt{<atom>} non-terminal, the corresponding \ttt{Atom} is constructed and set as the root atom. Subsequently processing a complete \ttt{<union>}, \ttt{<branch>}, or \ttt{<split>} non-terminal triggers three changes: (1) a child \ttt{Atom} is constructed; (2) the child is connected to the current root atom, unless a \ttt{<detachment>} non-terminal intervenes; and (3) the root atom is replaced with the child atom.
+Readers that capture atom-atom connectivity will typically maintain a reference to a \textit{root atom}. The root atom is initially undefined. On reading the first complete \ttt{<atom>} non-terminal, the corresponding atom is constructed and set as the root atom. Subsequently processing a complete \ttt{<union>}, \ttt{<branch>}, or \ttt{<split>} non-terminal triggers three changes: (1) a child atom is constructed; (2) the child is connected to the current root atom, unless a \ttt{<detachment>} non-terminal intervenes; and (3) the root atom is replaced with the child atom.
 
 The presence of a branch adds some nuances over a union. The leading open parenthesis terminal ("(") signifies that the current root atom will later be re-exposed. This operation can be supported by a stack. At the start of a branch, the current root is pushed to the stack. At the end of the branch, the stack is popped and its top value is assigned as the new root atom.
 
@@ -707,7 +707,7 @@ Further workflow adjustments can handle cuts. The necessary state can be maintai
     \label{fig:cuts-array}
 \end{figure}
 
-Two cut bonds are compatible if they possess the same \ttt{order} attributes, and their \ttt{direction} attributes are complementary. Bonds with undefined \ttt{direction} are always complementary. A bond with a defined \ttt{direction} is complementary to any \ttt{Bond} with an undefined state, or a \ttt{Bond} with an opposing \ttt{direction}. For example, an elided \ttt{Bond} is compatible with a single \ttt{Bond}. Likewise, two elided \ttt{Bond}s are compatible. A \ttt{Bond} with a \ttt{direction} of \ttt{Up} is incompatible with another \ttt{Bond} with a \ttt{direction} of \ttt{Up}, but compatible with one having a \ttt{direction} of \ttt{Down}.
+Two cut bonds are compatible if they possess the same \ttt{order} attributes, and their \ttt{direction} attributes are complementary. Bonds with undefined \ttt{direction} are always complementary. A bond with a defined \ttt{direction} is complementary to any bond with an undefined state, or a bond with an opposing \ttt{direction}. For example, an elided bond is compatible with a single bond. Likewise, two elided bonds are compatible. A bond with a \ttt{direction} of \ttt{Up} is incompatible with another bond with a \ttt{direction} of \ttt{Up}, but compatible with one having a \ttt{direction} of \ttt{Down}.
 
 \begin{figure}
     \centering
@@ -716,7 +716,7 @@ Two cut bonds are compatible if they possess the same \ttt{order} attributes, an
     \label{fig:bond-compatibility}
 \end{figure}
 
-Decoding atomic configuration from a string requires the order of attachment from each \ttt{Atom} to its neighbors to be recorded. Cuts are treated as if the neighboring atom itself were detected. In this regard, the first member of a cut pair requires special attention. The neighboring \ttt{Atom} won't be available until the paired cut index is found. Nevertheless, it must ultimately appear before the neighbors in subsequent unions, branches, and splits. This can be accomplished though the use of a placeholder or some other mechanism that preserves the overall relative order of attachment. No such special treatment is needed for the second member of a cut pair.
+Decoding atomic configuration from a string requires the order of attachment from each atom to its neighbors to be recorded. Cuts are treated as if the neighboring atom itself were detected. In this regard, the first member of a cut pair requires special attention. The neighboring atom won't be available until the paired cut index is found. Nevertheless, it must ultimately appear before the neighbors in subsequent unions, branches, and splits. This can be accomplished though the use of a placeholder or some other mechanism that preserves the overall relative order of attachment. No such special treatment is needed for the second member of a cut pair.
 
 \begin{figure}
     \centering
@@ -752,7 +752,7 @@ A reader may also report optional errors, including:
 \begin{enumerate}
     \item{Impossible isotope. A negative implied mass number results from the atom. For example, "[2C]".}
     \item{Impossible valence. The valence at an `Atom` is impossibly high. For example, "C(C)(C)(C)(C)C".}
-    \item{Impossible charge. An \ttt{Atom}'s charge gives it an apparent negative electron count. For example, "[C+7]".}
+    \item{Impossible charge. An atom's charge gives it an apparent negative electron count. For example, "[C+7]".}
 \end{enumerate}
 
 \section*{Pruning}
