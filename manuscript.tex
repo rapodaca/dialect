@@ -97,7 +97,8 @@ The data model is expressed in terms of a small set of \textit{primitives}. A pr
     \hline
     \ttt{Option<Type>} & Optional Value & \ttt{None}, \ttt{Type} \\
     \ttt{Index} & Unsigned integer & 0..2\textsuperscript{32} \\
-    \ttt{Ten} & Integer count & 0..10 \\
+    \ttt{Three} & Integer count & 1..4 \\
+    \ttt{Ten} & Unsigned integer & 0..10 \\
     \ttt{SignedTen} & Integer count & -9..10 \\
     \ttt{Thousand} & Integer count & 0..1000 \\
     \ttt{Element} & IUPAC-\-approved element symbol & \ttt{Ac}, \ttt{Ag}, \ttt{Al}, {\ldots}\ttt{Zn}\\
@@ -130,7 +131,7 @@ Table \ref{table:atomic-state} summarizes atomic attributes. Not all combination
 \label{table:atomic-state}
 \end{table}
 
-Three restrictions apply to atomic state:
+Restrictions on atomic state are:
 
 \begin{enumerate}
     \item{The value of \ttt{index} must be unique over the molecular graph.}
@@ -138,7 +139,25 @@ Three restrictions apply to atomic state:
     \item{If \ttt{selected} equals \ttt{true}, then \ttt{element} must equal one of: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; or \ttt{S}.}
 \end{enumerate}
 
-The following restrictions apply to bond state:
+Bond attributes are summarized in Table \ref{table:bond-state}. As with atomic attributes, not all bond states are valid. Three restrictions apply:
+
+\begin{table}
+\caption{Bond State.}
+\centering
+\begin{tabular}{l L L l}
+    \hline
+    Attribute & Description & Type & Default \\
+    \hline
+    \ttt{index} & Unique identifier & \ttt{Index} & - \\
+    \ttt{source} & Source atom index & \ttt{Index} & - \\
+    \ttt{target} & Target atom index & \ttt{Index} & - \\
+    \ttt{order} & Bond order & \ttt{Three} & 1 \\
+    \ttt{elided} & Elision status & \ttt{boolean} & \ttt{false} \\
+    \ttt{direction} & Partial conformational parity & \ttt{Option} \ttt{<Direction>} & \ttt{None} \\
+    \hline
+\end{tabular}
+\label{table:bond-state}
+\end{table}
 
 \begin{enumerate}
     \item{The value of \ttt{index} must be unique over the molecular graph.}
