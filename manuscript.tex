@@ -96,10 +96,10 @@ The data model is expressed in terms of a small set of \textit{primitives}. A pr
     Name & Description & Values \\
     \hline
     \ttt{Option<Type>} & Optional Value & \ttt{None}, \ttt{Type} \\
-    \ttt{Index} & Unsigned integer & 0{\ldots}2\textsuperscript{32} \\
-    \ttt{Ten} & Integer count & 0{\ldots}10 \\
-    \ttt{SignedTen} & Integer count & -9{\ldots}10 \\
-    \ttt{Thousand} & Integer count & 0{\ldots}1000 \\
+    \ttt{Index} & Unsigned integer & 0..2\textsuperscript{32} \\
+    \ttt{Ten} & Integer count & 0..10 \\
+    \ttt{SignedTen} & Integer count & -9..10 \\
+    \ttt{Thousand} & Integer count & 0..1000 \\
     \ttt{Element} & IUPAC-\-approved element symbol & \ttt{Ac}, \ttt{Ag}, \ttt{Al}, {\ldots}\ttt{Zn}\\
     \ttt{HydrogenCount} & Hydrogen count & \ttt{Implicit}, \ttt{Ten} \\
     \ttt{Configuration} & Configurational descriptor & \ttt{Right}, \ttt{Left} \\
@@ -155,9 +155,13 @@ A Dialect molecule is described at the lowest level by its constitution. Constit
 
 Two attributes characterize an atom's nucleus: \ttt{element} and \ttt{isotope}. The `element` attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC/IUPAP Working Party.\cite{iupac2016} When the Working Party authorizes additional symbols, they will become valid values for the \ttt{element} attribute. If the elemental identity of an atom is unknown, its \ttt{element} attribute can be omitted. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Omitting the \ttt{isotope} property means that the isotopic composition is unspecified. When present, the lower bound on \ttt{isotope} equals one. This constraint leaves room for physically meaningless negative implied neutron count as in, for example, carbon-5. The lower bound for isotope applies even if the \ttt{element} attribute is not defined.
 
-The atomic \ttt{hydrogens} attribute records the number of associated \textit{virtual hydrogens}. A virtual hydrogen is an atom whose presence is recorded, not as a node and edge, but rather as a unit contribution to an integer tally. For example, methane can be represented by a molecular graph having five nodes and four edges. But methane can also be represented as a graph of one node having a \ttt{hydrogens} attribute set to four. The \ttt{hydrogens} attribute, if present, may assume integer values ranging from zero to nine. Only monovalent hydrogens with unspecified isotopic composition are eligible for virtualization.
+The \ttt{hydrogens} attribute encodes an atom's mode of \textit{hydrogen suppression}. Hydrogen suppression replaces hydrogen atoms in a molecular graph with a more compact representation. Despite the removal of its node, a suppressed hydrogen and its bonds to the parent atom are understood to be present. The abundance and regular bonding of hydrogen atoms in molecular graphs makes hydrogen suppression a popular strategy for increasing information density.
 
-The two remaining constitutional attributes support \textit{electron counting}. The purpose of electron counting is to ensure that every valence electron, whether bonding or nonbonding, can be associated with either an atom or a bond. Accurate electron counting is crucial for any molecular representation system given their influence on charge, bond order, and mass.
+Dialect supports two mutually-exclusive modes of hydrogen suppression. The first is \textit{virtual hydrogen}. A virtual hydrogen is one whose node and connecting bond have been replaced by an integer tally attribute on the parent atom. For example, methane can be represented by a molecular graph having five nodes and four edges. But methane can also be represented as a graph of one node whose \ttt{hydrogens} attribute equals four. When using this variant, the \ttt{hydrogens} attribute may assume integer values from zero to nine, inclusive. The process of transforming one or more hydrogen nodes into a virtual hydrogen is called "virtualization." The opposite process, transforming one or more virtual hydrogens into a node, is called "reification."
+
+The second mode of suppressed hydrogen is \textit{implicit hydrogen}. An implicit hydrogen is similar to a virtual hydrogen in that both the hydrogen node and bond have been replaced with a tally. Unlike a virtual hydrogen, however, this tally is not present as attribute on the parent atom but rather as a computation. The computation will be described in detail in a subsequent section. Subject to certain limitations, an an atom identifies itself as having an implicit hydrogen count by setting its \ttt{hydrogens} attribute to \ttt{Implicit}.
+
+The remaining constitutional atomic attribute, \ttt{charge}, enables electron counting. Electron counting associates each electron in a molecular graph with either an atom or a bond. This is a fundamental requirement for the principle of mass conversion. In a more practical sense, electron counting lays the foundation for calculations of formal charge and bond order.\cite{dietz:1995}
 
 Electron counting in Dialect is based on the well-known \textit{valence bond model} (VB Model).\cite{lewis1916} Although not commonly considered as such, the VB model can be thought of as an algorithm for molecular assembly. The perspective is especially useful given that Dialect itself can be viewed as a programming language for molecular assembly.
 
@@ -170,7 +174,7 @@ A simplified algorithm for electron counting can be summarized as follows. A mol
     \label{fig:electron-counting}
 \end{figure}
 
-For convenience, the actual model used by Dialect differs slightly from the above description. Neither nodes nor edges carry an explicit electron count attribute. Instead, edges carry an \ttt{order} attribute, and nodes carry a \ttt{charge} attribute. Bond order equals electron count divided by two. Formal charge equals the number of electrons gained or lost due to ionizations events outside of bond formation. Gaining an electron decrements the \ttt{charge} attribute, whereas losing an electron increments it. If no electrons are gained or lost to ionization outside of bond formation, the formal charge equals zero. 
+For convenience, the actual model used by Dialect differs slightly from the above description. Neither nodes nor edges carry an explicit electron count attribute. Instead, edges carry an \ttt{order} attribute, and nodes carry a \ttt{charge} attribute. Bond order equals electron count divided by two. Formal charge equals the number of electrons gained or lost due to ionization events outside of bond formation. Gaining an electron decrements the \ttt{charge} attribute, whereas losing an electron increments it. If no electrons are gained or lost to ionization outside of bond formation, the formal charge equals zero. 
 
 \begin{figure}
     \centering
@@ -179,7 +183,7 @@ For convenience, the actual model used by Dialect differs slightly from the abov
     \label{fig:electron-counting-shorthand}
 \end{figure}
 
-From these rules follow some important consequences. For example, bond order must be an integer greater than zero. This follows from the definition of bond formation. The electron count deducted from each atom is $n$, an integer greater than zero. Given bond formation deducts an equal number of electrons from each atom, the total number of electrons associated with the newly-formed bond is $2n$. By definition, bond order is the bond's electron count divided by two, therefore $n$ is the bond order. Fractional, negative, and zero bond orders are all disallowed by Dialect for this reason.
+From these rules follow some practical consequences. For one, bond order must be an integer greater than zero. This follows from the definition of bond formation. The electron count deducted from each atom is $n$, an integer greater than zero. Given bond formation deducts an equal number of electrons from each atom, the total number of electrons associated with the newly-formed bond is $2n$. By definition, bond order is the bond's electron count divided by two, therefore $n$ is the bond order. Fractional, negative, and zero bond orders are all disallowed by Dialect for this reason.
 
 Dialect imposes an upper limit of three on formal bond order. The relative scarcity of bond orders greater than three in molecules conforming the the VB Model makes this restriction unlikely to meaningfully restrict applicability.
 
@@ -194,7 +198,7 @@ Whereas negative bond order is disallowed by definition, Dialect places no restr
 
 \section*{Bond Elision}
 
-To promote compact string representations, Dialect supports \textit{bond elision}. An single bond may be elided by marking it as such. An elided bond nevertheless has a bond order of one. A bond may be elided for one of two reasons. First, elided bonds are not written during serialization, allowing for increased information density. The second reason relates to a feature described in the next section.
+To promote compact string representations, Dialect supports \textit{bond elision}. A bond of order one may be setting its \ttt{elided} attribute to \ttt{true}. As such, an elided bond always has a bond order of one. A bond may be elided for one of two reasons. First, elided bonds are not written during serialization, allowing for increased information density. The second reason relates to a feature described in the next section.
 
 \section*{Delocalization Subgraph}
 
@@ -244,9 +248,7 @@ The opposite operation can be accomplished with a \textit{selection algorithm}. 
     \label{fig:selection}
 \end{figure}
 
-\section*{Implicit Hydrogens and Subvalence}
-
-In addition to virtual hydrogen count, Dialect supports a second form of hydrogen suppression called \textit{implicit hydrogens}. Like a virtual hydrogen, an implicit hydrogen is monovalent, has only default attributes, and is present as an integer tally associated with a particular atom. But unlike a virtual hydrogen, the presence of an implicit hydrogen can only be deduced through computation. Implicit hydrogens are an integral yet invisible component of many molecular graphs.
+\section*{Valence and Subvalence}
 
 To support implicit hydrogen counting, Dialect uses the concept of \textit{valence}. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, and triple bonds three. Every other bond contributes one, as does each virtual hydrogen. For example, the valence of a methyl carbon having a \ttt{hydrogens} attribute of three is four. In contrast, the valence of a methyl carbon with a \ttt{hydrogens} attribute of \ttt{Implicit} is one.
 
