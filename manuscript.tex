@@ -237,7 +237,7 @@ DIME can interfere with \textit{canonicalization}, or the selection of a single 
 
 To eliminate DIME and thereby streamline canonicalization, Dialect representations support a \textit{delocalization subgraph} (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS is drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
 
-A non-empty DS must possess a \textit{perfect matching}. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
+An atom is added to a DS by setting its \ttt{selected} attribute to \ttt{true} ("selection"). For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements (or \ttt{None}) must not be selected. Only selected atoms belong to the DS.
 
 \begin{figure}
     \centering
@@ -246,11 +246,9 @@ A non-empty DS must possess a \textit{perfect matching}. A matching is a subgrap
     \label{fig:perfect-matching}
 \end{figure}
 
-Only some atoms are eligible for inclusion (or "selection") in a DS. Atoms whose \ttt{element} values are one of \ttt{C}, \ttt{N}, \ttt{O}, \ttt{P}, or \ttt{S}, or \ttt{None}, may be selected --- regardless of cycle membership. Atoms having other \ttt{element} values must not be selected.
-
-To support the construction of a DS, eligible atoms carry a \ttt{selected} boolean attribute. Setting this attribute to \ttt{true}, adds the atom to the DS. Otherwise, the atom is excluded from the DS. All ineligible atoms are excluded from the DS.
-
 A bond will be added to the DS only if both of the following conditions are met: (1) both terminals are selected; and (2) the bond itself is elided. No other bond will be added to the DS. This behavior makes it possible to exclude a specific bond from the DS by making its bond order explicit.
+
+A non-empty DS must possess a \textit{perfect matching}. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
 
 A filled DS can be emptied through a two-step process of \textit{deselection}. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A popular algorithm for matching, the Edmunds "blossom algorithm,"\cite{edmunds65} has a time complexity of $O(|E||V|^2)$, where $|E|$ is the number of edges and $|V|$ is the number of nodes. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
 
@@ -261,7 +259,7 @@ A filled DS can be emptied through a two-step process of \textit{deselection}. F
     \label{fig:deselection}
 \end{figure}
 
-The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more eligible atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of "aromaticity." A double bond between two selected atoms may or may not be elided, depending on the application.
+The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of "aromaticity." A double bond between two selected atoms may or may not be elided, depending on the application.
 
 \begin{figure}
     \centering
@@ -743,7 +741,7 @@ A reader must assume that any input string can contain errors, and take appropri
     \item{Unexpected end-of-line. Input ended unexpectedly.}
     \item{Unbalanced cut (position). A cut with a given index appears an odd number of times.}
     \item{Incompatible cut bonds (position, position). The bonds to a pair of cuts are incompatible.}
-    \item{Delocalization subgraph lacks perfect matching. Before reporting this error, steps to remove ineligible atoms should be taken as described in the next section.}
+    \item{Delocalization subgraph lacks perfect matching. Before reporting this error, steps to remove unnecessarily selected atoms should be taken as described in the next section.}
     \item{Partial parity bond not allowed (position). Neither terminal of a PPB possesses a double bond. Strings such as "C/C" and "C{\textbackslash}C" contain isolated PPBs, which are invalid. A reader encountering such strings must report an error.}
 \end{enumerate}
 
