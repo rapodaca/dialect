@@ -138,7 +138,7 @@ Restrictions on atomic state are:
 
 \begin{enumerate}
     \item{The value of \ttt{index} must be unique over the molecular graph.}
-    \item{If \ttt{hydrogens} equals \ttt{Implicit}, then \ttt{isotope}, \ttt{configuration}, and \ttt{charge} must equal their default values. Furthermore, \ttt{element} must equal one of \ttt{B}; \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{S}; \ttt{F}; \ttt{Cl}; \ttt{Br}; \ttt{I}.}
+    \item{If \ttt{hydrogens} equals \ttt{Implicit}, then \ttt{isotope}, \ttt{configuration}, and \ttt{charge} must equal their default values. Furthermore, \ttt{element} must equal one of \ttt{B}; \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{S}; \ttt{F}; \ttt{Cl}; \ttt{Br}; \ttt{I}; or \ttt{None}.}
     \item{If \ttt{selected} equals \ttt{true}, then \ttt{element} must equal one of: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; or \ttt{S}.}
 \end{enumerate}
 
@@ -270,18 +270,16 @@ The opposite operation can be accomplished with a \textit{selection algorithm}. 
 
 \section*{Valence and Subvalence}
 
-To support implicit hydrogen counting, Dialect uses the concept of \textit{valence}. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, and triple bonds three. Every other bond contributes one, as does each virtual hydrogen. For example, the valence of a methyl carbon having a \ttt{hydrogens} attribute of three is four. In contrast, the valence of a methyl carbon with a \ttt{hydrogens} attribute of \ttt{Implicit} is one.
+To support implicit hydrogen counting, Dialect uses the concept of \textit{valence}. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, and triple bonds three. All other bonds contribute one, as does each virtual hydrogen. For example, the valence of a methyl carbon having three virtual hydrogens and a hydrogen neighbor is four. The valence of an acetaldehyde oxygen atom is two. And so on.
 
-Only some atoms are eligible for implicit hydrogen counting. These are called \textit{eligible atoms}. An atom becomes eligible by fulfilling two requirements: (1) its \ttt{hydrogens} attribute equals \ttt{Implicit}; and (2) its \ttt{element} attribute is associated with at least one \textit{default valence}.
-
-A default valence is a value associated with an element that represents the number of hydrogens that can be attached to an isolated atom. Table \ref{table:target-valences} lists those elements possessing at least one default valence. All other elements have no default valences. The target valence of 4 for carbon, for example, means that a fully-saturated carbon atom will be bound to four hydrogen atoms. Likewise, a fully-saturated oxygen atom will be bound to two hydrogen atoms. However, iron has no default valences. Some elements such as nitrogen have multiple target valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the target valences three and five. Both ammonia and nitrogen pentahydride (NH\textsubscript{5}) are fully saturated forms of nitrogen according to Table \ref{table:target-valences}.
+Some elements are associated with one or more \textit{default valences} (Table~\ref{table:default-valences}). A default valence is the number of hydrogens that can be attached to an isolated, fully-saturated atom using the corresponding element. For example, the default valence for a carbon-bearing atom is 4. This means that a fully saturated atom of carbon will have four hydrogens. Likewise, a fully-saturated atom of oxygen will have two hydrogens. Some elements such as nitrogen are associated with multiple default valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the default valences three and five. Both ammonia (NH\textsubscript{3}) and nitrogen pentahydride (NH\textsubscript{5}) are therefore fully saturated forms of nitrogen.
 
 \begin{table}
     \caption{Default Valences.}
     \centering
     \begin{tabular}{l l}
         \hline
-        Element & Defaults \\
+        Element & Valences \\
         \hline
         B & 3 \\
         C & 4 \\
@@ -295,24 +293,24 @@ A default valence is a value associated with an element that represents the numb
         I & 1 \\
         \hline
     \end{tabular}
-    \label{table:target-valences}
+    \label{table:default-valences}
 \end{table}
 
-Given one or more default valences, \textit{subvalence} can be computed. Subvalence is the number of hydrogens that can be added to an eligible atom without exceeding the lowest possible default valence. If no default valence less than a default valence exists, then the subvalence is zero. The subvalence for an eligible atom (\ttt{a}) can be computed with Algorithm \ref{algorithm:implicit-hydrogen}.
+Given an atom whose element has one or more default valences \textit{subvalence} can be computed. Subvalence is the number of hydrogens that can be added to an atom without exceeding the lowest possible default valence. If no suitable default valence exists, then the subvalence is zero. This computation can be expressed algorithmically (Algorithm~\ref{algorithm:subvalence}). First, the atom's valence is computed. Next, the ordered list of default valences of the atom's element is found. For each default valence, the difference between it and the valence is compute. If this differences is positive, it is returned as the subvalence. If no suitable default valence is found, zero is returned.
 
 \begin{algorithm}
     \SetKwInOut{Input}{input}
     \SetKwInOut{Output}{output}
     \SetKwFunction{BondOrderSum}{BondOrderSum}
     \SetKwFunction{TargetValences}{TargetValences}
-    \caption{Compute subvalence}
-    \label{algorithm:implicit-hydrogen}
+    \caption{Computing subvalence.}
+    \label{algorithm:subvalence}
     
-    \Input{An eligible atom $a$}
+    \Input{An atom $a$ with one or more default valences}
     \Output{The subvalence of $a$}
     \Begin{
       $v \leftarrow$ Valence($a$)\;
-      $T \leftarrow$ TargetValences($a$)\;
+      $T \leftarrow$ DefaultValences($a$)\;
       \For{$t \in T$}{
         $d \leftarrow t-v$\;
         \If{$d >= 0$}{
@@ -323,27 +321,27 @@ Given one or more default valences, \textit{subvalence} can be computed. Subvale
     }
 \end{algorithm}
 
-The algorithm accepts an eligible atom \ttt{a} as input and returns its subvalence. First, the valence (sum of bond orders) for \ttt{a} is computed. Next, the ordered list of target valences (\ttt{T}) is obtained from Table {table:target-valences}. For each target valence (\ttt{t}), the difference (\ttt{d}) between \ttt{t} and \ttt{v} is computed. If this difference is non-negative, \ttt{d} is returned as the implicit hydrogen count. If no suitable target valence can be found, zero is returned.
+The subvalence of an atom whose element has no default valences (i.e. no listing in Table~\ref{table:default-valences}) is zero. For example, an iron atom always has a subvalence of zero, regardless of how it is bonded.
 
-Consider an isolated atom whose values of \ttt{element} and \ttt{hydrgogens} are \ttt{N} and \ttt{Implicit}, respectively. The atom's bond order sum is zero. Its default valences are 3 and 5. The difference \ttt{d} is found to be three (3 - 0). Therefore, subvalence of this atom is three.
+For a representative subvalence computation, consider an isolated nitrogen atom without virtual hydrogens. The atom's bond order sum is zero. Its default valences are 3 and 5. The difference is found to be three ($3 - 0$). Therefore, the subvalence of this atom is three.
 
-The carbonyl carbon atom of acetaldehyde illustrates the effects of substitution and multiple bonding. This atom uses implicit hydrogen counting (\ttt{hydrogens} equals \ttt{Implicit}). Valence is therefore three (2 + 1). The first and only default valence for carbon is four. Subtracting three from four yields one, which is returned as the atom's subvalence.
+The carbonyl carbon atom of acetaldehyde illustrates the effects of substitution and multiple bonding. Bond order sum is three (2 + 1). From Table~\ref{table:default-valences}, default valence is four. Subtracting bond order sum from default valence yields one ($4 - 3$), which is returned as the atom's subvalence.
 
-The phosphorous atom in phosphorous acid (H\textsubscript{3}PO\textsubscript{3}) illustrates the use of Algorithm \ref{algorithm:implicit-hydrogen} for atoms with multiple target valences. Given a \ttt{hydrogens} attribute of \ttt{Implicit}, the atom's bond order sum is four (2 + 1 + 1). The first target valence is 3, but subtracting that value from four yields a negative number (-1). Continuing to the next default valence, 5, a difference of 1 is obtained. Therefore, the subvalence of the phosphorous-bearing atom is reported as 1.
+The phosphorous atom in phosphorous acid (H\textsubscript{3}PO\textsubscript{3}) illustrates the use of Algorithm \ref{algorithm:subvalence} for atoms with multiple target valences. Bond order sum is four ($2 + 1 + 1$). The first default valence is 3, but subtracting valence from that value yields a negative number ($3 - 4$). Continuing to the next default valence, five, a difference of 1 is obtained. Therefore, the subvalence of the phosphorous-bearing atom is reported as one.
 
-The valence of some atoms exceeds the largest default valence. In these cases, subvalence is reported as zero. Consider sodium perchlorate (NaClO\textsubscript{4}). The chlorine atom has a bond order sum of seven (2 + 2 + 2 + 1). From Table 1, the only target valence for chlorine is one. Subtracting seven yields a negative number (-6). Therefore, the subvalence is reported as zero.
-
-The subvalence for ineligible atoms is zero.
+The valence of some atoms exceeds the largest default valence. In these cases, subvalence is reported as zero. Consider sodium perchlorate (NaClO\textsubscript{4}). The chlorine atom has a bond order sum of seven ($2 + 2 + 2 + 1$). From Table~\ref{table:default-valences}, the only default valence for chlorine is one. Subtracting seven yields a negative number (-6). Therefore, the subvalence is reported as zero.
 
 \section*{Computing Implicit Hydrogen Count}
 
-For unselected atoms, implicit hydrogen count equals subvalence. Consider an oxygen atom with a \ttt{hydrogens} attribute of \ttt{Implicit}. Subvalence equals two and so does implicit hydrogen count. However, an oxygen atom with a \ttt{hydrogens} attribute equal to one will have an implicit hydrogen count of zero.
+To qualify for implicit hydrogen counting, an atom must have a \ttt{hydrogens} attribute set to \ttt{Implicit}. As noted previously, this setting requires: (1) \ttt{isotope}, \ttt{charge}, and \ttt{configuration} must be set to their default values; and (2) the value of \ttt{element} must equal one of: \ttt{B}; \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{S}; \ttt{F}; \ttt{Cl}; \ttt{Br}; \ttt{I}; or \ttt{None}.
 
-For selected atoms, a modified procedure is used. If subvalence is greater than zero, then the implicit hydrogen count equals subvalence minus one. This subtraction models the unpaired electron that would would be required for delocalized bonding, or localized bonding if the atom were deselected. Consider a selected carbon atom in benzene whose \ttt{hydrogens} attribute equals \ttt{Implicit}. Subvalence equals two, so implicit hydrogen count equals one (2 - 1).
+For unselected atoms, implicit hydrogen count equals subvalence, with one exception. An oxygen atom with one single bond has an implicit hydrogen count of one because subvalence is one ($2 - 1$). However, an oxygen atom with two singly-bonded neighbors has an implicit hydrogen count of zero ($2 - 2$). For atoms whose \ttt{element} attribute is \ttt{None}, implicit hydrogen count equals zero.
 
-A selected atom with a \ttt{hydrogens} attribute of \ttt{Implicit} and subvalence equal to zero has an implicit hydrogen count of zero. The semantics of such a state may seem suspect. If an atom has no unpaired electrons, how can it participate in delocalized bonding? As will be explained in more detail later (Pruning), this situation can arise through gratuitous atom selection. Returning zero avoids miscalculation of the implicit hydrogen count.
+For selected atoms, a modified procedure is used. If subvalence is greater than zero, then the implicit hydrogen count equals subvalence minus one. This subtraction models the unpaired electron that would would be required for delocalized bonding, or localized bonding if the atom were deselected. Consider a selected carbon atom in benzene with a \ttt{hydrogens} attribute of \ttt{Implicit}. Subvalence equals two, so implicit hydrogen count equals one ($2 - 1$).
 
-An implicit hydrogen count may or may not correlate with chemical intuition or experimental data. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H\textsubscript{2}). We might expect the implicit hydrogen count to equal the experimentally-determined hydrogen count (2). However, the subvalence for the phosphorous atom is found to be three (2 + 1 - 3). The implicit hydrogen count is therefore zero (3 - 3) rather than the expected two. Similar atoms must be encoded using virtual hydrogens.
+If the subvalence of a selected atom equals zero, then an implicit hydrogen count of zero is reported. The meaning of such an atomic state may seem suspect. If an atom has no unpaired electrons, how can it participate in delocalized bonding? As will be explained in detail later (Pruning), this situation can arise for reasons of convenience or tradition. Returning zero avoids miscalculation of the implicit hydrogen count.
+
+An implicit hydrogen count may or may not correlate with chemical intuition or experimental data. Consider the phosphorous-bearing atom of hypophosphorous acid (HOP(O)H\textsubscript{2}). We might expect the implicit hydrogen count to equal the experimentally-determined hydrogen count (2). However, the subvalence for the phosphorous atom is found to be three ($2 + 1 - 3$). The implicit hydrogen count is therefore zero ($3 - 3$) rather than the expected two. The hydrogen count of this atom, and others like it, must be encoded as a virtual hydrogen count.
 
 \begin{figure}
     \centering
@@ -785,7 +783,7 @@ Regardless of the form taken by the input data structure, it must be traversable
     \label{fig:depth-first-traversal}
 \end{figure}
 
-A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The \ttt{<atom>} and \ttt{<bond>} non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane as either "C" or "[CH4]". Single bonds may be elided or not. Similarly, selection can be used or not for eligible atoms. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
+A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The \ttt{<atom>} and \ttt{<bond>} non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane as either "C" or "[CH4]". Single bonds may be elided or not. Similarly, the DS may or may not be empty. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
 
 The presence of branches within an input data structure is encoded via the \ttt{<branch>} data structure. A useful tool for this purpose is a \ttt{stack}. A stack is a data structure that allows items to be added individually and removed ("popped") in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
 
@@ -857,7 +855,7 @@ SMILES assigns no explicit upper or lower bounds to numerical atomic attributes.
 
 Dialect provides a few semantic clarifications not fully addressed in SMILES. A detailed algorithm for determining implicit hydrogen count is provided, together with the required valence table. Unlike SMILES, Dialect explicitly considers the case of computing implicit hydrogens on selected atoms. Dialect also provides detailed algorithms, absent in SMILES, for selection and deselection. These are based in graph theory rather than the ambiguous and overloaded chemical concept of "aromaticity" used in SMILES. Uniquely, Dialect introduces the concepts of "pruning" and "gratuitous selection." Neither the paper nor the book chapter indicate those bonds that can be promoted during deselection, but Dialect does. Finally, Dialect syntax is based on a formal grammar and tooling rooted in decades of computer science research, whereas SMILES syntax is based for the most part on imprecise natural language descriptions.
 
-Dialect also resolves some internal contradictions within SMILES. The article reports 3 as the only default valence for nitrogen (p. 34), whereas the book chapter reports two default valences: 3 and 5 (p. 84). Dialect uses the latter default valences. Eligible atoms ("the organic subset") are reported in the article as: B; C; N; O; P; S; F; Cl; Br; and I (p. 32). However, an example later in the article indicates that "Hn1cccc1" with its unbracketed hydrogen is a valid string (p. 35). Dialect explicitly rejects strings containing unbracketed hydrogen atoms. On the topic of atom selection ("aromaticity"), the article implies that selected atoms must be part of a cycle: "To qualify as aromatic, all atoms in the ring must be sp2 hybridized and the number of available 'excess' $\pi$ electrons must satisfy Hückel's 4{\textit{N}} + 2 criterion." (p. 34). The book chapter, however, presents two examples of valid strings that do not encode cycles ("cc" and "cccc", p. 85). Consistent with the latter view, Dialect explicitly allows the selection of atoms regardless of cycle membership.
+Dialect also resolves some internal contradictions within SMILES. The article reports 3 as the only default valence for nitrogen (p. 34), whereas the book chapter reports two default valences: 3 and 5 (p. 84). Dialect uses the latter default valences. Atoms whose \ttt{hydrogens} attribute may be set to \ttt{Implicit} ("the organic subset") are reported in the article as: B; C; N; O; P; S; F; Cl; Br; and I (p. 32). However, an example later in the article indicates that "Hn1cccc1" with its unbracketed hydrogen is a valid string (p. 35). Dialect explicitly rejects strings containing unbracketed hydrogen atoms. On the topic of atom selection ("aromaticity"), the article implies that selected atoms must be part of a cycle: "To qualify as aromatic, all atoms in the ring must be sp2 hybridized and the number of available 'excess' $\pi$ electrons must satisfy Hückel's 4{\textit{N}} + 2 criterion." (p. 34). The book chapter, however, presents two examples of valid strings that do not encode cycles ("cc" and "cccc", p. 85). Consistent with the latter view, Dialect explicitly allows the selection of atoms regardless of cycle membership.
 
 \begin{table}
     \caption{Some differences between SMILES and Dialect.}
