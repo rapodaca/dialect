@@ -89,11 +89,14 @@ Dialect uses several abstractions collectively known as the \textit{data model}.
 The data model is expressed in terms of a small set of \textit{primitives}. A primitive is an irreducible data type. Dialects primitives are summarized in Table \ref{table:primitives}.
 
 \begin{table}
+\begin{minipage}{\textwidth}
+\renewcommand*\footnoterule{}
 \caption{Data Model Primitives.}
+\label{table:primitives}
 \centering
 \begin{tabular}{l l l}
     \hline
-    Name & Description & Values \\
+    Name & Description & Values\footnote{Ranges defined as \ttt{a..b} include \ttt{a} and exclude \ttt{b}.} \\
     \hline
     \ttt{Option<Type>} & Optional Value & \ttt{None}, \ttt{Type} \\
     \ttt{Index} & Unsigned integer & 0..2\textsuperscript{32} \\
@@ -108,7 +111,7 @@ The data model is expressed in terms of a small set of \textit{primitives}. A pr
     \ttt{boolean} & Boolean & \ttt{true}, \ttt{false} \\
     \hline
 \end{tabular}
-\label{table:primitives}
+\end{minipage}
 \end{table}
 
 Table \ref{table:atomic-state} summarizes atomic attributes. Not all combinations of values ("atomic state") are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created.
