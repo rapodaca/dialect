@@ -225,7 +225,7 @@ To promote compact string representations, Dialect supports \textit{bond elision
 
 \section*{Delocalization Subgraph}
 
-A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME occurs when a molecular graph exists in two or more equal forms, each differing from the others only through electron delocalization. Two molecular graphs are equal if they are isomorphic and a 1:1 mapping exists between the atoms and bonds in each graph. Electron delocalization results when the electrons of a valence bond representation can be distributed over more than one atom pair, between two or more atoms, or across some combination of atoms and bonds. DIME is similar to "resonance" or "aromaticity," but those terms are avoided here due to their ambiguity.\cite{randic:2018,kerber:2006}
+A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME occurs when a molecular graph exists in two or more unequal forms, each differing from the others only through electron delocalization. Two molecular graphs are equal if they are isomorphic and a 1:1 mapping exists between the atoms and bonds in each graph. Electron delocalization results when the electrons of a valence bond representation can be distributed over more than one pair of atoms, as is the case with benzene and related molecules. DIME is similar to "resonance" or "aromaticity," but those terms are avoided here due to their ambiguity.\cite{randic:2018,kerber:2006}
 
 \begin{figure}
     \centering
@@ -513,8 +513,6 @@ It is sometimes useful to manipulate a configuration in a way that preserves the
     \caption{Configurational Transformations.}
     \label{fig:iconfigurational-transformations}
 \end{figure}
-
-It is an error to assign a stereodescriptor to any atom that is not tetracoordinate, or which has more than one virtual hydrogen.
 
 Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is an atom whose "ligand permutation produces stereoisomers," as defined by Mislow and Siegel.\cite{mislow:1984} In the context of Dialect, a stereocenter must be tetracoordinate. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
 
