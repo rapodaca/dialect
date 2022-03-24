@@ -33,21 +33,21 @@ Simplified Molecular Input Line Entry System (SMILES) was first described by Wei
 
 SMILES has since been widely adopted. Read and write functionalities are routinely supported by popular cheminformatics toolkits, including: Open Babel~\cite{oBoyle:2011}; RDKit~\cite{rdkit}; Chemistry Development Kit~\cite{steinbeck:2003}; JChem Base~\cite{jchemBase}; the Daylight Toolkit~\cite{daylightToolkit}; and OEChem TK~\cite{oetk}. SMILES encodings can be found in many public-facing databases, including: PubChem~\cite{kim:2016}; ChEBI~\cite{degtyarenko:2007}; ZINC~\cite{irwin:2005}; ChEMBL~\cite{gaulton:2012}; and Wikipedia~\cite{wikipediaCAS}. Raw SMILES strings have been used extensively in machine learning applications~\cite{sousa:2021}. SMILES has also been extended to carry various forms of metadata, as exemplified by Jmol SMILES~\cite{hanson:2016}, CurleySMILES~\cite{drefahl:2011}, BigSMILES~\cite{lin:2019}, and CXSMILES~\cite{cxsmiles}.
 
-Despite its many applications, SMILES remains a language with an incomplete specification. Weininger's 1988 paper leaves the following either fully or incompletely specified: (1) stereochemical configuration; (2) double bond conformation; (3) the meaning handling of "aromatic" features; (4) the computation of implicit hydrogen count, especially as related to aromatic features; (5) formal syntax; (6) constraints on quantities such as mass number and charge; and (7) enumeration of error states.
+Despite its many applications, SMILES remains a language with an incomplete specification. Weininger's 1988 paper leaves the following either fully or incompletely specified: (1) stereochemical configuration; (2) double bond conformation; (3) the meaning handling of ``aromatic'' features; (4) the computation of implicit hydrogen count, especially as related to aromatic features; (5) formal syntax; (6) constraints on quantities such as mass number and charge; and (7) enumeration of error states.
 
 Earlier descriptions of SMILES were published in various media, although these are not cited by Weininger. A currently-accessible example is a 1987 report to the US Environmental Protection Agency~\cite{anderson:1987}. Although the language described there shares many features with later descriptions, there are important differences as well.
 
-Since 1988, two authoritative sources have attempted to clarify or revise Weininger's 1988 description of SMILES. A 2003 book chapter by Weininger addressed some of the limitations of the paper~\cite{weininger:2008}. The Daylight Theory Manual, a website maintained by SMILES's corporate sponsor, Daylight Chemical Information Systems, Inc. ("Daylight"), recapitulates previously-published material~\cite{daylightTheory}. The lack of other written sources describing SMILES is consistent with Weininger's reported disinterest in traditional scientific publication~\cite{gasteiger:2018}.
+Since 1988, two authoritative sources have attempted to clarify or revise Weininger's 1988 description of SMILES. A 2003 book chapter by Weininger addressed some of the limitations of the paper~\cite{weininger:2008}. The Daylight Theory Manual, a website maintained by SMILES's corporate sponsor, Daylight Chemical Information Systems, Inc. (``Daylight''), recapitulates previously-published material~\cite{daylightTheory}. The lack of other written sources describing SMILES is consistent with Weininger's reported disinterest in traditional scientific publication~\cite{gasteiger:2018}.
 
-In 2007 a documentation effort that would become known as OpenSMILES began~\cite{openSMILES}. OpenSMILES was conceived as "a non-proprietary specification for the SMILES language." Many of the points left open by previous SMILES documentation efforts were addressed. Noteworthy contributions included: the first formal grammar, which was later adapted~\cite{denjoed:2010}; many refinements around stereochemistry; and the introduction of "standard form." Absent were detailed procedures for assigning and interpreting aromatic features, and a detailed procedure for computing implicit hydrogen count. OpenSMILES also left several points of syntactic and semantic ambiguity unsettled, while introducing extensions of its own.
+In 2007 a documentation effort that would become known as OpenSMILES began~\cite{openSMILES}. OpenSMILES was conceived as ``a non-proprietary specification for the SMILES language.'' Many of the points left open by previous SMILES documentation efforts were addressed. Noteworthy contributions included: the first formal grammar, which was later adapted~\cite{denjoed:2010}; many refinements around stereochemistry; and the introduction of ``standard form.'' Absent were detailed procedures for assigning and interpreting aromatic features, and a detailed procedure for computing implicit hydrogen count. OpenSMILES also left several points of syntactic and semantic ambiguity unsettled, while introducing extensions of its own.
 
-In 2019 IUPAC announced the SMILES+ initiative~\cite{smilesPlusSpecification}. Noting the limitations of existing SMILES documentation, the SMILES+ effort seeks to "establish a formalized recommended up-to-date specification of the SMILES format." SMILES+ took as its starting point the documentation produced by the OpenSMILES project. Efforts to extend this starting point are in progress online through a public repository, but no formal recommendation has to date resulted~\cite{smilesPlusGitHub}.
+In 2019 IUPAC announced the SMILES+ initiative~\cite{smilesPlusSpecification}. Noting the limitations of existing SMILES documentation, the SMILES+ effort seeks to ``establish a formalized recommended up-to-date specification of the SMILES format.'' SMILES+ took as its starting point the documentation produced by the OpenSMILES project. Efforts to extend this starting point are in progress online through a public repository, but no formal recommendation has to date resulted~\cite{smilesPlusGitHub}.
 
 The ongoing lack of a comprehensive SMILES documentation suite has caused several problems. First, authors of new SMILES implementations have limited guidance when resolving ambiguities and so must invent them on an ad hoc basis. Second, maintainers of existing SMILES implementations lack a blueprint for working toward a common feature set. Third, standards bodies draw from a limited set of source material when preparing recommendations. Fourth, a lack of detailed documentation hinders the development of compliance suites, thereby interfering with efforts to validate cross-implementation compatibility. Finally, extensions to SMILES only make sense in the context of a rigorously defined base language.
 
-The lack of a detailed, comprehensive, and universally-applied SMILES specification also hampers broader data integrity efforts. The FAIR Guiding Principles identify four qualities essential for extracting maximum utility from published scholarly data: Findability; Accessibility; Interoperability; and Reusability~\cite{wilkinson:2016}. Interoperability in particular requires that "(meta)data" use a formal, accessible, shared, and broadly applicable language for knowledge representation." Although SMILES may be a shared, accessible, and broadly applicable language, its formal underpinnings leave room for improvement.
+The lack of a detailed, comprehensive, and universally-applied SMILES specification also hampers broader data integrity efforts. The FAIR Guiding Principles identify four qualities essential for extracting maximum utility from published scholarly data: Findability; Accessibility; Interoperability; and Reusability~\cite{wilkinson:2016}. Interoperability in particular requires that ``(meta)data'' use a formal, accessible, shared, and broadly applicable language for knowledge representation.'' Although SMILES may be a shared, accessible, and broadly applicable language, its formal underpinnings leave room for improvement.
 
-This situation has persisted long enough that the notion of a SMILES "standard" may not currently be feasible. A dozen or more slightly different implementations are now in use. None of them can be considered a reference standard. Some have introduced extensions not recognized by the others, contributing to language "drift" while compounding the already formidable difficulties faced by implementors. Others claim SMILES compatibility while ignoring certain aspects of written documentation. The Daylight implementation, like some of the others, is distributed under a non-Open Source license that restricts use~\cite{daylightToolkit}. For several years Daylight operated a publicly-accessible web service based on its toolkit that depicted SMILES strings, but it has since been decommissioned~\cite{depictArchive}. Although SMILES may underpin modern chemical information exchange, the foundations of this system are weathered and showing signs of stress.
+This situation has persisted long enough that the notion of a SMILES standard may not currently be feasible. A dozen or more slightly different implementations are now in use. None of them can be considered a reference standard. Some have introduced extensions not recognized by the others, contributing to language drift while compounding the already formidable difficulties faced by implementors. Others claim SMILES compatibility while ignoring certain aspects of written documentation. The Daylight implementation, like some of the others, is distributed under a non-Open Source license that restricts use~\cite{daylightToolkit}. For several years Daylight operated a publicly-accessible web service based on its toolkit that depicted SMILES strings, but it has since been decommissioned~\cite{depictArchive}. Although SMILES may underpin modern chemical information exchange, the foundations of this system are weathered and showing signs of stress.
 
 This paper attempts to resolve these these issues with Dialect, a fully-specified subset of the SMILES language. The following sections present Dialect from three perspectives: as a compact system for molecular representation; as a text-based language; and as a specification for software intended to convey chemical structure information across organizational and temporal boundaries.
 
@@ -75,9 +75,9 @@ Dialect's molecular representation system is based on four mutually-exclusive co
 \label{fig:myfig}
 \end{figure}
 
-Dialect's system of representation is based on the \textit{molecular graph} concept~\cite{balaban:1985}. A graph is a data structure comprised of a set of nodes (which map to "atoms") and a set of pairwise relationships between them called edges (which map to "bonds"). A molecular graph is a specialized graph onto which atomic and bonding metadata have been overlaid. Molecular graphs are ubiquitous in cheminformatics, appearing in contexts such as data formats like Chemical Markup Language~\cite{murray-rust:2011}, CDXML~\cite{cdxml}, and Molfile~\cite{ctfileFormats}, as well as in-memory data structures found in cheminformatics toolkits. Like these systems, Dialect augments its underlying graph with node and edge labels.
+Dialect's system of representation is based on the \textit{molecular graph} concept~\cite{balaban:1985}. A graph is a data structure comprised of a set of nodes (which map to atoms) and a set of pairwise relationships between them called edges (which map to bonds). A molecular graph is a specialized graph onto which atomic and bonding metadata have been overlaid. Molecular graphs are ubiquitous in cheminformatics, appearing in contexts such as data formats like Chemical Markup Language~\cite{murray-rust:2011}, CDXML~\cite{cdxml}, and Molfile~\cite{ctfileFormats}, as well as in-memory data structures found in cheminformatics toolkits. Like these systems, Dialect augments its underlying graph with node and edge labels.
 
-A Dialect molecule consists of a graph with zero or more nodes and zero or more edges. The "empty molecule", devoid of atoms and bonds, is allowed. Dialect imposes no upper bound on the number of atoms or bonds. However, practical limitations related to memory, storage, and CPU time will likely limit the size of molecules in practice.
+A Dialect molecule consists of a graph with zero or more nodes and zero or more edges. The empty molecule, devoid of atoms and bonds, is allowed. Dialect imposes no upper bound on the number of atoms or bonds. However, practical limitations related to memory, storage, and CPU time will likely limit the size of molecules in practice.
 
 The edges of a Dialect molecular graph are defined as a set of unordered pairs of non-identical nodes. The practical consequences of this are threefold. First, \textit{loops} are not allowed. A loop is an edge joining a node to itself. Second, edges are \textit{undirected}. An undirected edge is equivalent to another edge whose terminals are swapped. An undirected edge between nodes A and B is therefore identical to an undirected edge between nodes B and A. Third, \textit{parallel edges} are disallowed. Edges are said to be parallel if they connect the same two nodes.
 
@@ -115,7 +115,7 @@ The data model is expressed in terms of a small set of \textit{primitives}. A pr
 \end{minipage}
 \end{table}
 
-Table \ref{table:atomic-state} summarizes atomic attributes. Not all combinations of values ("atomic state") are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created.
+Table \ref{table:atomic-state} summarizes atomic attributes. Not all combinations of values (``atomic state'') are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created.
 
 \begin{table}
 \caption{Atomic State.}
@@ -180,7 +180,7 @@ Two attributes characterize an atom's nucleus: \ttt{element} and \ttt{isotope}. 
 
 The \ttt{hydrogens} attribute encodes an atom's mode of \textit{hydrogen suppression}. Hydrogen suppression replaces hydrogen atoms in a molecular graph with a more compact representation. Despite the removal of its node, a suppressed hydrogen and its bonds to the parent atom are understood to be present. The abundance and regular bonding of hydrogen atoms in molecular graphs makes hydrogen suppression a popular strategy for increasing information density.
 
-Dialect supports two mutually-exclusive modes of hydrogen suppression. The first is \textit{virtual hydrogen}. A virtual hydrogen is one whose node and connecting bond have been replaced by an integer tally attribute on the parent atom. For example, methane can be represented by a molecular graph having five nodes and four edges. But methane can also be represented as a graph of one node whose \ttt{hydrogens} attribute equals four. When using this variant, the \ttt{hydrogens} attribute may assume integer values from zero to nine, inclusive. The process of transforming one or more hydrogen nodes into a virtual hydrogen is called "virtualization." The opposite process, transforming one or more virtual hydrogens into a node, is called "reification."
+Dialect supports two mutually-exclusive modes of hydrogen suppression. The first is \textit{virtual hydrogen}. A virtual hydrogen is one whose node and connecting bond have been replaced by an integer tally attribute on the parent atom. For example, methane can be represented by a molecular graph having five nodes and four edges. But methane can also be represented as a graph of one node whose \ttt{hydrogens} attribute equals four. When using this variant, the \ttt{hydrogens} attribute may assume integer values from zero to nine, inclusive. The process of transforming one or more hydrogen nodes into a virtual hydrogen is called ``virtualization.'' The opposite process, transforming one or more virtual hydrogens into a node, is called ``reification.''
 
 The second mode of suppressed hydrogen is \textit{implicit hydrogen}. An implicit hydrogen is similar to a virtual hydrogen in that both the hydrogen node and bond have been replaced with a tally. Unlike a virtual hydrogen, however, this tally is not present as attribute on the parent atom but rather as a computation. The computation will be described in detail in a subsequent section. Subject to certain limitations, an an atom identifies itself as having an implicit hydrogen count by setting its \ttt{hydrogens} attribute to \ttt{Implicit}.
 
@@ -225,7 +225,7 @@ To promote compact string representations, Dialect supports \textit{bond elision
 
 \section*{Delocalization Subgraph}
 
-A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME occurs when a molecular graph exists in two or more unequal forms, each differing from the others only through electron delocalization. Two molecular graphs are equal if they are isomorphic and a 1:1 mapping exists between the atoms and bonds in each graph. Electron delocalization results when the electrons of a valence bond representation can be distributed over more than one pair of atoms, as is the case with benzene and related molecules. DIME is similar to "resonance" or "aromaticity," but those terms are avoided here due to their ambiguity~\cite{randic:2018,kerber:2006}.
+A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME occurs when a molecular graph exists in two or more unequal forms, each differing from the others only through electron delocalization. Two molecular graphs are equal if they are isomorphic and a 1:1 mapping exists between the atoms and bonds in each graph. Electron delocalization results when the electrons of a valence bond representation can be distributed over more than one pair of atoms, as is the case with benzene and related molecules. DIME is similar to ``resonance'' or ``aromaticity,'' but those terms are avoided here due to their ambiguity~\cite{randic:2018,kerber:2006}.
 
 \begin{figure}
     \centering
@@ -238,7 +238,7 @@ DIME can interfere with \textit{canonicalization}, or the selection of a single 
 
 To eliminate DIME and thereby streamline canonicalization, Dialect representations support a \textit{delocalization subgraph} (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS is drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
 
-An atom is added to a DS by setting its \ttt{selected} attribute to \ttt{true} ("selection"). For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements (or \ttt{None}) must not be selected. Only selected atoms belong to the DS.
+An atom is added to a DS by setting its \ttt{selected} attribute to \ttt{true} (``selection''). For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements (or \ttt{None}) must not be selected. Only selected atoms belong to the DS.
 
 \begin{figure}
     \centering
@@ -251,7 +251,7 @@ A bond will be added to the DS only if both of the following conditions are met:
 
 A non-empty DS must possess a \textit{perfect matching}. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
 
-A filled DS can be emptied through a two-step process of \textit{deselection}. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A popular algorithm for matching, the Edmunds "blossom algorithm," has a time complexity of $O(|E||V|^2)$, where $|E|$ is the number of edges and $|V|$ is the number of nodes~\cite{edmonds:1965}. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
+A filled DS can be emptied through a two-step process of \textit{deselection}. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A popular algorithm for matching, the Edmunds ``blossom algorithm,'' has a time complexity of $O(|E||V|^2)$, where $|E|$ is the number of edges and $|V|$ is the number of nodes~\cite{edmonds:1965}. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
 
 \begin{figure}
     \centering
@@ -260,7 +260,7 @@ A filled DS can be emptied through a two-step process of \textit{deselection}. F
     \label{fig:deselection}
 \end{figure}
 
-The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of "aromaticity." A double bond between two selected atoms may or may not be elided, depending on the application.
+The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of ``aromaticity.'' A double bond between two selected atoms may or may not be elided, depending on the application.
 
 \begin{figure}
     \centering
@@ -353,7 +353,7 @@ An implicit hydrogen count may or may not correlate with chemical intuition or e
 
 \section*{Atom Index}
 
-To support the assignment and interpretation stereochemical features, each node is assigned a sequential, unique, non-negative integer \ttt{index} attribute ("index"). The value of an atom's index equals zero for a molecular's graph's first atom. The index for each subsequently-added atom equals the order (node count) of the graph prior to the addition. For example, the index for the second atom is one, the index for the third atom is two, and so on. The maximum value of an atomic index is 2\textsuperscript{32} - 1.
+To support the assignment and interpretation stereochemical features, each node is assigned a sequential, unique, non-negative integer \ttt{index} attribute (``index''). The value of an atom's index equals zero for a molecular's graph's first atom. The index for each subsequently-added atom equals the order (node count) of the graph prior to the addition. For example, the index for the second atom is one, the index for the third atom is two, and so on. The maximum value of an atomic index is 2\textsuperscript{32} - 1.
 
 Indexes impose an ordering over the atoms in a molecular graph. An atom with an index less than another atom is said to \textit{precede} it. An atom with an index grater than another atom \textit{succeeds} it. No special significance is ascribed to the atom whose index is zero, except that every other atom succeeds it.
 
@@ -379,7 +379,7 @@ Dialect takes a different approach by introducing \textit{partial parity bonds} 
     \label{fig:partial-parity-bonds}
 \end{figure}
 
-To support this system, each bond carries a nullable \ttt{direction} attribute ("direction"). When present, this attribute may assume one of the two values \ttt{Up} or \ttt{Down}. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest \ttt{index} attribute appears to the left of the terminal with the higher atomic \ttt{index} attribute. These terminals are designated "left terminal" and "right terminal," respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the \ttt{index} attribute and the direction of its PPB bond.
+To support this system, each bond carries a nullable \ttt{direction} attribute (``direction''). When present, this attribute may assume one of the two values \ttt{Up} or \ttt{Down}. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest \ttt{index} attribute appears to the left of the terminal with the higher atomic \ttt{index} attribute. These terminals are designated ``left terminal'' and ``right terminal,'' respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the \ttt{index} attribute and the direction of its PPB bond.
 
 \begin{figure}
     \centering
@@ -462,9 +462,9 @@ Given that conformational specification is distributed over three or more bonds,
 
 \section*{Configuration}
 
-The third major element of molecular representation is \textit{configuration}. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. Here, "substituent" means an atomic neighbor; lone electron pairs are not considered substituents. One of the four substituents may be a virtual hydrogen.
+The third major element of molecular representation is \textit{configuration}. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. Here, ``substituent'' means an atomic neighbor; lone electron pairs are not considered substituents. One of the four substituents may be a virtual hydrogen.
 
-A configuration is comprised of two components: an ordering of bonds to a central atom; and a \textit{configurational descriptor}. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: \ttt{Left} and \ttt{Right}. The context for the terms "left" and "right" will be explained shortly.
+A configuration is comprised of two components: an ordering of bonds to a central atom; and a \textit{configurational descriptor}. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: \ttt{Left} and \ttt{Right}. The context for the terms ``left'' and ``right'' will be explained shortly.
 
 The descriptors \ttt{Left} and \ttt{Right} restrict neighboring atoms to the vertices of a tetrahedron whose center is the central atom. First, the mate of the first bond to the central atom is placed at an arbitrary vertex. Then shift the frame of reference by sighting along the first bond from the neighbor toward the central atom. Finally, arrange the remaining neighbors using the ordering of bonds to the central atom. For the \ttt{Left} variant, use a counterclockwise distribution. For the \ttt{Right} variant, use a clockwise distribution.
 
@@ -514,28 +514,28 @@ It is sometimes useful to manipulate a configuration in a way that preserves the
     \label{fig:iconfigurational-transformations}
 \end{figure}
 
-Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is an atom whose "ligand permutation produces stereoisomers," as defined by Mislow and Siegel~\cite{mislow:1984}. In the context of Dialect, a stereocenter must be tetracoordinate. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
+Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is an atom whose ``ligand permutation produces stereoisomers,'' as defined by Mislow and Siegel~\cite{mislow:1984}. In the context of Dialect, a stereocenter must be tetracoordinate. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
 
 Special handling is required for \textit{undefined stereocenters}. A stereocenter is undefined if it lacks a stereodescriptor. Omitting a stereodescriptor conveys to readers that no information about the stereocenter's configuration is known. This could imply that either a single configuration or a configurational mixture are present. This interpretation is consistent with the one used by molfile format~\cite{ctfileFormats}.
 
 \section*{Syntax}
 
-A Dialect string ("string") is a UTF-encoded sequence of zero or more characters chosen from the set: \ttt{A}; \ttt{B}; \ttt{C}; \ttt{D}; \ttt{E}; \ttt{F}; \ttt{G}; \ttt{H}; \ttt{I}; \ttt{K}; \ttt{L}; \ttt{M}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{R}; \ttt{S}; \ttt{T}; \ttt{U}; \ttt{V}; \ttt{W}; \ttt{X}; \ttt{Y}; \ttt{Z}; \ttt{a}; \ttt{b}; \ttt{c}; \ttt{d}; \ttt{e}; \ttt{f}; \ttt{g}; \ttt{h}; \ttt{i}; \ttt{k}; \ttt{l}; \ttt{m}; \ttt{n}; \ttt{o}; \ttt{p}; \ttt{r}; \ttt{s}; \ttt{t}; \ttt{u}; \ttt{v}; \ttt{0}; \ttt{1}; \ttt{2}; \ttt{3}; \ttt{4}; \ttt{5}; \ttt{6}; \ttt{7}; \ttt{8}; \ttt{9}; \ttt{+}; \ttt{-}; \ttt{.}; \ttt{\%}; \ttt{@}; \ttt{*}; \ttt{[}; \ttt{]}; \ttt{/}; \ttt{\char`\\}; \ttt{=}; and \ttt{\#}. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
+A Dialect string (``string'') is a UTF-encoded sequence of zero or more characters chosen from the set: \ttt{A}; \ttt{B}; \ttt{C}; \ttt{D}; \ttt{E}; \ttt{F}; \ttt{G}; \ttt{H}; \ttt{I}; \ttt{K}; \ttt{L}; \ttt{M}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{R}; \ttt{S}; \ttt{T}; \ttt{U}; \ttt{V}; \ttt{W}; \ttt{X}; \ttt{Y}; \ttt{Z}; \ttt{a}; \ttt{b}; \ttt{c}; \ttt{d}; \ttt{e}; \ttt{f}; \ttt{g}; \ttt{h}; \ttt{i}; \ttt{k}; \ttt{l}; \ttt{m}; \ttt{n}; \ttt{o}; \ttt{p}; \ttt{r}; \ttt{s}; \ttt{t}; \ttt{u}; \ttt{v}; \ttt{0}; \ttt{1}; \ttt{2}; \ttt{3}; \ttt{4}; \ttt{5}; \ttt{6}; \ttt{7}; \ttt{8}; \ttt{9}; \ttt{+}; \ttt{-}; \ttt{.}; \ttt{\%}; \ttt{@}; \ttt{*}; \ttt{[}; \ttt{]}; \ttt{/}; \ttt{\char`\\}; \ttt{=}; and \ttt{\#}. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
 
 Strings conform to an \textit{LL(1) grammar}. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR~\cite{parr:2014}. The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
 
-Dialect's formal grammar is presented as a series of \textit{production rules} (aka "productions"). A production rule defines a transformation allowed under the grammar. These transformations collectively define the set of valid Dialect strings. Production rules can be used in the forward direction, when writing a string, or in the reverse direction, when reading a string. 
+Dialect's formal grammar is presented as a series of \textit{production rules} (aka ``productions''). A production rule defines a transformation allowed under the grammar. These transformations collectively define the set of valid Dialect strings. Production rules can be used in the forward direction, when writing a string, or in the reverse direction, when reading a string. 
 
-A production rule is composed of two kinds of elements: \textit{terminals} and \textit{non-terminals}. A terminal is a character literal (e.g., "A"). A non-terminal is a reference to another production rule. This reference occurs through a name, which appears to the left of a separator (\ttt{::=}) in a production rule. To the right of a separator appear the allowed terminals and non-terminals for the rule.
+A production rule is composed of two kinds of elements: \textit{terminals} and \textit{non-terminals}. A terminal is a character literal (e.g., ``A''). A non-terminal is a reference to another production rule. This reference occurs through a name, which appears to the left of a separator (\ttt{::=}) in a production rule. To the right of a separator appear the allowed terminals and non-terminals for the rule.
 
-Consider a hypothetical language composed of variable-length sequences of the lowercase letter "a". Such a language could be cast as the following two production rules:
+Consider a hypothetical language composed of variable-length sequences of the lowercase letter ``a''. Such a language could be cast as the following two production rules:
 
 \begin{lstlisting}
 <text> ::= <a>*
 <a>    ::= "a"
 \end{lstlisting}
 
-The quantifier (\ttt{*}) indicates that a text in this language consists of a sequence of zero or more instances of the production \ttt{<a>}. This production in turn is defined as the lowercase letter "a". Therefore, valid texts in this language include the empty string, \ttt{a}, \ttt{aa}, and \ttt{aaaaaa} to name a few.
+The quantifier (\ttt{*}) indicates that a text in this language consists of a sequence of zero or more instances of the production \ttt{<a>}. This production in turn is defined as a lowercase letter (`a`). Therefore, valid texts in this language include the empty string, \ttt{a}, \ttt{aa}, and \ttt{aaaaaa} to name a few.
 
 \subsection*{Atom}
 
@@ -545,39 +545,39 @@ Atoms carry most of the information in a Dialect string. The non-terminal \ttt{<
 <atom> ::= <star> | <shortcut> | <selection> | <bracket>
 \end{lstlisting}
 
-The first atomic non-terminal, \ttt{<star>}, can assume one terminal value, the asterisk character (\ttt{*}). This "star atom" represents an atom in which every attribute assumes its default value. The implicit hydrogen count of a star atom is zero.
+The first atomic non-terminal, \ttt{<star>}, can assume one terminal value, the asterisk character (\ttt{*}). This ``star atom'' represents an atom in which every attribute assumes its default value. The implicit hydrogen count of a star atom is zero.
 
 \begin{lstlisting}
 <star> ::= "*"
 \end{lstlisting}
 
-The next atomic production rule, \ttt{<shortcut>} is a non-terminal selected from the list: "B"; "C"; "N"; "O"; "P"; "S"; "F"; "Cl"; "Br"; and "I". An atom encoded in this way ("shortcut atom") assigns the corresponding symbol to the \ttt{element} attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
+The next atomic production rule, \ttt{<shortcut>} is a non-terminal selected from the list: ``B''; ``C''; ``N''; ``O''; ``P''; ``S''; ``F''; ``Cl''; ``Br''; and ``I.'' An atom encoded in this way (``shortcut atom'') assigns the corresponding symbol to the \ttt{element} attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
 
 \begin{lstlisting}
 <shortcut> ::= "B" "r"? | "C" "l"? | "N" | "O" | "P"
              | "S" | "F" | "I"
 \end{lstlisting}
 
-The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: "c"; "n"; "o"; "p"; and "s". An atom encoded in this way ("selected shortcut atom") assigns the corresponding atom symbol to the \ttt{element} attribute and sets the \ttt{selected} attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
+The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: ``c''; ``n''; ``o''; ``p''; and ``s.'' An atom encoded in this way (``selected shortcut atom'') assigns the corresponding atom symbol to the \ttt{element} attribute and sets the \ttt{selected} attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
 
 \begin{lstlisting}
 <selection> ::= "c" | "n" | "o" | "p" | "s"
 \end{lstlisting}
 
-The fourth and most complex atomic production rule is \ttt{<bracket>} ("bracket atom"). A bracket atom can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an atom makes it ineligible for implicit hydrogen counting. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
+The fourth and most complex atomic production rule is \ttt{<bracket>} (``bracket atom''). A bracket atom can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an atom makes it ineligible for implicit hydrogen counting. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
 
 \begin{lstlisting}
 <bracket> ::= "[" <isotope>? <symbol> <stereodescriptor>?
               <virtual_hydrogen>? <charge>? "]"
 \end{lstlisting}
 
-The value of a bracket atom's \ttt{isotope} attribute is determined by the optional \ttt{<isotope>} non-terminal. It consists of between one and three digits encoding the integers 0-999. Leading zeros are disregarded when assigning the value of the \ttt{isotope} attribute. In other words, "007" and "7" are considered equivalent expressions of the value 7.
+The value of a bracket atom's \ttt{isotope} attribute is determined by the optional \ttt{<isotope>} non-terminal. It consists of between one and three digits encoding the integers 0-999. Leading zeros are disregarded when assigning the value of the \ttt{isotope} attribute. In other words, ``007'' and ``7'' are considered equivalent expressions of the value 7.
 
 \begin{lstlisting}
 <isotope> ::= <digit> <digit>? <digit>?
 \end{lstlisting}
 
-The values of a bracket atom's \ttt{element} and \ttt{selected} attributes are determined by the \ttt{<symbol>} production rule ("symbol"). Three non-terminal options are available: \ttt{<star>}; \ttt{<element>}; and \ttt{<selection>}.
+The values of a bracket atom's \ttt{element} and \ttt{selected} attributes are determined by the \ttt{<symbol>} production rule (``symbol''). Three non-terminal options are available: \ttt{<star>}; \ttt{<element>}; and \ttt{<selection>}.
 
 \begin{lstlisting}
 <symbol> ::= <star> | <element> | <selection>
@@ -594,25 +594,25 @@ The \ttt{<element>} non-terminal option assigns the atomic \ttt{element} attribu
 
 A \ttt{<selection>} non-terminal found within a symbol sets the atomic \ttt{selected} attribute to \ttt{true}. The corresponding \ttt{element} attribute is assigned by capitalization. For example, the terminal \ttt{p} would assign the atomic \ttt{element} and \ttt{selected} attributes to the values \ttt{P} and \ttt{true}, respectively.
 
-The \ttt{stereodescriptor} attribute of a bracket atom is determined by the \ttt{<stereodescriptor>} non-terminal. Allowed values are "@" and "@@", corresponding to the \ttt{stereodescriptor} values \ttt{Counterclockwise} and \ttt{Clockwise}, respectively.
+The \ttt{stereodescriptor} attribute of a bracket atom is determined by the \ttt{<stereodescriptor>} non-terminal. Allowed values are ``@'' and ``@@,'' corresponding to the \ttt{stereodescriptor} values \ttt{Counterclockwise} and \ttt{Clockwise}, respectively.
 
 \begin{lstlisting}
 <stereodescriptor> ::= "@" "@"?
 \end{lstlisting}
 
-The \ttt{hydrogens} attribute of a bracket atom is controlled by the \\ \ttt{<virtual{\_}hydrogen>} non-terminal. This non-terminal is comprised of the terminal "H" followed by an optional \ttt{<digit>} non-terminal. A digit appearing after the "H" terminal sets \ttt{hydrogens} to the corresponding virtual hydrogen count. A digit of 0 (i.e., "H0") sets the \ttt{hydrogens} attribute to zero. If no digit is present, \ttt{hydrogens} is set to one.
+The \ttt{hydrogens} attribute of a bracket atom is controlled by the \\ \ttt{<virtual{\_}hydrogen>} non-terminal. This non-terminal is comprised of the terminal ``H'' followed by an optional \ttt{<digit>} non-terminal. A digit appearing after the ``H'' terminal sets \ttt{hydrogens} to the corresponding virtual hydrogen count. A digit of 0 (i.e., ``H0'') sets the \ttt{hydrogens} attribute to zero. If no digit is present, \ttt{hydrogens} is set to one.
 
 \begin{lstlisting}
 <virtual_hydrogen> ::= "H" <digit>?
 \end{lstlisting}
 
-The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals ("+", "-", respectively) and ends with an optional \ttt{<digit>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, "+" sets the \ttt{charge} attribute to one and "-" sets it to minus one. A digit of zero (e.g., "+0" or "-0") sets the \ttt{charge} attribute to zero.
+The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (``+'' and ``-,'' respectively) and ends with an optional \ttt{<digit>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, the plus terminal (``+'') sets the \ttt{charge} attribute to one and the minus terminal (``-'') sets it to minus one. A charge of zero (e.g., ``+0'' or ``-0'') sets the \ttt{charge} attribute to zero.
 
 \begin{lstlisting}
 <charge> ::= ( "+" | "-" ) <digit>?
 \end{lstlisting}
 
-Should an optional bracket non-terminal not be present, the atom must retain its corresponding default value. For example, the bracket "[C@H+]" lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket "[13CH+]" lacks the \ttt{<stereodescriptor>} non-terminal, so the corresponding \ttt{configuration} attribute remains \ttt{None}.
+Should an optional bracket non-terminal not be present, the atom must retain its corresponding default value. For example, the bracket ``[C@H+]'' lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket ``[13CH+]'' lacks the \ttt{<stereodescriptor>} non-terminal, so the corresponding \ttt{configuration} attribute remains \ttt{None}.
 
 \subsection*{Bond}
 
@@ -622,11 +622,11 @@ An atom may be connected to zero or more neighbors through a bond, encoded with 
 <bond> ::= "-" | "=" | "#" | | "/" | "\"
 \end{lstlisting}
 
-Five terminals are available ("-", "=", "\#", "/", and "\textbackslash"). The first three ("-", "=", and "\#") set the \ttt{order} attribute of a bond to 1; 2; or 3, respectively. The last two terminals, "/" and "\textbackslash", set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
+Five terminals are available (``-,'' ``=,'' ``\#,'' ``/,'' and ``\textbackslash''). The first three (``-,'' ``=,'' and ``\#'') set the \ttt{order} attribute of a bond to one, two, or three, respectively. The last two terminals, ``/'' and ``\textbackslash,'' set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
 
 \subsection*{Sequence}
 
-An atom may be assigned zero or more children through the \ttt{<sequence>} non-terminal ("sequence"). A sequence starts with a required \ttt{<atom>} non-terminal. If no allowed non-terminals follow, the corresponding atom will have no children. Allowed non-terminals are chosen from the list: \ttt{<union>}; \ttt{<branch>}; and \ttt{<sequence>}.
+An atom may be assigned zero or more children through the \ttt{<sequence>} non-terminal (``sequence''). A sequence starts with a required \ttt{<atom>} non-terminal. If no allowed non-terminals follow, the corresponding atom will have no children. Allowed non-terminals are chosen from the list: \ttt{<union>}; \ttt{<branch>}; and \ttt{<sequence>}.
 
 \begin{lstlisting}
 <sequence> ::= <atom> ( <union> | <branch> | <split> )*
@@ -640,7 +640,7 @@ The \ttt{<union>} non-terminal consists of an optional \ttt{<bond>} non-terminal
 
 A sequence can contain a union, which in turn can contain a sequence. This is an example of recursion, transitive though it may be. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in \ttt{<sequence>} is allowed. Right recursion also occurs within the \ttt{<union>} and \ttt{<branch>} non-terminals.
 
-The \ttt{<cut>} non-terminal ("cut") can takes two forms. A digit non-terminal can be used, enabling single-digit cut indexes. Double- or single-digit cut indexes, supporting the values zero through 99 inclusive, are available by prepending the percent character (\ttt{\%}).
+The \ttt{<cut>} non-terminal (``cut'') can takes two forms. A digit non-terminal can be used, enabling single-digit cut indexes. Double- or single-digit cut indexes, supporting the values zero through 99 inclusive, are available by prepending the percent character (\ttt{\%}).
 
 \begin{lstlisting}
 <cut> ::= <digit> | "%" <digit> <digit>
@@ -657,14 +657,14 @@ A cut signifies the disconnection of an atom from its neighbor. The most common 
 
 To prevent overflow, a cut index may be reused provided that it appears to the right of its last paired appearance.
 
-An alternative to \ttt{<union>} within a sequence is the \ttt{<branch>} non-terminal ("branch"). Like union, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals ("(" and ")", respectively), branch encodes a sequence that may or may not be attached to its parent. Attachment occurs if the \ttt{<bond>} non-terminal is included. Alternatively, the subgraph will be detached if the \ttt{<detachment>} non-terminal appears. If neither \ttt{<bond>} nor \ttt{<detachment>} non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through an elided bond.
+An alternative to \ttt{<union>} within a sequence is the \ttt{<branch>} non-terminal (``branch''). Like union, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (``('' and ``),'' respectively), branch encodes a sequence that may or may not be attached to its parent. Attachment occurs if the \ttt{<bond>} non-terminal is included. Alternatively, the subgraph will be detached if the \ttt{<detachment>} non-terminal appears. If neither \ttt{<bond>} nor \ttt{<detachment>} non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through an elided bond.
 
 \begin{lstlisting}
 <branch> ::= "(" ( <detachment> | <bond> )?
              <sequence> ")"
 \end{lstlisting}
 
-The third option for associating a parent Atom with a child within a sequence is the \ttt{<split>} non-terminal ("split"). A split is a sequence of \ttt{<detachment>} and \ttt{<sequence>} non-terminals. The `<detachment>` non-terminal serves the same purpose as it does within a branch: the prevent the bonding of the parent atom with a child.
+The third option for associating a parent Atom with a child within a sequence is the \ttt{<split>} non-terminal (``split''). A split is a sequence of \ttt{<detachment>} and \ttt{<sequence>} non-terminals. The `<detachment>` non-terminal serves the same purpose as it does within a branch: the prevent the bonding of the parent atom with a child.
 
 \begin{lstlisting}
 <split> ::= <detachment> <sequence>
@@ -684,7 +684,7 @@ Dialect strings are read one character at a time starting at the leftmost charac
 
 Readers that capture atom-atom connectivity will typically maintain a reference to a \textit{root atom}. The root atom is initially undefined. On reading the first complete \ttt{<atom>} non-terminal, the corresponding atom is constructed and set as the root atom. Subsequently processing a complete \ttt{<union>}, \ttt{<branch>}, or \ttt{<split>} non-terminal triggers three changes: (1) a child atom is constructed; (2) the child is connected to the current root atom, unless a \ttt{<detachment>} non-terminal intervenes; and (3) the root atom is replaced with the child atom.
 
-The presence of a branch adds some nuances over a union. The leading open parenthesis terminal ("(") signifies that the current root atom will later be re-exposed. This operation can be supported by a stack. At the start of a branch, the current root is pushed to the stack. At the end of the branch, the stack is popped and its top value is assigned as the new root atom.
+The presence of a branch adds some nuances over a union. The leading open parenthesis terminal (``('') signifies that the current root atom will later be re-exposed. This operation can be supported by a stack. At the start of a branch, the current root is pushed to the stack. At the end of the branch, the stack is popped and its top value is assigned as the new root atom.
 
 \begin{figure}
     \centering
@@ -720,9 +720,9 @@ Decoding atomic configuration from a string requires the order of attachment fro
     \label{fig:order-of-attachment}
 \end{figure}
 
-Readers must not assume that detachment (the period terminal, ".") implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the single molecule propane can be encoded using the string "C1C.C1".
+Readers must not assume that detachment (the period terminal, ``.'') implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the single molecule propane can be encoded using the string ``C1C.C1''.
 
-The partial parity bond model is unusual in that it spreads conformational information over three or more bonds. Regardless, readers must report as an error any string containing an isolated PPB (e.g., "C/C"). Beyond this check, generating (\textit{E}) and (\textit{Z}) stereodescriptors from PPBs is not a straightforward process. Performing such a conversion requires a method capable of translating PPB into a localized bond descriptor. One approach is to first consider the parity of each double bond terminal individually. A separate step would then relate the individual terminal parities to a double bond conformation parity. This intermediate parity can then be used to perform the final conversion.
+The partial parity bond model is unusual in that it spreads conformational information over three or more bonds. Regardless, readers must report as an error any string containing an isolated PPB (e.g., ``C/C''). Beyond this check, generating (\textit{E}) and (\textit{Z}) stereodescriptors from PPBs is not a straightforward process. Performing such a conversion requires a method capable of translating PPB into a localized bond descriptor. One approach is to first consider the parity of each double bond terminal individually. A separate step would then relate the individual terminal parities to a double bond conformation parity. This intermediate parity can then be used to perform the final conversion.
 
 \begin{figure}
     \centering
@@ -739,15 +739,15 @@ A reader must assume that any input string can contain errors, and take appropri
     \item{Unbalanced cut (position). A cut with a given index appears an odd number of times.}
     \item{Incompatible cut bonds (position, position). The bonds to a pair of cuts are incompatible.}
     \item{Delocalization subgraph lacks perfect matching. Before reporting this error, steps to remove unnecessarily selected atoms should be taken as described in the next section.}
-    \item{Partial parity bond not allowed (position). Neither terminal of a PPB possesses a double bond. Strings such as "C/C" and "C{\textbackslash}C" contain isolated PPBs, which are invalid. A reader encountering such strings must report an error.}
+    \item{Partial parity bond not allowed (position). Neither terminal of a PPB possesses a double bond. Strings such as ``C/C'' and ``C{\textbackslash}C'' contain isolated PPBs, which are invalid. A reader encountering such strings must report an error.}
 \end{enumerate}
 
 A reader may also report optional errors, including:
 
 \begin{enumerate}
-    \item{Impossible isotope. A negative implied mass number results from the atom. For example, "[2C]".}
-    \item{Impossible valence. The valence at an `Atom` is impossibly high. For example, "C(C)(C)(C)(C)C".}
-    \item{Impossible charge. An atom's charge gives it an apparent negative electron count. For example, "[C+7]".}
+    \item{Impossible isotope. A negative implied mass number results from the atom (e.g., ``[2C]'').}
+    \item{Impossible valence. The valence at an atom is impossibly high (e.g., ``C(C)(C)(C)(C)C'').}
+    \item{Impossible charge. An atom's charge gives it an apparent negative electron count (e.g., ``[C+7]'').}
 \end{enumerate}
 
 \section*{Pruning}
@@ -756,7 +756,7 @@ As noted previously, a delocalization subgraph is invalid if it lacks a perfect 
 
 An atom must be pruned if its subvalence equals zero. None of the bonds to such an atom can be promoted without altering the atom's \ttt{charge} attribute. Pruning the atom ensures the stability of its \ttt{charge} attribute, without interfering with bond promotion elsewhere. Viewed from another perspective, an atom with zero subvalence lacks unpaired electrons - at least within the narrow boundaries of the Dialect valence model. Such atoms can only form double bonds through changes to atomic charge. 
 
-If a selected atom bears a non-zero \ttt{charge} attribute, subvalence is computed using the isoelectronic element's default valences. For example, a selected nitrogen atom with a charge of +1 would use the default valences for carbon. A selected phosphorous atom with a charge of -1 would use the default valences of sulfur. And so on. If no default valences are found in this way (e.g., "[c+2]"), a reader must generate an error. Writers must not encode such atoms.
+If a selected atom bears a non-zero \ttt{charge} attribute, subvalence is computed using the isoelectronic element's default valences. For example, a selected nitrogen atom with a charge of +1 would use the default valences for carbon. A selected phosphorous atom with a charge of -1 would use the default valences of sulfur. And so on. If no default valences are found in this way (e.g., ``[c+2]''), a reader must generate an error. Writers must not encode such atoms.
 
 \begin{figure}
     \centering
@@ -765,7 +765,7 @@ If a selected atom bears a non-zero \ttt{charge} attribute, subvalence is comput
     \label{fig:gratuitous-selection}
 \end{figure}
 
-Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience overrides necessity. Consider furan represented as the string "c1ccco1". Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation, "c1cccO1" leads to a delocalization subgraph with a perfect matching and hydrogen counts consistent with the original encoding.
+Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience overrides necessity. Consider a string representing furan in which all atoms are selected (e.g., ``c1ccco1''). Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation (e.g., ``c1cccO1'') leads to a delocalization subgraph with a perfect matching and hydrogen counts consistent with the original encoding.
 
 Writers are encouraged, but not required, to avoid gratuitous atom selection. Readers, however, must always be prepared to prune.
 
@@ -782,9 +782,9 @@ Regardless of the form taken by the input data structure, it must be traversable
     \label{fig:depth-first-traversal}
 \end{figure}
 
-A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The \ttt{<atom>} and \ttt{<bond>} non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane as either "C" or "[CH4]". Single bonds may be elided or not. Similarly, the DS may or may not be empty. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
+A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The \ttt{<atom>} and \ttt{<bond>} non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane using either implicit or virtual hydrogens (e.g., ``C'' or ``[CH4]''). Single bonds may be elided or not. Similarly, the DS may or may not be empty. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
 
-The presence of branches within an input data structure is encoded via the \ttt{<branch>} data structure. A useful tool for this purpose is a \ttt{stack}. A stack is a data structure that allows items to be added individually and removed ("popped") in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
+The presence of branches within an input data structure is encoded via the \ttt{<branch>} data structure. A useful tool for this purpose is a \ttt{stack}. A stack is a data structure that allows items to be added individually and removed (``popped'') in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
 
 \begin{figure}
     \centering
@@ -804,7 +804,7 @@ Cycles are encoded using the \ttt{<cut>} non-terminal. This one- or two-digit in
 
 A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic indexes as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
 
-The encoding of cuts is likely to pose special challenges for writers. For a cut across a PPB, care must be taken to report the correct parity. Consider \textit{trans}-cyclooctene. The correct encoding accounts for the reverse in parity at the left-hand side (e.g., "C{\textbackslash}1C=C/CCCCC/1"). Moreover, the double-encoding of the PPB bond type can lead to inconsistencies that must be reported by a reader (e.g., the invalid string "C/1C=C/CCCCC/1"). Such errors can be avoided by encoding the bond type of one side or the other side of a cut, but not both. (e.g., "C{\textbackslash}1C=C/CCCCC/1" or "C1C=C/CCCCC/1"). A cut across a bond attached to an atom with a stereodescriptor must take bond ordering into consideration. For example, the string "O[C@H]1NC1" encodes the same absolute configuration as the string "O[C@H](C1)N1", but the \textit{opposite} configuration as "O[C@H](N1)C1". 
+The encoding of cuts is likely to pose special challenges for writers. For a cut across a PPB, care must be taken to report the correct parity. Consider \textit{trans}-cyclooctene. The correct encoding accounts for the reverse in parity at the left-hand side (e.g., ``C{\textbackslash}1C=C/CCCCC/1''). Moreover, the double-encoding of the PPB bond type can lead to inconsistencies that must be reported by a reader (e.g., the invalid string ``C/1C=C/CCCCC/1''). Such errors can be avoided by encoding the bond type of one side or the other side of a cut, but not both. (e.g., ``C{\textbackslash}1C=C/CCCCC/1'' or ``C1C=C/CCCCC/1''). A cut across a bond attached to an atom with a stereodescriptor must take bond ordering into consideration. For example, the two strings ``O[C@H]1NC1'' and ``O[C@H](C1)N1'' encode the same configuration, but the string ``O[C@H](N1)C1'' encodes the \textit{opposite} configuration. 
 
 \begin{figure}
     \centering
@@ -824,13 +824,13 @@ The presence of conformational restriction about a double bond presents a specia
 
 Writers should carefully weigh the non-negligible costs of atom selection. Algorithms for doing so sometimes involve the perceptions of cycles, and often exhibit superlinear time complexity. Very often a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In this sense atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
 
-Writers must ensure that all selected atoms can be deselected. Consider pyrrole, erroneously encoded as the string "n1cccc1". The nitrogen atom can not be pruned because its subvalence is 1 (3 - 2). The DS therefore contains all five atoms and all five bonds. A perfect matching does not exist. A reader receiving such a string must report an error. To avoid this outcome, a writer can consume the subvalence by adding a virtual hydrogen, as in the string "[nH]1cccc1". The subvalence of nitrogen in this case is zero, so the atom can be pruned. Doing so leaves a DS with four nodes, four edges, and a perfect matching. Readers will consider the string valid. Nevertheless, the larger question of gratuitous selection remains.
+Writers must ensure that all selected atoms can be deselected. Consider pyrrole, erroneously encoded with a selected nitrogen atom (e.g., ``n1cccc1''). The nitrogen atom can not be pruned because its subvalence is 1 (3 - 2). The DS therefore contains all five atoms and all five bonds. A perfect matching does not exist. A reader receiving such a string must report an error. To avoid this outcome, a writer can consume the subvalence by adding a virtual hydrogen (e.g., ``[nH]1cccc1''). The subvalence of nitrogen in this case is zero, so the atom can be pruned. Doing so leaves a DS with four nodes, four edges, and a perfect matching. Readers will consider the string valid. Nevertheless, the larger question of gratuitous selection remains.
 
 \section*{Compatibility}
 
 For maximum compatibility with existing software, Dialect was designed as a \textit{language subset} of SMILES. A language subset contains all of the syntax and semantics of its parent language, but adds none of its own. In principle this means that a feature present in Dialect should also be present in SMILES. Conversely, a feature present in SMILES may or may not also be present in Dialect.
 
-Language subsets have ample precedent in computer science. A well-known example is MISRA C~\cite{misraC}, a subset of the C programming language that aims to eliminate "known undefined or otherwise dangerous behavior"~\cite{hatton:2007}. Another example is the subset of JavaScript described by Crockford whose purpose is to "chip away at the features that are not beautiful until the language's true nature reveals itself."~\cite{crockford:2008}. Language subsets arise for two main reasons. First, designing a language presents many opportunities for errors small and large. Second, popular languages inevitably bring with them many users with diverse problems that demand new features. Some of these features cause future problems of their own. A language subset can improve both situations by eliminating the most problematic features.
+Language subsets have ample precedent in computer science. A well-known example is MISRA C~\cite{misraC}, a subset of the C programming language that aims to eliminate ``known undefined or otherwise dangerous behavior''~\cite{hatton:2007}. Another example is the subset of JavaScript described by Crockford whose purpose is to ``chip away at the features that are not beautiful until the language's true nature reveals itself.''~\cite{crockford:2008}. Language subsets arise for two main reasons. First, designing a language presents many opportunities for errors small and large. Second, popular languages inevitably bring with them many users with diverse problems that demand new features. Some of these features cause future problems of their own. A language subset can improve both situations by eliminating the most problematic features.
 
 Although similar considerations apply to SMILES, its case is different in one important way: SMILES was never publicly described with high precision. Overviews of the language have been published by both Weininger and Daylight. But the kind of technical documentation suitable for software development was never made public. Both the OpenSMILES and SMILES+ initiatives cite this shortfall as motivation.
 
@@ -838,23 +838,23 @@ Nevertheless, several SMILES software implementations have been released as note
 
 A publicly-available and precise subset of SMILES would offer a new way to address the problem. If sufficiently constrained, the subset should be interpretable by all existing software without modification. Moreover, most strings written by existing software would be interpretable by software based on the language subset. Because its description would be both public and precise, the language subset could serve as the basis for many implementations with strong consensus around both syntax and semantics.
 
-Unfortunately, the choice of the Dialect base language is fraught with difficulty on technical, historical, and cultural grounds. Simply put, "SMILES" has come to mean different things to different people. To some, SMILES is the language defined in public documentation. To others, SMILES is the Daylight implementation source code. Some may view SMILES as the collective definitions contained in both published documents and all software. To others, SMILES isn't even definable.
+Unfortunately, the choice of the Dialect base language is fraught with difficulty on technical, historical, and cultural grounds. Simply put, the term ``SMILES'' has come to mean different things to different people. To some, SMILES is the language defined in public documentation. To others, SMILES is the Daylight implementation source code. Some may view SMILES as the collective definitions contained in both published documents and all software. To others, SMILES isn't even definable.
 
-These problems can be avoided by considering as a base language not SMILES itself, but a \textit{protolanguage}. A protolanguage is a hypothetical language from which a family of languages can be derived. A suitable SMILES protolanguage would ideally contain all of the features consistent with the many ways in which the term "SMILES" is used today.
+These problems can be avoided by considering as a base language not SMILES itself, but a \textit{protolanguage}. A protolanguage is a hypothetical language from which a family of languages can be derived. A suitable SMILES protolanguage would ideally contain all of the features consistent with the many ways in which the term ``SMILES'' is used today.
 
-Accordingly, Dialect's base language is "ProtoSMILES," a SMILES protolanguage. ProtoSMILES was developed through a process of elimination that started with every SMILES document ever published and every SMILES software implementation, Open Source or not. The field was narrowed through two limitations: (1) the source must be authoritative; and (2) the source must be publicly accessible. In this context, authoritative means that the source was created by either Weininger himself or Daylight. They alone can speak most authoritatively about what SMILES is. The requirement for public accessibility ensures that, even if inconvenient, claims of compatibility can be tested. The following documents were identified as candidate ProtoSMILES sources:
+Accordingly, Dialect's base language is ``ProtoSMILES,'' a SMILES protolanguage. ProtoSMILES was developed through a process of elimination that started with every SMILES document ever published and every SMILES software implementation, Open Source or not. The field was narrowed through two limitations: (1) the source must be authoritative; and (2) the source must be publicly accessible. In this context, authoritative means that the source was created by either Weininger himself or Daylight. They alone can speak most authoritatively about what SMILES is. The requirement for public accessibility ensures that, even if inconvenient, claims of compatibility can be tested. The following documents were identified as candidate ProtoSMILES sources:
 
 \begin{itemize}
-    \item Weininger's report to the US Environmental Protection Agency ("The Article")~\cite{anderson:1987}.
-    \item Weininger's original publication (herein "The Article")~\cite{weininger:1988}.
-    \item Weininger's 2003 book chapter, revised in 2008 ("The Book Chapter")~\cite{weininger:2008}.
-    \item An online manual maintained by Daylight ("The Manual").
-    \item The Daylight's toolkit, which implements a SMILES reader and writer ("The Toolkit")~\cite{daylightToolkit}.
+    \item Weininger's report to the US Environmental Protection Agency (``The Article'')~\cite{anderson:1987}.
+    \item Weininger's original publication (herein ``The Article'')~\cite{weininger:1988}.
+    \item Weininger's 2003 book chapter, revised in 2008 (``The Book Chapter'')~\cite{weininger:2008}.
+    \item An online manual maintained by Daylight (``The Manual'').
+    \item The Daylight's toolkit, which implements a SMILES reader and writer (``The Toolkit'')~\cite{daylightToolkit}.
 \end{itemize}
 
 The Toolkit was eliminated for three reasons. First, its source code is not available, forcing an indirect reverse-engineering approach to language definition. Second, as a product of the company Weininger started, the Toolkit is likely to recapitulate the other sources. Third, as a commercial product without source code, the Toolkit may not always be available in the future.
 
-The Report was eliminated mainly because the contents of this older document contradict the three remaining sources. For example, The Report contains no mention of bracket syntax, using markedly different notation instead. The report also supports unusual characters including the exclamation mark (\ttt{!}). Semantically, The Report supports "special states" for nitrogen-containing atoms.
+The Report was eliminated mainly because the contents of this older document contradict the three remaining sources. For example, The Report contains no mention of bracket syntax, using markedly different notation instead. The report also supports unusual characters including the exclamation mark (\ttt{!}). Semantically, The Report supports ``special states'' for nitrogen-containing atoms.
 
 The Manual was disregarded as a ProtoSMILES source because it merely recapitulates content already present in The Paper and The Book Chapter. Removing this source simplifies the construction of ProtoSMILES without changing its definition. A secondary consideration was the possibility that updates to this web page could change the meaning of ProtoSMILES. However, web archives indicate that neither styling nor content of the Manual have changed in at least ten years.
 
@@ -862,27 +862,27 @@ The only remaining sources are The Paper and the Book Chapter. These are the two
 
 The Book Chapter defines a fixed set of element symbols which even at the time of publication was obsolete~\cite[p.~83]{weininger:2008}. The symbol for element 105 is given as Ha (Hahnium), despite IUPAC's resolution of this naming controversy in favor of the symbol Db (Dubnium) years prior~\cite{sageson:1997}. Accordingly, Dialect disallows the symbol Ha. To support the full set of currently-named transuranium elements, Dialect adds the symbols: Db; Sg; Bh; Hs; Mt; Rg; Cn; Nh; Fl; Mc; Lv; Ts; and Og. Moreover, Dialect explicitly accepts all future element symbols approved by IUPAC. The addition of these element symbols means that Dialect can't be considered a strict subset of SMILES. The alternative would, however, leave dialect without the ability to express every kind of IUPAC-recognized element.
 
-The Article implies that comma (\ttt{,}) is either an element symbol or a valid SMILES character: "This subset uses only the symbols H, C, N, O, P, S, F, Cl, Br, I, and (,) and digits, with the following four rules..."~\cite[p.~33]{weininger:1988}. The comma character is explicitly disallowed in Dialect.
+The Article implies that comma (\ttt{,}) is either an element symbol or a valid SMILES character: ``This subset uses only the symbols H, C, N, O, P, S, F, Cl, Br, I, and (,) and digits, with the following four rules...''~\cite[p.~33]{weininger:1988}. The comma character is explicitly disallowed in Dialect.
 
-The Book Chapter defines a recursive grammar for branching which, perhaps without the knowledge of the author, defines sequential parentheses~\cite[p.~86]{weininger:2008}. Dialect disallows such constructs, including for example "*((*))*" and "*(((*)))*".
+The Book Chapter defines a recursive grammar for branching which, perhaps without the knowledge of the author, defines sequential parentheses~\cite[p.~86]{weininger:2008}. Dialect disallows such constructs (e.g., ``*((*))*'' and ``*(((*)))*'').
 
-"Reaction SMILES" is an extension described in the Book Chapter~\cite[p.~89]{weininger:2008}, but disallowed in Dialect. Specifically, the greater than symbol (\ttt{>}) is not a valid Dialect character. This precludes strings such as "*>>*" in Dialect. Furthermore, Dialect lacks the "map" attribute, used for atom-atom mapping in reactions, and its accompanying syntax.
+``Reaction SMILES'' is an extension described in the Book Chapter~\cite[p.~89]{weininger:2008}, but disallowed in Dialect. Specifically, the greater than symbol (\ttt{>}) is not a valid Dialect character. This precludes strings such as ``*>>*'' in Dialect. Furthermore, Dialect lacks the ``map'' attribute, used for atom-atom mapping in reactions, and its accompanying syntax.
 
-Dialect only supports two stereodescriptors, encoded with the terminals "@" and "@@". The Book Chapter provides a recursive grammar for stereodescriptors that allows multi-symbol descriptors such as "@@@" and "@@@@"~\cite[p.~94]{weininger:2008}. The book chapter also discusses non-tetrahedral descriptors including "@AL1", "@AL2", "@1", and "@SP1". None of these are supported by Dialect. Nor does Dialect support the application of tetracoordinate stereodescriptors to odd cumulenes as described in the book chapter. Although some of these forms of configuration are supported today, it's unusual to find them all supported. The reason is simple: in the context in which Dialect will most often used, these forms of stereochemistry are rare. To support them burdens implementors with little payoff.
+Dialect only supports two stereodescriptors, encoded with the terminals ``@'' and ``@@.'' The Book Chapter provides a recursive grammar for stereodescriptors that allows multi-symbol descriptors such as ``@@@'' and ``@@@@''~\cite[p.~94]{weininger:2008}. The book chapter also discusses non-tetrahedral descriptors including ``@AL1,'' ``@AL2,'' ``@1,'' and ``@SP1.'' None of these are supported by Dialect. Nor does Dialect support the application of tetracoordinate stereodescriptors to odd cumulenes as described in the book chapter. Although some of these forms of configuration are supported today, it's unusual to find them all supported. The reason is simple: in the context in which Dialect will most often used, these forms of stereochemistry are rare. To support them burdens implementors with little payoff.
 
-ProtoSMILES supports the concept of "aromatic bond" (":"), but Dialect does not. Despite clear inclusion within the syntax of ProtoSMILES, no precise guidance on using this feature is provided. The Book Chapter notes "Adjacent atoms without an intervening bond symbol are connected by a valence-dictated bond (typically a single or aromatic bond). "-" (single) and ":" (aromatic) bond symbols may always be omitted on input"~\cite[p.~85]{weininger:2008}. This passage implies that aromatic bonds serve no purpose. Accordingly, Dialect does not allow them and the syntax does not include the colon symbol (\ttt{:}).
+ProtoSMILES supports the concept of ``aromatic bond'' (``:''), but Dialect does not. Despite clear inclusion within the syntax of ProtoSMILES, no precise guidance on using this feature is provided. The Book Chapter notes ``Adjacent atoms without an intervening bond symbol are connected by a valence-dictated bond (typically a single or aromatic bond). `-' (single) and `:' (aromatic) bond symbols may always be omitted on input''~\cite[p.~85]{weininger:2008}. This passage implies that aromatic bonds serve no purpose. Accordingly, Dialect does not allow them and the syntax does not include the colon symbol (\ttt{:}).
 
-Along these lines, Dialect does not recognize atoms bearing either arsenic (As) or selenium (Se) as selectable. Doing so would increase the complexity of the language unnecessarily. Although The Paper implies selectability ("Elements other than C, N, O, P, S, As, and Se are not yet dealt with in an aromatic context.")~\cite[p.~35]{weininger:1988}, default valences for the latter two atoms are not provided. Even if they were, the elements As and Se must be bracketed. As such, special rules for handling them in the context of pruning would be required. Moreover, molecules bearing the elements As or Se are often made "aromatic" unnecessarily in SMILES. Finally, allowing the selection of atoms bearing As or Se does nothing to address molecules with atoms bearing silicon, germanium, tin, or other heavy main group elements that may be discovered in the future to participate in DIME.
+Along these lines, Dialect does not recognize atoms bearing either arsenic (As) or selenium (Se) as selectable. Doing so would increase the complexity of the language unnecessarily. Although The Paper implies selectability (``Elements other than C, N, O, P, S, As, and Se are not yet dealt with in an aromatic context.'')~\cite[p.~35]{weininger:1988}, default valences for the latter two atoms are not provided. Even if they were, the elements As and Se must be bracketed. As such, special rules for handling them in the context of pruning would be required. Moreover, molecules bearing the elements As or Se are often made ``aromatic'' unnecessarily in SMILES. Finally, allowing the selection of atoms bearing As or Se does nothing to address molecules with atoms bearing silicon, germanium, tin, or other heavy main group elements that may be discovered in the future to participate in DIME.
 
-It's unclear whether ProtoSMILES allows a virtual hydrogen count on hydrogen itself. The Article implies that the element symbol H (hydrogen) must not have an implicit hydrogen count when used within a bracket sequence ("There are few exceptions to the hydrogen-suppression convention, the most obvious being specification of a proton, [H+], and molecular hydrogen, [H][H].")~\cite[p.~34]{weininger:1988}. If so, the author may have erroneously believed that parsers would be incapable of processing constructs such as "[HH]". The Book Chapter appears to reiterate this view, noting that "explicit hydrogen specification is required" in the case of "hydrogens connected to other hydrogens, e.g. [H][H], molecular hydrogen"~\cite[p.~97]{weininger:2008}. To be clear, Dialect supports any valid virtual hydrogen count on hydrogen itself. For example, the following are all valid, if chemically nonsensical, strings: "[HH]"; "[HH2]"; and "[HH3]". Depending on interpretation, this feature may or may not render Dialect a superset of SMILES.
+It's unclear whether ProtoSMILES allows a virtual hydrogen count on hydrogen itself. The Article implies that the element symbol H (hydrogen) must not have an implicit hydrogen count when used within a bracket sequence (``There are few exceptions to the hydrogen-suppression convention, the most obvious being specification of a proton, [H+], and molecular hydrogen, [H][H].'')~\cite[p.~34]{weininger:1988}. If so, the author may have erroneously believed that parsers would be incapable of processing strings encoding bracket hydrogen with a virtual hydrogen count (e.g., ``[HH]''). The Book Chapter appears to reiterate this view, noting that ``explicit hydrogen specification is required'' in the case of ``hydrogens connected to other hydrogens, e.g. [H][H], molecular hydrogen''~\cite[p.~97]{weininger:2008}. To be clear, Dialect supports any valid virtual hydrogen count on hydrogen itself (e.g., ``[HH]'' and ``[HH2]''). Subject to interpretation of the original literature, this feature may or may not render Dialect a superset of SMILES.
 
-ProtoSMILES ascribes ambiguous meaning to detachments. As noted in the Book Chapter, "... In terms of the valence model being represented, the dot literally represents a bond of formal order zero: the atoms on either side of the dot are explicitly not bonded to each other."~\cite[p.~88]{weininger:2008}. The state of not being bonded and the state of having a zero-order bond are not necessarily equivalent~\cite{clark:2011}. To be clear, Dialect explicitly disallows the zero bond order interpretation of detachments and the dot character.
+ProtoSMILES ascribes ambiguous meaning to detachments. As noted in the Book Chapter, ``... In terms of the valence model being represented, the dot literally represents a bond of formal order zero: the atoms on either side of the dot are explicitly not bonded to each other.''~\cite[p.~88]{weininger:2008}. Other statements appear to contradict this statement. To be clear, the state of not being bonded and the state of having a zero-order bond are not necessarily equivalent~\cite{clark:2011}. Dialect explicitly disallows the zero bond order interpretation of detachments and the dot character.
 
-ProtoSMILES assigns no explicit upper or lower bounds to numerical atomic attributes. These boundaries are nevertheless crucial for implementors, who seek the data types necessary to prevent underflow and overflow. For this reason, Dialect sets both upper and lower bounds on the following atomic attributes: isotope (0 $\leq$ value \textless 1000); charge (-10, \textless value \textless 10); and hydrogens, 0 $\leq$ value \textless 10). Although it might be argued that lower bounds on physical quantities such as isotope and hydrogen count should be implicit, the lack of precision forces implementors to improvise, which can lead to divergent behavior. ProtoSMILES places no upper bound on the charge notation "+", "++", "+++", and their corresponding negative forms ("The SMILES program also recognizes constructions of the form [Fe+++] as being synonymous with the form [Fe+3].")~\cite[p.~32]{weininger:1988}. However, Dialect disallows duplicated plus and minus characters (\ttt{+} and \ttt{-}, respectively) from bracket atoms.
+ProtoSMILES assigns no explicit upper or lower bounds to numerical atomic attributes. These boundaries are nevertheless crucial for implementors, who seek the data types necessary to prevent underflow and overflow. For this reason, Dialect sets both upper and lower bounds on the following atomic attributes: isotope (0 $\leq$ value \textless 1000); charge (-10, \textless value \textless 10); and hydrogens, 0 $\leq$ value \textless 10). Although it might be argued that lower bounds on physical quantities such as isotope and hydrogen count should be implicit, the lack of precision forces implementors to improvise, which can lead to divergent behavior. ProtoSMILES places no upper bound on the charge notation (e.g., ``++'' and ``+++'') and their corresponding negative forms: ``The SMILES program also recognizes constructions of the form [Fe+++] as being synonymous with the form [Fe+3]''~\cite[p.~32]{weininger:1988}. Due to their redundancy, Dialect disallows duplicated plus and minus characters (\ttt{+} and \ttt{-}, respectively) from bracket atoms.
 
-Dialect provides a few semantic clarifications not fully addressed in ProtoSMILES. A detailed algorithm for determining implicit hydrogen count is provided, together with the required valence table. Unlike ProtoSMILES, Dialect explicitly considers the case of computing implicit hydrogens on selected atoms. Dialect also provides detailed algorithms, absent in SMILES, for selection and deselection. These are based in graph theory rather than the ambiguous and overloaded chemical concept of "aromaticity" used in ProtoSMILES. Uniquely, Dialect introduces the concepts of "pruning" and "gratuitous selection." ProtoSMILES does not specify those bonds that can be promoted during deselection, but Dialect does. ProtoSMILES does not restrict partial parity bonds to those atoms also possessing at least one double bond, whereas Dialect does. Finally, Dialect syntax is based on a formal grammar and tooling rooted in decades of computer science research, whereas ProtoSMILES syntax is based for the most part on imprecise natural language descriptions.
+Dialect provides a few semantic clarifications not fully addressed in ProtoSMILES. A detailed algorithm for determining implicit hydrogen count is provided, together with the required valence table. Unlike ProtoSMILES, Dialect explicitly considers the case of computing implicit hydrogens on selected atoms. Dialect also provides detailed algorithms, absent in SMILES, for selection and deselection. These are based in graph theory rather than the ambiguous and overloaded chemical concept of ``aromaticity'' used in ProtoSMILES. Uniquely, Dialect introduces the concepts of ``pruning'' and ``gratuitous selection.'' ProtoSMILES does not specify those bonds that can be promoted during deselection, but Dialect does. ProtoSMILES does not restrict partial parity bonds to those atoms also possessing at least one double bond, whereas Dialect does. Finally, Dialect syntax is based on a formal grammar and tooling rooted in decades of computer science research, whereas ProtoSMILES syntax is based for the most part on imprecise natural language descriptions.
 
-Dialect also resolves some internal contradictions within ProtoSMILES. The Article reports the only default valence for nitrogen as three (p. 34)~\cite[p.~34]{weininger:1988}, whereas the Book Chapter reports two default valences: 3 and 5~\cite[p.~84]{weininger:2008}. Dialect uses the latter default valences. Atoms whose \ttt{hydrogens} attribute may be set to \ttt{Implicit} ("the organic subset") are reported in the Article as: B; C; N; O; P; S; F; Cl; Br; and I~\cite[p.~32]{weininger:2008}. However, an example later in the Article indicates that "Hn1cccc1" with its unbracketed hydrogen is a valid string~\cite[p.~35]{weininger:1988}. Dialect explicitly rejects strings containing unbracketed hydrogen atoms. On the topic of atom selection ("aromaticity"), the Article implies that selected atoms must be part of a cycle: "To qualify as aromatic, all atoms in the ring must be sp2 hybridized and the number of available 'excess' $\pi$ electrons must satisfy Hückel's 4{\textit{N}} + 2 criterion."~\cite[p.~34]{weininger:1988}. The Book Chapter, however, presents two examples of valid strings that do not encode cycles ("cc" and "cccc")~\cite[p 85]{weininger:2008}. Consistent with the latter view, Dialect explicitly allows the selection of atoms regardless of cycle membership.
+Dialect also resolves some internal contradictions within ProtoSMILES. The Article reports the only default valence for nitrogen as three (p. 34)~\cite[p.~34]{weininger:1988}, whereas the Book Chapter reports two default valences: 3 and 5~\cite[p.~84]{weininger:2008}. Dialect uses the latter default valences. Atoms whose \ttt{hydrogens} attribute may be set to \ttt{Implicit} (``the organic subset'') are reported in the Article as: B; C; N; O; P; S; F; Cl; Br; and I~\cite[p.~32]{weininger:2008}. However, an example later in the Article indicates that the string ``Hn1cccc1'' with its unbracketed hydrogen valid~\cite[p.~35]{weininger:1988}. Dialect explicitly rejects strings containing unbracketed hydrogen atoms. On the topic of atom selection (``aromaticity''), The Article implies that selected atoms must be part of a cycle: ``To qualify as aromatic, all atoms in the ring must be sp2 hybridized and the number of available 'excess' $\pi$ electrons must satisfy Hückel's 4{\textit{N}} + 2 criterion''~\cite[p.~34]{weininger:1988}. The Book Chapter, however, presents two examples of valid strings that do not encode cycles (``cc'' and ``cccc'')~\cite[p.~85]{weininger:2008}. Consistent with the latter view, Dialect explicitly allows the selection of atoms regardless of cycle membership.
 
 \begin{table}
 \begin{minipage}{\textwidth}
@@ -891,19 +891,19 @@ Dialect also resolves some internal contradictions within ProtoSMILES. The Artic
     \centering
     \begin{tabular}{p{0.50\linewidth} p{0.20\linewidth} p{0.15\linewidth}}
         \hline
-        Feature & ProtoSMILES\footnote{Values of "maybe" indicate ambiguous source descriptions.} & Dialect \\
+        Feature & ProtoSMILES\footnote{Values of ``maybe'' indicate ambiguous source descriptions.} & Dialect \\
         \hline
         element symbol Ha & yes & no \\
         element symbols Db; Sg; Bh; Hs; Mt; Rg; Cn; Nh; Fl; Mc; Lv; Ts; and Og & no & yes \\
         future element symbols approved by IUPAC & no & yes \\
-        comma symbol (\ttt{,}) & maybe & no \\
-        multiple branching such as "*((*))*" & yes & no \\
+        comma symbol (``,'') & maybe & no \\
+        multiple branching (e.g., ``*((*))*'') & yes & no \\
         reactions using greater than symbol (\ttt{>}) & yes & no \\
-        atomic "map" attribute & yes & no \\
-        extended stereodescriptors (e.g., "@@@", "@OH1", etc.) & yes & no \\
+        atomic ``map'' attribute & yes & no \\
+        extended stereodescriptors (e.g., ``@@@'' and ``@OH1'') & yes & no \\
         use of stereodescriptors on odd cumulene centers & yes & no \\
-        virtual hydrogen count on hydrogen (e.g., "[HH]") & maybe & yes \\
-        detachments are bonds of "formal order zero" & maybe & no \\
+        virtual hydrogen count on hydrogen (e.g., ``[HH]'') & maybe & yes \\
+        detachments are bonds of ``formal order zero'' & maybe & no \\
         upper and lower bounds on numerical atomic properties & no & yes \\
         nitrogen default valence includes 5 & maybe & yes \\
         unbracketed hydrogen atom & maybe & no \\
@@ -911,15 +911,15 @@ Dialect also resolves some internal contradictions within ProtoSMILES. The Artic
         atoms with elements As and Se are selectable & yes & no \\
         non-elided bonds may be promoted during selection & maybe & no \\
         isolated partial parity bond & yes & no \\
-        repeated charge notation (e.g., "++", "+++", etc.) & yes & no \\
-        aromatic bond (":") & yes & no \\
+        repeated charge notation (e.g., ``++'' and ``+++'') & yes & no \\
+        aromatic bond (``:'') & yes & no \\
         \hline
     \end{tabular}
     \label{table:feature-comparison}
 \end{minipage}
 \end{table}
 
-With only one clear-cut exception, Table~\ref{table:feature-comparison} shows Dialect to be a subset of ProtoSMILES. The exceptional case deals with the validity certain transfermium element symbols already recognized by IUPAC and to be recognized in the future. Ambiguous exceptions include those for which the ProtoSMILES column feature support is uncertain ("maybe") but the Dialect column is affirmative ("yes"). If ProtoSMILES support tends toward "no," then support by Dialect would break out of the ProtoSMILES subset. There are three such cases. The first is dihydrogen represented using the string "[HH]". The second ambiguous case is whether or not the default valence of nitrogen includes the value five. The third case is whether or not ProtoSMILES recognizes acyclic "aromatic" atoms as valid.
+With only one clear-cut exception, Table~\ref{table:feature-comparison} shows Dialect to be a subset of ProtoSMILES. The exceptional case deals with the validity certain transfermium element symbols already recognized by IUPAC and to be recognized in the future by Dialect. Ambiguous exceptions include those for which the ProtoSMILES column feature support is uncertain (``maybe'') but the Dialect column is affirmative (``yes''). If ProtoSMILES support tends toward ``no,'' then support by Dialect would break out of the ProtoSMILES subset. There are three such cases. The first is hydrogen having virtual hydrogens (e.g., ``[HH]''). The second ambiguous case is whether or not the default valence of nitrogen includes the value five. The third case is whether or not ProtoSMILES recognizes acyclic ``aromatic'' atoms as valid.
 
 \section*{Discussion}
 
@@ -931,7 +931,7 @@ The information density of Dialect strings makes them attractive for several app
 
 Another advantage is lossless serialization and deserialization. The line notation InChI might appear to compete with Dialect in this sense. Although InChI can be read and written, the InChI Technical manual notes that InChI's value lies in molecular identification. The authors of InChI have repeatedly noted that InChI is not a solution to the molecular serialization problem. The reason presumably lies with the fact that both serialization and deserialization require intimate knowledge of the InChI canonicalization algorithm. To date, no third-party reader or writer of InChI has ever been released.
 
-Despite its information density, Dialect can faithfully encode and decode most of what chemists would consider "organic molecules." This is evidenced by the widespread presence of Dialect strings within large, public-facing databases such as PubChem, ChEMBL, ChEBI, and eMolecules.
+Despite its information density, Dialect can faithfully encode and decode most of what chemists would consider ``organic molecules.'' This is evidenced by the widespread presence of Dialect strings within large, public-facing databases such as PubChem, ChEMBL, ChEBI, and eMolecules.
 
 Dialect's compact representation requires some tradeoffs regarding expressiveness. Extended bonding beyond the delocalization subgraph is not supported. This limitation excludes many types of molecule, including organometallics and delocalization-\-stabilized ions. Zero-\-order bonds are not supported, making it difficult to accurately encode coordination complexes. Only four-\-coordinate, tetrahedral stereocenters can be encoded, excluding many forms of chirality, including helical chirality, all forms of non-\-tetrahedral stereochemistry, and lone-\-pair tetrahedral centers. Conformational restrictions beyond the isolated double bond are not supported, which excludes important molecules such as those exhibiting atropisomerism. Other formats such as CDXML and molfile support enhanced stereochemical features enabling the differentiation of various kinds of partial stereochemical information, but Dialect does not.
 
