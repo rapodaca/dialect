@@ -83,9 +83,7 @@ A molecular graph contains zero or more \textit{connected components}. A connect
 
 \section*{Data Model}
 
-Dialect uses several abstractions collectively known as the \textit{data model}. The data model defines data types and relationships between them for the purpose of lossless molecular representation.
-
-The data model is expressed in terms of a small set of \textit{primitives}. A primitive is an irreducible data type. Dialects primitives are summarized in Table \ref{table:primitives}.
+Dialect uses several abstractions collectively known as the \textit{data model}. The data model defines metadata attributes associated with the components of a molecular graph. These attributes are themselves composed of \textit{primitives} (Table~\ref{table:primitives}), or irreducible data types.
 
 \begin{table}
 \begin{minipage}{\textwidth}
@@ -113,7 +111,7 @@ The data model is expressed in terms of a small set of \textit{primitives}. A pr
 \end{minipage}
 \end{table}
 
-Table \ref{table:atomic-state} summarizes atomic attributes. Not all combinations of values (\enquote{atomic state}) are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created.
+An atom possesses several attributes (Table~\ref{table:atomic-state}), which collectively define an \textit{atomic state}. Not all atomic states are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created. Atomic state is restricted in the following ways:
 
 \begin{table}
 \caption{Atomic State.}
@@ -133,15 +131,13 @@ Table \ref{table:atomic-state} summarizes atomic attributes. Not all combination
 \label{table:atomic-state}
 \end{table}
 
-Restrictions on atomic state are:
-
 \begin{enumerate}
     \item{The value of \ttt{index} must be unique over the molecular graph.}
-    \item{If \ttt{hydrogens} equals \ttt{Implicit}, then \ttt{isotope}, \ttt{configuration}, and \ttt{charge} must equal their default values. Furthermore, \ttt{element} must equal one of \ttt{B}; \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{S}; \ttt{F}; \ttt{Cl}; \ttt{Br}; \ttt{I}; or \ttt{None}.}
-    \item{If \ttt{selected} equals \ttt{true}, then \ttt{element} must equal one of: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; or \ttt{S}.}
+    \item{If the value of \ttt{hydrogens} equals \ttt{Implicit}, then the values of \ttt{isotope}, \ttt{configuration}, and \ttt{charge} must equal their respective defaults. Furthermore, the value of \ttt{element} must equal one of \ttt{B}; \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{S}; \ttt{F}; \ttt{Cl}; \ttt{Br}; \ttt{I}; or \ttt{None}.}
+    \item{If the value of \ttt{selected} equals \ttt{true}, then the value of \ttt{element} must equal one of: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; or \ttt{S}.}
 \end{enumerate}
 
-Bond attributes are summarized in Table \ref{table:bond-state}. As with atomic attributes, not all bond states are valid. Three restrictions apply:
+Like atoms, bonds carry metadata in the form of attributes (Table \ref{table:bond-state}), which collectively define a \textit{bond state}. As with atomic attributes, not all bond states are valid. Bond state is restricted in the following ways:
 
 \begin{table}
 \caption{Bond State.}
@@ -163,12 +159,12 @@ Bond attributes are summarized in Table \ref{table:bond-state}. As with atomic a
 
 \begin{enumerate}
     \item{The value of \ttt{index} must be unique over the molecular graph.}
-    \item{The \ttt{source} and \ttt{target} attributes must reference valid atomic \ttt{index} attributes.}
-    \item{If \ttt{direction} is non-default (any value other than \ttt{None}), then \ttt{order} must equal 1.}
-    \item{If the value of \ttt{elided} is \ttt{true}, the values of \ttt{order} and \ttt{direction} must equal 1 and \ttt{None}, respectively.}
+    \item{The \ttt{source} and \ttt{target} attributes must reference atomic \ttt{index} attributes found elsewhere in the molecular graph.}
+    \item{If the value of \ttt{direction} does not equal \ttt{None}, then the value of \ttt{order} must equal one.}
+    \item{If the value of \ttt{elided} equals \ttt{true}, the values of \ttt{order} and \ttt{direction} must equal one and \ttt{None}, respectively.}
 \end{enumerate}
 
-The data model provides a link between syntax and semantics. Dialect-compatible software may, of course, use any suitable internal data model. Dialect implementations must, however, ensure that their internal data model is consistent with the one provided here.
+The data model will be referenced throughout this paper as a way to connect syntax and semantics. Dialect-compatible software may, of course, use any suitable internal data model. Implementations must, however, ensure that any internal data model is consistent with the one provided here.
 
 \section*{Constitution}
 
