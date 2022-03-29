@@ -265,9 +265,9 @@ The opposite operation can be accomplished with a \textit{selection algorithm}. 
 
 \section*{Valence and Subvalence}
 
-To support implicit hydrogen counting, Dialect uses the concept of \textit{valence}. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single bonds contribute one to the tally, double bonds two, and triple bonds three. All other bonds contribute one, as does each virtual hydrogen. For example, the valence of a methyl carbon having three virtual hydrogens and a hydrogen neighbor is four. The valence of an acetaldehyde oxygen atom is two. And so on.
+To support implicit hydrogen counting, Dialect uses the concept of \textit{valence}. Valence is a non-negative integer computed as the sum of bond orders at a given atom. Single and elided bonds contribute one to the tally, double bonds two, and triple bonds three. Each virtual hydrogen contributes one. For example, the valence of a methyl carbon having three virtual hydrogens and a hydrogen neighbor is four. The valence of an acetaldehyde oxygen atom is two. And so on.
 
-Some elements are associated with one or more \textit{default valences} (Table~\ref{table:default-valences}). A default valence is the number of hydrogens that can be attached to an isolated, fully-saturated atom using the corresponding element. For example, the default valence for a carbon-bearing atom is 4. This means that a fully saturated atom of carbon will have four hydrogens. Likewise, a fully-saturated atom of oxygen will have two hydrogens. Some elements such as nitrogen are associated with multiple default valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the default valences three and five. Both ammonia (NH\textsubscript{3}) and nitrogen pentahydride (NH\textsubscript{5}) are therefore fully saturated forms of nitrogen.
+Some elements are associated with one or more \textit{default valences} (Table~\ref{table:default-valences}). A default valence is the number of hydrogens that can be attached to an isolated, fully-saturated atom using the corresponding element. For example, the default valence for a carbon-bearing atom is 4. This means that a fully saturated atom of carbon will have four hydrogens. Likewise, a fully-saturated atom of oxygen will have two hydrogens. Some elements such as nitrogen are associated with multiple default valences. In these cases, multiple saturated forms are possible. For example, nitrogen has the default valences three and five. Both ammonia (NH\textsubscript{3}) and nitrogen pentahydride (NH\textsubscript{5}) are therefore fully saturated forms of nitrogen according to Table~\ref{table:default-valences}.
 
 \begin{table}
     \caption{Default Valences.}
@@ -291,7 +291,7 @@ Some elements are associated with one or more \textit{default valences} (Table~\
     \label{table:default-valences}
 \end{table}
 
-Given an atom whose element has one or more default valences \textit{subvalence} can be computed. Subvalence is the number of hydrogens that can be added to an atom without exceeding the lowest possible default valence. If no suitable default valence exists, then the subvalence is zero. This computation can be expressed algorithmically (Algorithm~\ref{algorithm:subvalence}). First, the atom's valence is computed. Next, the ordered list of default valences of the atom's element is found. For each default valence, the difference between it and the valence is compute. If this differences is positive, it is returned as the subvalence. If no suitable default valence is found, zero is returned.
+Given an atom whose element has one or more default valences, \textit{subvalence} can be computed. Subvalence is the number of hydrogens that can be added to an atom without exceeding the lowest possible default valence. If no suitable default valence exists, then subvalence equals zero. This computation can be expressed algorithmically (Algorithm~\ref{algorithm:subvalence}). First, the atom's valence is computed. Next, the ordered list of default valences of the atom's element is found. For each default valence, the difference between it and the valence is compute. If this differences is positive, it is returned as the subvalence. If no suitable default valence is found, zero is returned. The subvalence of an atom whose element has no default valences (i.e., no listing in Table~\ref{table:default-valences}) is zero. For example, an iron atom always has a subvalence of zero, regardless of how it is bonded.
 
 \begin{algorithm}
     \SetKwInOut{Input}{input}
@@ -315,8 +315,6 @@ Given an atom whose element has one or more default valences \textit{subvalence}
       \Return{$0$}\;
     }
 \end{algorithm}
-
-The subvalence of an atom whose element has no default valences (i.e. no listing in Table~\ref{table:default-valences}) is zero. For example, an iron atom always has a subvalence of zero, regardless of how it is bonded.
 
 For a representative subvalence computation, consider an isolated nitrogen atom without virtual hydrogens. The atom's bond order sum is zero. Its default valences are 3 and 5. The difference is found to be three ($3 - 0$). Therefore, the subvalence of this atom is three.
 
