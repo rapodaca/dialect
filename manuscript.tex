@@ -221,7 +221,7 @@ A bond whose attributes are assigned default values can participate in \textit{b
 
 \section*{Delocalization Subgraph}
 
-A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME occurs when a molecular graph exists in two or more unequal forms, each differing from the others only through electron delocalization. Two molecular graphs are equal if they are isomorphic and a 1:1 mapping exists between the atoms and bonds in each graph. Electron delocalization results when the electrons of a valence bond representation can be distributed over more than one pair of atoms, as is the case with benzene and related molecules. DIME is similar to \enquote{resonance} or \enquote{aromaticity,} but those terms are avoided here due to their ambiguity~\cite{randic:2018,kerber:2006}.
+A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME arises when a molecular graph exists in two or more unequal forms, each differing from the others only through electron delocalization. In this context, two graphs are equal if they are isomorphic and each matched pair of atoms or bonds possess equivalent non-index attributes. If shifting electrons through delocalization causes two graphs to become equal, then DIME has occurred. DIME is sometimes referred to as \enquote{resonance} or \enquote{aromaticity,} but those terms are avoided here due to their ambiguity~\cite{randic:2018,kerber:2006}.
 
 \begin{figure}
     \centering
@@ -230,11 +230,11 @@ A molecular representation based solely on the valence bond model can yield arti
     \label{fig:dime}
 \end{figure}
 
-DIME can interfere with \textit{canonicalization}, or the selection of a single representation for a molecular graph. The presence of multiple equivalent molecular graphs differing only in the placement of single and double bonds complicates selection rules and invariants, which must be adapted to account for the artificial asymmetry.
+DIME can interfere with \textit{canonicalization}, or the selection of a single representation for a molecular graph. The presence of multiple equivalent molecular graphs differing only in electron delocalization complicates the formulation of selection rules and invariants, which must be adapted to account for the artificial asymmetry.
 
-To eliminate DIME and thereby streamline canonicalization, Dialect representations support a \textit{delocalization subgraph} (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS is drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
+To eliminate DIME and thereby streamline canonicalization, the molecular graph is augmented with a \textit{delocalization subgraph} (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS may be drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
 
-An atom is added to a DS by setting its \ttt{selected} attribute to \ttt{true} (\enquote{selection}). For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements (or \ttt{None}) must not be selected. Only selected atoms belong to the DS.
+Membership of a DS is determined as follows. An atom is added to the DS by setting its \ttt{selected} attribute to \ttt{true} through a process called \textit{selection}. For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements (or \ttt{None}) must not be selected. A bond will be added to the DS if both of its terminals are selected and the \ttt{elided} attribute equals \ttt{true}. No other bond will be added to the DS. This rule allows arbitrary bonds between selected atoms to be excluded from the DS.
 
 \begin{figure}
     \centering
@@ -243,11 +243,9 @@ An atom is added to a DS by setting its \ttt{selected} attribute to \ttt{true} (
     \label{fig:perfect-matching}
 \end{figure}
 
-A bond will be added to the DS only if both of the following conditions are met: (1) both terminals are selected; and (2) the bond itself is elided. No other bond will be added to the DS. This behavior makes it possible to exclude a specific bond from the DS by making its bond order explicit.
+A non-empty DS must possess a \textit{perfect matching}. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore become part of its perfect matching.
 
-A non-empty DS must possess a \textit{perfect matching}. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore be part of a perfect matching over it.
-
-A filled DS can be emptied through a two-step process of \textit{deselection}. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A popular algorithm for matching, the Edmunds \enquote{blossom algorithm,} has a time complexity of $O(|E||V|^2)$, where $|E|$ is the number of edges and $|V|$ is the number of nodes~\cite{edmonds:1965}. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
+A filled DS can be emptied through a two-step process of \textit{deselection}. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A widely-used algorithm for matching, the Edmunds \enquote{blossom algorithm,} has a time complexity of $O(|E||V|^2)$, where $|E|$ is the number of edges and $|V|$ is the number of nodes~\cite{edmonds:1965}. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
 
 \begin{figure}
     \centering
@@ -256,7 +254,7 @@ A filled DS can be emptied through a two-step process of \textit{deselection}. F
     \label{fig:deselection}
 \end{figure}
 
-The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm can restrict candidate atoms to those found in cycles. Electron-counting techniques can also be introduced to approximate the chemical concept of \enquote{aromaticity.} A double bond between two selected atoms may or may not be elided, depending on the application.
+The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm may restrict candidate atoms to those found in cycles. Electron-counting techniques may also be introduced to approximate the chemical concept of \enquote{aromaticity.} Elision of the single bonds to be added to the DS completes the process.
 
 \begin{figure}
     \centering
