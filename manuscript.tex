@@ -345,7 +345,7 @@ An atom's implicit hydrogen count may or may not correlate with chemical intuiti
 
 \section*{Atom Index}
 
-To support the assignment and interpretation stereochemical features, each node is assigned a sequential, unique, non-negative integer \ttt{index} attribute (\enquote{index}). The value of an atom's index equals zero for a molecular's graph's first atom. The index for each subsequently-added atom equals the order (node count) of the graph prior to the addition. For example, the index for the second atom is one, the index for the third atom is two, and so on. The maximum value of an atomic index is 2\textsuperscript{32} - 1.
+To support the assignment and interpretation stereochemical features, each node carries a unique, non-negative integer \ttt{index} attribute (\enquote{index}). Assignment is sequential, meaning that the first atom gets index zero, the next one, and so on. For example, the index for the first atom is zero, for the second atom one, for the third atom two, and so on. The maximum value of an atomic index is 2\textsuperscript{32} - 1.
 
 Indexes impose an ordering over the atoms in a molecular graph. An atom with an index less than another atom is said to \textit{precede} it. An atom with an index grater than another atom \textit{succeeds} it. No special significance is ascribed to the atom whose index is zero, except that every other atom succeeds it.
 
@@ -353,7 +353,7 @@ Indexes impose an ordering over the atoms in a molecular graph. An atom with an 
 
 The second major component of molecular representation in Dialect is \textit{conformation}. Conformation is a rotational restriction about one or more bonds. Dialect limits conformation to just one of many possible types: rotational restrictions occurring at individual double bonds.
 
-Organic chemistry uses the parity descriptors \textit{entgegen} (\textit{E}) and \textit{zusammen} (\textit{Z}) to label conformational parity. This system is based on prioritization of the atoms neighboring the double bond. One pattern of priority yields the \textit{E} parity, and the other yields \textit{Z}. Conveniently, the parity descriptor can be localized at the double bond.
+Organic chemistry uses the descriptors \textit{entgegen} (\textit{E}) and \textit{zusammen} (\textit{Z}) to label conformational parity. This system is based on prioritization of the atoms neighboring the double bond. One pattern of priority yields the \textit{E} parity, and the other yields \textit{Z}. Conveniently, the parity descriptor can be localized at the double bond.
 
 \begin{figure}
     \centering
@@ -362,7 +362,7 @@ Organic chemistry uses the parity descriptors \textit{entgegen} (\textit{E}) and
     \label{fig:traditional-conformational-stereodescriptors}
 \end{figure}
 
-Dialect takes a different approach by introducing \textit{partial parity bonds} (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. At least two PPBs must flank the double bond.
+Dialect takes a different approach by introducing \textit{partial parity bonds} (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. With just a few exceptions (see below), a double bond with a neighbor at one terminal bound through a PPB must also have a neighbor at the opposite terminal bound through a PPB.
 
 \begin{figure}
     \centering
@@ -371,7 +371,11 @@ Dialect takes a different approach by introducing \textit{partial parity bonds} 
     \label{fig:partial-parity-bonds}
 \end{figure}
 
-To support this system, each bond carries a nullable \ttt{direction} attribute (\enquote{direction}). When present, this attribute may assume one of the two values \ttt{Up} or \ttt{Down}. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The double bond terminals are placed on the x-axis such that the terminal with the lowest \ttt{index} attribute appears to the left of the terminal with the higher atomic \ttt{index} attribute. These terminals are designated \enquote{left terminal} and \enquote{right terminal,} respectively. Each neighbor of a terminal is then assigned a relative coordinate based on the \ttt{index} attribute and the direction of its PPB bond.
+To support this system, each bond carries an optional \ttt{direction} attribute (\enquote{direction}). When present, direction may assume one of the two values \ttt{Up} or \ttt{Down}. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The terminals of the bond are placed on the x-axis such that the one on the right succeeds the one on the left. The neighbors at each terminal joined through a PPB are then assigned relative coordinates in the plane.
+
+Neighbors of the left terminal are positioned according to the relative ordering of atomic indexes and the bond's \ttt{direction} attribute. If the neighbor precedes the terminal then a \ttt{direction} attribute equal to \ttt{Up} locates the neighbor in the lower-left quadrant and a \ttt{direction} attribute of \ttt{Down} locates the neighbor in the upper-left quadrant. If the neighbor succeeds the terminal, these placements are reversed.
+
+An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place it to the upper right given an \ttt{Up} direction, or to the lower right given a \ttt{Down} direction. Reverse these assignments if the neighbor precedes the right terminal.
 
 \begin{figure}
     \centering
@@ -380,11 +384,7 @@ To support this system, each bond carries a nullable \ttt{direction} attribute (
     \label{fig:interpret-ppb}
 \end{figure}
 
-The following procedure assigns a relative coordinate to a neighbor of the left terminal. First, determine the relative order of the indexes for the neighbor and the left terminal. If the neighbor succeeds the left terminal, place the neighbor to the upper left of the terminal if the bond direction is \ttt{Up}, or to the lower left if the bond direction is \ttt{Down}. If the terminal succeeds its neighbor, reverse these assignments.
-
-An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place the neighbor to the upper right given an \ttt{Up} direction, or to the lower right given a \ttt{Down} direction. Reverse these assignments if the right terminal succeeds its neighbor.
-
-In some cases the placement of a terminal neighbor can be deduced from the placement of a sibling, without the presence of an explicit PPB. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
+In some cases the placement of a terminal neighbor can be deduced from the placement of a sibling, without the presence of an explicit PPB. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well by elimination. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
 
 \begin{figure}
     \centering
@@ -395,7 +395,7 @@ In some cases the placement of a terminal neighbor can be deduced from the place
 
 The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
 
-Consider the encoding of PPBs for (\textit{E})-2-butene. Assume that indexes are assigned sequentially from left to right and the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis. Left and right terminals are placed on the basis of succession. The left terminal (Atom 1) succeeds its neighbor (Atom 0), which should be placed in the lower-left quadrant. To achieve this, assign a PPB direction of \ttt{Up}. The right terminal (Atom 2) precedes its neighbor (Atom 3), which should be placed in the upper-right quadrant. To active this, assign a PPB direction of \ttt{Up}.
+Consider the encoding of PPBs for (\textit{E})-2-butene. Assume that indexes are assigned sequentially from the neighbor of the left terminal to the neighbor of the right terminal and that the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis according to succession. The left terminal succeeds its neighbor, which should be placed in the lower-left quadrant. To achieve this, assign a PPB direction of \ttt{Up}. The right terminal precedes its neighbor, which should be placed in the upper-right quadrant. To active this, assign a PPB direction of \ttt{Up}.
 
 \begin{figure}
     \centering
@@ -404,11 +404,9 @@ Consider the encoding of PPBs for (\textit{E})-2-butene. Assume that indexes are
     \label{fig:assigning-ppb}
 \end{figure}
 
-In a similar manner assigned PPBs can be decoded. The process starts by placing Atom 1 to the left of Atom 2 along the x-axis. The PPB between the left terminal and its neighbor (Atom 0) uses the \ttt{Up} direction. The neighbor precedes the left terminal, so Atom 0 should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor (Atom 3) uses the \ttt{Up} direction. The neighbor (Atom 3) succeeds the right terminal (Atom 2). Therefore, Atom 3 is placed in the upper right quadrant. This results in the expected conformation (\textit{E}).
+PPBs are decoded analogously. Start by placing the terminals on the x-axis according to succession. The PPB between the left terminal and its neighbor has a direction of \ttt{Up}. Because the neighbor precedes the terminal, the neighbor should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor has a direction of \ttt{Up}. Because the neighbor succeeds the terminal, the neighbor is placed in the upper-right quadrant. The result is the expected (\textit{E}) conformation.
 
 The above procedures assume that all PPBs are expressed in \textit{normal form}. In normal form, a PPB's source precedes it target. In other words, \ttt{source} is less than \ttt{target}. If a PPB is not in normal form, it must be \textit{inverted} before quadrants can be assigned. Inversion swaps the values of `source` and target attributes while simultaneously toggling the `direction` attribute. Inversion occurs in two contexts: conjugated polyenes and cycles. In the case of polyenes, the same PPB carries partial conformation for at least two different double bond systems. In the case of cycles, non-normal PPBs can be generated at bonds forming cycles. However, readers and writers must be capable of inverting PPBs wherever they appear.
-
-Consider (\textit{E})-2-butene. The PPB spanning atoms 0 and 1 will typically be encoded as the tuple \ttt{(0, 1, Up)} because this orientation tracks the order of atom index. However, the PPB can be equivalently encoded as the tuple \ttt{(1, 0, Down)}. Before this representation can be used, it must first be inverted into the equivalent form represented by the tuple \ttt{(0, 1, Up)}.
 
 \begin{figure}
     \centering
@@ -420,7 +418,7 @@ Consider (\textit{E})-2-butene. The PPB spanning atoms 0 and 1 will typically be
 The distributed nature of conformational encoding means that several additive error states are possible:
 
 \begin{itemize}
-    \item{Overspecification. This state occurs when two or more PPBs share a common ancestor and simultaneously use the same parity, thus placing multiple neighbors into the same quadrant.}
+    \item{Overspecification. This state occurs when two or more PPBs share a common terminal and simultaneously use the same parity, thus placing multiple neighbors into the same quadrant.}
     \item{Underspecification. A required and non-deducible PPB is absent. This state occurs when a double bond terminal connects to at least one neighbor through a PPB, but the terminal's mate does not.}
     \item{ Misspecification. A PPB is used between atoms lacking at least one double bond.}
 \end{itemize}
@@ -434,7 +432,7 @@ A reader that detects one of these error conditions must abort the molecular gra
     \label{fig:bond-error-states}
 \end{figure}
 
-An exception to the underspecification rule applies in the case of conjugated polyenes. In this case a double bond with a terminal bearing a PPB does not require the opposing terminal to also bear a neighbor with a PPB. If the opposing terminal lacks neighbors, no error is generated and reading continues normally. If the opposing terminal has at least one neighbor, the bond to it need not be a PPB. In either case the conformation of the double bond in question remains undefined.
+An exception to the underspecification rule applies in the case of conjugated polyenes. Here a double bond with a terminal connected through a PPB does not require the opposing terminal to also bear a neighbor connected through a PPB. If the opposing terminal lacks neighbors, no error is generated and reading continues normally. If the opposing terminal has at least one neighbor, the bond to it need not be a PPB. In either case the conformation of the double bond in question remains undefined.
 
 \begin{figure}
     \centering
@@ -443,7 +441,7 @@ An exception to the underspecification rule applies in the case of conjugated po
     \label{fig:bond-error-state-exceptions}
 \end{figure}
 
-Given that conformational specification is distributed over three or more bonds, some conformations will be difficult or possible to represent. Cyclooctatetraene offers an example. Although the (\textit{E}, \textit{E}, \textit{E}, \textit{E}) conformation is accessible, the (\textit{Z}, \textit{E}, \textit{E}, \textit{E}) conformation is not. This problem arises because the same PPB encodes a partial conformation of two different double bonds.
+Given that conformational specification is distributed over three or more bonds, some conformations will be difficult or possible to represent. Cyclooctatetraene offers an example. Although the (\textit{E}, \textit{E}, \textit{E}, \textit{E}) conformation is expressable, the (\textit{Z}, \textit{E}, \textit{E}, \textit{E}) conformation is not. This problem arises because the same PPB encodes a partial conformation of two different double bonds.
 
 \begin{figure}
     \centering
