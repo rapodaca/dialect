@@ -452,11 +452,13 @@ Given that conformational specification is distributed over three or more bonds,
 
 \section*{Configuration}
 
-The third major element of molecular representation is \textit{configuration}. Configuration is the three-dimensional arrangement of neighbors about an atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertexes of a tetrahedron. Here, \enquote{substituent} means an atomic neighbor; lone electron pairs are not considered substituents. One of the four substituents may be a virtual hydrogen.
+The third major element of molecular representation is \textit{configuration}, the three-dimensional arrangement of neighbors about a central atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertices of a tetrahedron. Here, \enquote{substituent} means an atomic neighbor or virtual hydrogen. Lone electron pairs are not considered substituents.
 
-A configuration is comprised of two components: an ordering of bonds to a central atom; and a \textit{configurational descriptor}. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: \ttt{Left} and \ttt{Right}. The context for the terms \enquote{left} and \enquote{right} will be explained shortly.
+A configuration is comprised of two components: an ordering of bonds to a central atom; and a \textit{configurational descriptor}. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: \ttt{Left} and \ttt{Right}. These descriptors constrain the neighbors of a central atom to the vertices of a tetrahedron.
 
-The descriptors \ttt{Left} and \ttt{Right} restrict neighboring atoms to the vertices of a tetrahedron whose center is the central atom. First, the mate of the first bond to the central atom is placed at an arbitrary vertex. Then shift the frame of reference by sighting along the first bond from the neighbor toward the central atom. Finally, arrange the remaining neighbors using the ordering of bonds to the central atom. For the \ttt{Left} variant, use a counterclockwise distribution. For the \ttt{Right} variant, use a clockwise distribution.
+The \ttt{Left} variant works as follows. First, the bond having the index with the lowest value identified. The frame of reference is shifted by sighting down this bond from the neighbor to the central atom. An equilateral triangle with one vertex pointing upward is then inscribed about the central atom. The bond with the next lowest index is then identified and its neighbor is placed at the top vertex of the triangle. The neighbor attached to the succeeding bond is then placed at the left triangle vertex. Finally, the remaining neighbor is placed at the remaining vertex. The overall pattern is one of counterclockwise distribution.
+
+The \ttt{Right} variant follows the same pattern, except that placement of the neighbors attached to the last two bonds in succession are transposed. The overall pattern here is one of clockwise distribution.
 
 \begin{figure}
     \centering
@@ -465,7 +467,7 @@ The descriptors \ttt{Left} and \ttt{Right} restrict neighboring atoms to the ver
     \label{fig:configurational-descriptor}
 \end{figure}
 
-If an atom bears one virtual hydrogen and three substituents, a modified procedure is used. The virtual hydrogen is first placed at an arbitrary vertex of the tetrahedron. The tetrahedron is then oriented along the axis pointing from the virtual hydrogen to the center. Neighbor atoms are then distributed in a counterclockwise (\ttt{Counterclockwise}) or clockwise (\ttt{Clockwise}) pattern to the remaining vertices.
+A modified procedure is used for atoms bearing one virtual hydrogen and three atomic substituents. The implied bond to the virtual hydrogen is considered to precede the others. Sighting down this bond, the atomic neighbors are then placed as previously at the vertices of a triangle inscribed about the central atom.
 
 \begin{figure}
     \centering
@@ -474,9 +476,9 @@ If an atom bears one virtual hydrogen and three substituents, a modified procedu
     \label{fig:configurational-descriptor-vh}
 \end{figure}
 
-The association of a configurational descriptor with an atom implies a neighbor count of either four if no virtual hydrogens are present, or three if exactly one virtual hydrogen is present. In any other context, the use of a configurational descriptor is considered an error.
+An atom whose \ttt{configuration} attribute assumes a non-default value must have a neighbor count of either four if no virtual hydrogens are present or three if one virtual hydrogen is present. In any other context, the use of a configurational descriptor is considered an error.
 
-This restriction places some constraints around the use of configuration. For example, the assignment of stereodescriptors to central carbon atom of allenes and other cumulenes might seem like a reasonable extension. However, to do so is an error because the central atom lacks four substituents. Similarly, lone pairs must not take the place of atomic substituents, as might be the case with sulfoxides for example.
+This restriction places some constraints around the use of configuration. Some topologies may appear close enough to tetrahedral to stretch the meaning of the configurational descriptors. However, all such adaptations are invalid. Examples include the central atom of allenes and other odd cumulenes, and the sulfur atom of sulfoxides where the lone pair plays the role of a substituent.
 
 \begin{figure}
     \centering
@@ -485,9 +487,9 @@ This restriction places some constraints around the use of configuration. For ex
     \label{fig:invalid-configurational-descriptors}
 \end{figure}
 
-A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, and partial parity bond types can all be present. The only requirement that must be satisfied is four substituents or, equivalently, three substituents and a virtual hydrogen.
+A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, and partial parity bond types can all be present. The only requirement that must be satisfied by a central atom is a neighbor count of four, or three when a virtual hydrogen is present.
 
-It is sometimes useful to manipulate a configuration in a way that preserves the relative three-dimensional positioning of neighbor atoms. This process is called \textit{transformation}. Five rules suffice to transform any configuration into any other:
+It is sometimes useful to manipulate a configuration in a way that preserves the relative three-dimensional positioning of neighbor atoms. This process is called \textit{transformation}. Five operations suffice to transform any configuration into any other:
 
 \begin{itemize}
     \item{Virtualize. Replaces an atomic hydrogen neighbor with a virtual hydrogen. If the deleted bond was first in the bond ordering, toggle the configurational descriptor.}
@@ -504,7 +506,7 @@ It is sometimes useful to manipulate a configuration in a way that preserves the
     \label{fig:iconfigurational-transformations}
 \end{figure}
 
-Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is an atom whose \enquote{ligand permutation produces stereoisomers,} as defined by Mislow and Siegel~\cite{mislow:1984}. In the context of Dialect, a stereocenter must be tetracoordinate. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
+Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is an atom whose \enquote{ligand permutation produces stereoisomers,} as defined by Mislow and Siegel~\cite{mislow:1984}. In the context of Dialect, a stereocenter must be tetracoordinate. However, this is a necessary but insufficient condition. Molecular topology can result in permutation that does not produce stereoisomers. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
 
 Special handling is required for \textit{undefined stereocenters}. A stereocenter is undefined if it lacks a stereodescriptor. Omitting a stereodescriptor conveys to readers that no information about the stereocenter's configuration is known. This could imply that either a single configuration or a configurational mixture are present. This interpretation is consistent with the one used by molfile format~\cite{ctfileFormats}.
 
