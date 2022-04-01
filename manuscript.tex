@@ -512,9 +512,9 @@ Special handling is required for \textit{undefined stereocenters}. A stereocente
 
 \section*{Syntax}
 
-A Dialect string (\enquote{string}) is a UTF-encoded sequence of zero or more characters chosen from the set: \ttt{A}; \ttt{B}; \ttt{C}; \ttt{D}; \ttt{E}; \ttt{F}; \ttt{G}; \ttt{H}; \ttt{I}; \ttt{K}; \ttt{L}; \ttt{M}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{R}; \ttt{S}; \ttt{T}; \ttt{U}; \ttt{V}; \ttt{W}; \ttt{X}; \ttt{Y}; \ttt{Z}; \ttt{a}; \ttt{b}; \ttt{c}; \ttt{d}; \ttt{e}; \ttt{f}; \ttt{g}; \ttt{h}; \ttt{i}; \ttt{k}; \ttt{l}; \ttt{m}; \ttt{n}; \ttt{o}; \ttt{p}; \ttt{r}; \ttt{s}; \ttt{t}; \ttt{u}; \ttt{v}; \ttt{0}; \ttt{1}; \ttt{2}; \ttt{3}; \ttt{4}; \ttt{5}; \ttt{6}; \ttt{7}; \ttt{8}; \ttt{9}; \ttt{+}; \ttt{-}; \ttt{.}; \ttt{\%}; \ttt{@}; \ttt{*}; \ttt{[}; \ttt{]}; \ttt{/}; \ttt{\char`\\}; \ttt{=}; and \ttt{\#}. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
+A Dialect string is a UTF-8-encoded sequence of zero or more characters chosen from the set \{ \ttt{A}, \ttt{B}, \ttt{C}, \ttt{D}, \ttt{E}, \ttt{F}, \ttt{G}, \ttt{H}, \ttt{I}, \ttt{K}, \ttt{L}, \ttt{M}, \ttt{N}, \ttt{O}, \ttt{P}, \ttt{R}, \ttt{S}, \ttt{T}, \ttt{U}, \ttt{V}, \ttt{W}, \ttt{X}, \ttt{Y}, \ttt{Z}, \ttt{a}, \ttt{b}, \ttt{c}, \ttt{d}, \ttt{e}, \ttt{f}, \ttt{g}, \ttt{h}, \ttt{i}, \ttt{k}, \ttt{l}, \ttt{m}, \ttt{n}, \ttt{o}, \ttt{p}, \ttt{r}, \ttt{s}, \ttt{t}, \ttt{u}, \ttt{v}, \ttt{0}, \ttt{1}, \ttt{2}, \ttt{3}, \ttt{4}, \ttt{5}, \ttt{6}, \ttt{7}, \ttt{8}, \ttt{9}, \ttt{+}, \ttt{-}, \ttt{.}, \ttt{\%}, \ttt{@}, \ttt{*}, \ttt{[}, \ttt{]}, \ttt{/}, \ttt{\char`\\}, \ttt{=}, \ttt{\#} \}. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
 
-Strings conform to an \textit{LL(1) grammar}. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. This set of features makes LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR~\cite{parr:2014}. The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
+Strings conform to an \textit{LL(1) grammar}. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. These features make LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR~\cite{parr:2014}. The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
 
 Dialect's formal grammar is presented as a series of \textit{production rules} (aka \enquote{productions}). A production rule defines a transformation allowed under the grammar. These transformations collectively define the set of valid Dialect strings. Production rules can be used in the forward direction, when writing a string, or in the reverse direction, when reading a string. 
 
@@ -527,36 +527,36 @@ Consider a hypothetical language composed of variable-length sequences of the lo
 <a>    ::= "a"
 \end{lstlisting}
 
-The quantifier (\ttt{*}) indicates that a text in this language consists of a sequence of zero or more instances of the production \ttt{<a>}. This production in turn is defined as a lowercase letter (`a`). Therefore, valid texts in this language include the empty string, \ttt{a}, \ttt{aa}, and \ttt{aaaaaa} to name a few.
+The quantifier (\ttt{*}) indicates that a text in this language consists of a sequence of zero or more instances of the production \ttt{<a>}. This production in turn is defined as a lowercase letter (\enquote{a}). Therefore, valid texts in this language include the empty string, \enquote{a}, \enquote{aa}, and \enquote{aaaaaa} to name a few.
 
 \subsection*{Atom}
 
-Atoms carry most of the information in a Dialect string. The non-terminal \ttt{<atom>} is a selection among four alternatives.
+Atoms carry most of the information in a Dialect string. The non-terminal \ttt{<atom>} can be expressed using one of four variants.
 
 \begin{lstlisting}
 <atom> ::= <star> | <shortcut> | <selection> | <bracket>
 \end{lstlisting}
 
-The first atomic non-terminal, \ttt{<star>}, can assume one terminal value, the asterisk character (\ttt{*}). This \enquote{star atom} represents an atom in which every attribute assumes its default value. The implicit hydrogen count of a star atom is zero.
+The first variant, \ttt{<star>}, produces one terminal value, the asterisk character (\ttt{*}). This \enquote{star atom} represents an atom in which every attribute assumes its default value.
 
 \begin{lstlisting}
 <star> ::= "*"
 \end{lstlisting}
 
-The next atomic production rule, \ttt{<shortcut>} is a non-terminal selected from the list: \enquote{B}; \enquote{C}; \enquote{N}; \enquote{O}; \enquote{P}; \enquote{S}; \enquote{F}; \enquote{Cl}; \enquote{Br}; and \enquote{I.} An atom encoded in this way (\enquote{shortcut atom}) assigns the corresponding symbol to the \ttt{element} attribute. All other attributes retain their default values. The implicit hydrogen count of a shortcut atom is determined by the algorithm previously given.
+The next atomic production rule, \ttt{<shortcut>} is a non-terminal selected from the list: \enquote{B}; \enquote{C}; \enquote{N}; \enquote{O}; \enquote{P}; \enquote{S}; \enquote{F}; \enquote{Cl}; \enquote{Br}; and \enquote{I.} An atom encoded in this way (\enquote{shortcut atom}) receives the corresponding symbol as the value for the \ttt{element} attribute. All other attributes retain their default values, except \ttt{hydrogens}, which is set to \ttt{Implicit}.
 
 \begin{lstlisting}
 <shortcut> ::= "B" "r"? | "C" "l"? | "N" | "O" | "P"
              | "S" | "F" | "I"
 \end{lstlisting}
 
-The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: \enquote{c}; \enquote{n}; \enquote{o}; \enquote{p}; and \enquote{s.} An atom encoded in this way (\enquote{selected shortcut atom}) assigns the corresponding atom symbol to the \ttt{element} attribute and sets the \ttt{selected} attribute to `true`. All other atomic attributes retain their default values. The implicit hydrogen count of a selected shortcut atom is determined as described previously.
+The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: \enquote{c}; \enquote{n}; \enquote{o}; \enquote{p}; and \enquote{s.} An atom encoded in this way (\enquote{selected shortcut atom}) assigns the corresponding atom symbol to the \ttt{element} attribute, sets the \ttt{selected} attribute to \ttt{true}, and sets the \ttt{hydrogens} attribute to \ttt{Implicit}. All other atomic attributes retain their default values.
 
 \begin{lstlisting}
 <selection> ::= "c" | "n" | "o" | "p" | "s"
 \end{lstlisting}
 
-The fourth and most complex atomic production rule is \ttt{<bracket>} (\enquote{bracket atom}). A bracket atom can be used to set any atomic attribute. A bracket atom must be used when the `element` attribute of an atom makes it ineligible for implicit hydrogen counting. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
+The fourth and most complex atomic production rule is \ttt{<bracket>} (\enquote{bracket atom}). Bracket can be used to set any atomic attribute. A bracket atom must be used for any atom whose \ttt{configuration}, or \ttt{charge} attributes deviate from default values, or whose \ttt{hydrogens} attributes equals anything other than \ttt{Implicit}. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
 
 \begin{lstlisting}
 <bracket> ::= "[" <isotope>? <symbol> <stereodescriptor>?
@@ -569,13 +569,13 @@ The value of a bracket atom's \ttt{isotope} attribute is determined by the optio
 <isotope> ::= <digit> <digit>? <digit>?
 \end{lstlisting}
 
-The values of a bracket atom's \ttt{element} and \ttt{selected} attributes are determined by the \ttt{<symbol>} production rule (\enquote{symbol}). Three non-terminal options are available: \ttt{<star>}; \ttt{<element>}; and \ttt{<selection>}.
+The values of a bracket atom's \ttt{element} and \ttt{selected} attributes are determined by the \ttt{<symbol>} production rule (\enquote{symbol}). Three non-terminal variants are supported. These three variants influence the \ttt{element} and \ttt{selected} attributes in different ways. The \ttt{<star>} variant leaves both attributes as their default values. The \ttt{<element>} variant assigns the \ttt{element} attribute to the corresponding value while leaving the \ttt{selected} attribute as its default value. The \ttt{<selection>} non-terminal sets the \ttt{element} attribute to the corresponding element and the \ttt{selected} attribute to \ttt{true}. For example, the selection sequence \enquote{p} would assign the atomic \ttt{element} and \ttt{selected} attribute to \ttt{P} and \ttt{true}, respectively.
 
 \begin{lstlisting}
 <symbol> ::= <star> | <element> | <selection>
 \end{lstlisting}
 
-The \ttt{<element>} non-terminal option assigns the atomic \ttt{element} attribute to the corresponding value while leaving the \ttt{selected} attribute as its default value. Given the large number of choices within the \ttt{<element>} non-terminal, the following production rule only defines the first several. For a complete list of alternative, see the full grammar in the Supporting Information.
+Given the large number of variants within the \ttt{<element>} non-terminal, the following production rule only defines the first several. For a complete list of variants, see the full grammar in the Supporting Information.
 
 \begin{lstlisting}
 <element> ::= "A" ( "c" | "g" | "l" | "m" | "r" | "s"
@@ -584,34 +584,32 @@ The \ttt{<element>} non-terminal option assigns the atomic \ttt{element} attribu
             ...
 \end{lstlisting}
 
-A \ttt{<selection>} non-terminal found within a symbol sets the atomic \ttt{selected} attribute to \ttt{true}. The corresponding \ttt{element} attribute is assigned by capitalization. For example, the terminal \ttt{p} would assign the atomic \ttt{element} and \ttt{selected} attributes to the values \ttt{P} and \ttt{true}, respectively.
-
-The \ttt{stereodescriptor} attribute of a bracket atom is determined by the \ttt{<stereodescriptor>} non-terminal. Allowed values are \enquote{@} and \enquote{@@,} corresponding to the \ttt{stereodescriptor} values \ttt{Counterclockwise} and \ttt{Clockwise}, respectively.
+The \ttt{stereodescriptor} attribute of a bracket atom is determined by the \ttt{<stereodescriptor>} non-terminal. Allowed values are \enquote{@} and \enquote{@@,} corresponding to the values \ttt{Left} and \ttt{Right}, respectively.
 
 \begin{lstlisting}
 <stereodescriptor> ::= "@" "@"?
 \end{lstlisting}
 
-The \ttt{hydrogens} attribute of a bracket atom is controlled by the \\ \ttt{<virtual{\_}hydrogen>} non-terminal. This non-terminal is comprised of the terminal \enquote{H} followed by an optional \ttt{<digit>} non-terminal. A digit appearing after the \enquote{H} terminal sets \ttt{hydrogens} to the corresponding virtual hydrogen count. A digit of 0 (i.e., \enquote{H0}) sets the \ttt{hydrogens} attribute to zero. If no digit is present, \ttt{hydrogens} is set to one.
+The \ttt{hydrogens} attribute of a bracket atom is controlled by the \\ \ttt{<virtual{\_}hydrogen>} non-terminal. It is comprised of the terminal \enquote{H} followed by an optional \ttt{<digit>} non-terminal. A digit appearing after the \enquote{H} terminal sets \ttt{hydrogens} to the corresponding virtual hydrogen count. A digit of 0 (i.e., \enquote{H0}) sets the \ttt{hydrogens} attribute to zero. If no digit is present, \ttt{hydrogens} is set to one.
 
 \begin{lstlisting}
 <virtual_hydrogen> ::= "H" <digit>?
 \end{lstlisting}
 
-The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (\enquote{+} and \enquote{-,} respectively) and ends with an optional \ttt{<digit>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, the plus terminal (\enquote{+}) sets the \ttt{charge} attribute to one and the minus terminal (\enquote{-}) sets it to minus one. A charge of zero (e.g., \enquote{+0} or \enquote{-0}) sets the \ttt{charge} attribute to zero.
+The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (\enquote{+} and \enquote{-} respectively) and ends with an optional \ttt{<digit>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, the plus terminal (\enquote{+}) sets the \ttt{charge} attribute to one and the minus terminal (\enquote{-}) sets it to minus one. A charge of zero (e.g., \enquote{+0} or \enquote{-0}) sets the \ttt{charge} attribute to zero.
 
 \begin{lstlisting}
 <charge> ::= ( "+" | "-" ) <digit>?
 \end{lstlisting}
 
-Should an optional bracket non-terminal not be present, the atom must retain its corresponding default value. For example, the bracket \enquote{[C@H+]} lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket \enquote{[13CH+]} lacks the \ttt{<stereodescriptor>} non-terminal, so the corresponding \ttt{configuration} attribute remains \ttt{None}.
+Values not defined within a bracket production leave the atomic attributes of the atom built from it in as their default values. For example, the bracket sequence \enquote{[C@H+]} lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket sequence \enquote{[13CH+]} lacks the \ttt{<stereodescriptor>} non-terminal, so the corresponding \ttt{configuration} attribute remains \ttt{None}.
 
 \subsection*{Bond}
 
 An atom may be connected to zero or more neighbors through a bond, encoded with the non-terminal \ttt{<bond>}.
 
 \begin{lstlisting}
-<bond> ::= "-" | "=" | "#" | | "/" | "\"
+<bond> ::= "-" | "=" | "#" | "/" | "\"
 \end{lstlisting}
 
 Five terminals are available (\enquote{-,} \enquote{=,} \enquote{\#,} \enquote{/,} and \enquote{\textbackslash}). The first three (\enquote{-,} \enquote{=,} and \enquote{\#}) set the \ttt{order} attribute of a bond to one, two, or three, respectively. The last two terminals, \enquote{/} and \enquote{\textbackslash,} set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
@@ -624,7 +622,7 @@ An atom may be assigned zero or more children through the \ttt{<sequence>} non-t
 <sequence> ::= <atom> ( <union> | <branch> | <split> )*
 \end{lstlisting}
 
-The \ttt{<union>} non-terminal consists of an optional \ttt{<bond>} non-terminal followed by a mandatory non-terminal selected from the list: \ttt{<cut>} or \ttt{<sequence>}. If either of these latter non-terminals are detected but \ttt{<bond>} is not, bond elision is used.
+The \ttt{<union>} non-terminal consists of an optional \ttt{<bond>} non-terminal followed by a mandatory non-terminal selected from the list: \ttt{<cut>} or \ttt{<sequence>}. If either of these latter non-terminals are detected but \ttt{<bond>} is not, the resulting bond is elided.
 
 \begin{lstlisting}
 <union> ::= <bond>? ( <cut> | <sequence> )
@@ -632,7 +630,7 @@ The \ttt{<union>} non-terminal consists of an optional \ttt{<bond>} non-terminal
 
 A sequence can contain a union, which in turn can contain a sequence. This is an example of recursion, transitive though it may be. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in \ttt{<sequence>} is allowed. Right recursion also occurs within the \ttt{<union>} and \ttt{<branch>} non-terminals.
 
-The \ttt{<cut>} non-terminal (\enquote{cut}) can takes two forms. A digit non-terminal can be used, enabling single-digit cut indexes. Double- or single-digit cut indexes, supporting the values zero through 99 inclusive, are available by prepending the percent character (\ttt{\%}).
+The \ttt{<cut>} non-terminal (\enquote{cut}) can takes two forms. A digit non-terminal can be used, enabling single-digit cut indexes. Double- or single-digit cut indexes, supporting the values zero through 99 inclusive, are available by prepending the percent character (\ttt{\%}). For the latter variant, any leading zero is disregarded, meaning that the sequences "07" and "7" are both interpreted as the index seven.
 
 \begin{lstlisting}
 <cut> ::= <digit> | "%" <digit> <digit>
@@ -649,20 +647,20 @@ A cut signifies the disconnection of an atom from its neighbor. The most common 
 
 To prevent overflow, a cut index may be reused provided that it appears to the right of its last paired appearance.
 
-An alternative to \ttt{<union>} within a sequence is the \ttt{<branch>} non-terminal (\enquote{branch}). Like union, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (\enquote{(} and \enquote{),} respectively), branch encodes a sequence that may or may not be attached to its parent. Attachment occurs if the \ttt{<bond>} non-terminal is included. Alternatively, the subgraph will be detached if the \ttt{<detachment>} non-terminal appears. If neither \ttt{<bond>} nor \ttt{<detachment>} non-terminals are detected between the parentheses but a sequence is, then bonding of parent and child occurs through an elided bond.
+An alternative to \ttt{<union>} within a sequence is the \ttt{<branch>} non-terminal (\enquote{branch}). Like union, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (\enquote{(} and \enquote{)} respectively), branch encodes a sequence that may or may not be attached to its parent. Attachment occurs if the \ttt{<bond>} non-terminal is included. Alternatively, the sequence will be detached if the \ttt{<detachment>} non-terminal (\enquote{.}) appears. If neither \ttt{<bond>} nor \ttt{<detachment>} are present then bond to the first atom of the sequence is elided.
 
 \begin{lstlisting}
 <branch> ::= "(" ( <detachment> | <bond> )?
              <sequence> ")"
 \end{lstlisting}
 
-The third option for associating a parent Atom with a child within a sequence is the \ttt{<split>} non-terminal (\enquote{split}). A split is a sequence of \ttt{<detachment>} and \ttt{<sequence>} non-terminals. The `<detachment>` non-terminal serves the same purpose as it does within a branch: the prevent the bonding of the parent atom with a child.
+The third option for adding atoms within a sequence is the \ttt{<split>} non-terminal (\enquote{split}). A split is a sequence of \ttt{<detachment>} and \ttt{<sequence>} productions. The \ttt{<detachment>} non-terminal serves the same purpose as it does within a branch: to prevent the bonding to the first atom of the sequence.
 
 \begin{lstlisting}
 <split> ::= <detachment> <sequence>
 \end{lstlisting}
 
-Having defined sequence, it's now possible to define a string as an optional sequence. In other words, a Dialect string is either empty or contains a sequence. A string without a sequence encodes a molecular graph of zero nodes and zero edges.
+Having defined sequence, it's now possible to define a string as an optional sequence. In other words, a Dialect string is either empty or contains a sequence. A string without a sequence encodes a molecular graph having zero nodes and zero edges.
 
 \begin{lstlisting}
 <string> ::= <sequence>?
