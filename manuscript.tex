@@ -683,7 +683,13 @@ The presence of a branch adds some nuances over a union. The leading open parent
     \label{fig:branches-stack}
 \end{figure}
 
-Further workflow adjustments can handle cuts. The necessary state can be maintained by a 100-element array. The first occurrence of a cut creates an entry in the array at the cut index consisting of the bond and the root atom. The second occurrence of a cut takes the entry at the cut index, attaching the atom in the entry to the current root atom. Either the leftmost or rightmost bond can be used to make the connection, provided they are \textit{compatible}.
+Further workflow adjustments can handle cuts. The necessary state can be maintained by a 100-element array. The first occurrence of a cut creates an entry in the array at the cut index consisting of the bond and the root atom. The second occurrence of a cut takes the entry at the cut index, attaching the atom in the entry to the current root atom. The two bonds spanning a cut must be \textit{compatible}. Compatibility is determined by comparing attributes using the following rules. If no rule applies to both bonds they are not compatible. It is an error to span a cut with incompatible bonds.
+
+\begin{enumerate}
+    \item An elided bond is compatible with any other bond, regardless of order or direction.
+    \item A bond with a defined direction is compatible with bond having the opposite direction if \ttt{source} precedes \ttt{target} (the usual case), or the same direction otherwise.
+    \item A bond without a direction is compatible with any bond having the same order.
+\end{enumerate}
 
 \begin{figure}
     \centering
@@ -692,8 +698,6 @@ Further workflow adjustments can handle cuts. The necessary state can be maintai
     \label{fig:cuts-array}
 \end{figure}
 
-Two cut bonds are compatible if they possess the same \ttt{order} attributes, and their \ttt{direction} attributes are complementary. Bonds with undefined \ttt{direction} are always complementary. A bond with a defined \ttt{direction} is complementary to any bond with an undefined state, or a bond with an opposing \ttt{direction}. For example, an elided bond is compatible with a single bond. Likewise, two elided bonds are compatible. A bond with a \ttt{direction} of \ttt{Up} is incompatible with another bond with a \ttt{direction} of \ttt{Up}, but compatible with one having a \ttt{direction} of \ttt{Down}.
-
 \begin{figure}
     \centering
     \includegraphics{filler}
@@ -701,7 +705,7 @@ Two cut bonds are compatible if they possess the same \ttt{order} attributes, an
     \label{fig:bond-compatibility}
 \end{figure}
 
-Decoding atomic configuration from a string requires the order of attachment from each atom to its neighbors to be recorded. Cuts are treated as if the neighboring atom itself were detected. In this regard, the first member of a cut pair requires special attention. The neighboring atom won't be available until the paired cut index is found. Nevertheless, it must ultimately appear before the neighbors in subsequent unions, branches, and splits. This can be accomplished though the use of a placeholder or some other mechanism that preserves the overall relative order of attachment. No such special treatment is needed for the second member of a cut pair.
+One further complication applies to decoding cuts. Atomic configuration is defined in terms of the relative order of attachment of neighbors about a central atom. In the first bond of a cut pair, the neighbor atom is undefined. It won't be known until the second bond of the cut pair is found. This might only occur after the addition of several intervening neighbors. Nevertheless, the neighbor atom across the cut must precede any subsequent neighbors. This requirement can be met by a placeholder or some other mechanism that preserves the relative order of neighbor attachment. No such special treatment is needed for the second bond of a cut pair.
 
 \begin{figure}
     \centering
@@ -710,9 +714,9 @@ Decoding atomic configuration from a string requires the order of attachment fro
     \label{fig:order-of-attachment}
 \end{figure}
 
-Readers must not assume that detachment (the period terminal, \enquote{.}) implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the single molecule propane can be encoded using the string \enquote{C1C.C1}.
+Readers must not assume that detachment (the period terminal, \enquote{.}) implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the connected molecular graph for propane can be encoded using the string \enquote{C1C.C1}.
 
-The partial parity bond model is unusual in that it spreads conformational information over three or more bonds. Regardless, readers must report as an error any string containing an isolated PPB (e.g., \enquote{C/C}). Beyond this check, generating (\textit{E}) and (\textit{Z}) stereodescriptors from PPBs is not a straightforward process. Performing such a conversion requires a method capable of translating PPB into a localized bond descriptor. One approach is to first consider the parity of each double bond terminal individually. A separate step would then relate the individual terminal parities to a double bond conformation parity. This intermediate parity can then be used to perform the final conversion.
+The use of PPBs conformation over three or more bonds. Readers must therefore report as an error any PPB not connected to an atom connected through a double bond. For example, an isolated PPB is invalid (e.g., \enquote{C/C} and \enquote{C/CC}). Beyond this check, generating (\textit{E}) and (\textit{Z}) stereodescriptors from PPBs is not a straightforward process. One approach is to first consider the parity of each double bond terminal individually. A separate step would then relate the individual terminal parities to a double bond conformation parity. This intermediate parity can then be used to perform the final conversion.
 
 \begin{figure}
     \centering
