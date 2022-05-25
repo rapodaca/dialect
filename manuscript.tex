@@ -96,16 +96,16 @@ Dialect uses several abstractions collectively known as the \textit{data model}.
     \hline
     Name & Description & Values\footnote{Ranges defined as \ttt{a..b} include \ttt{a} and exclude \ttt{b}.} \\
     \hline
-    \ttt{Option<Type>} & Optional Value & \ttt{None}, \ttt{Type} \\
+    \ttt{Option<T>} & Optional Value & \ttt{None}, \ttt{T} \\
     \ttt{Index} & Unsigned integer & 0..2\textsuperscript{32} \\
     \ttt{Three} & Integer count & 1..4 \\
-    \ttt{Ten} & Unsigned integer & 0..10 \\
-    \ttt{SignedTen} & Integer count & -9..10 \\
-    \ttt{Thousand} & Integer count & 0..1000 \\
+    \ttt{Dec} & Integer count &0..10 \\
+    \ttt{SignedDec} & Integer count & -9..10 \\
+    \ttt{Thou} & Integer count & 1..1000 \\
     \ttt{Element} & IUPAC-\-approved element symbol & \ttt{Ac}, \ttt{Ag}, \ttt{Al}, {\ldots}\ttt{Zn}\\
-    \ttt{HydrogenCount} & Hydrogen count & \ttt{Implicit}, \ttt{Ten} \\
     \ttt{Configuration} & Configurational descriptor & \ttt{Right}, \ttt{Left} \\
     \ttt{Direction} & Conformational descriptor & \ttt{Up}, \ttt{Down} \\
+    \ttt{Implicit} & Implicit hydrogen count flag & - \\
     \ttt{boolean} & Boolean & \ttt{true}, \ttt{false} \\
     \hline
 \end{tabular}
@@ -123,10 +123,10 @@ An atom possesses several attributes (Table~\ref{table:atomic-state}), which col
     \hline
     \ttt{index} & Unique identifier &\ttt{Index} & - \\
     \ttt{element} & Elemental symbol & \ttt{Option} \ttt{<Element>} & \ttt{None} \\
-    \ttt{hydrogens} & Hydrogen count & \ttt{HydrogenCount} & 0 \\
-    \ttt{configuration} & Configuration & \ttt{Configuration} & \ttt{None} \\
-    \ttt{charge} & Formal charge & \ttt{SignedTen} & 0 \\
-    \ttt{isotope} & Mass number & \ttt{Option<Thousand>} & \ttt{None} \\
+    \ttt{hydrogens} & Hydrogen count & \ttt{Implicit}, \ttt{Dec} & 0 \\
+    \ttt{configuration} & Configuration & \ttt{Option} \ttt{<Configuration>} & \ttt{None} \\
+    \ttt{charge} & Formal charge & \ttt{SignedDec} & 0 \\
+    \ttt{isotope} & Mass number & \ttt{Option<Thou>} & \ttt{None} \\
     \ttt{selected} & Selection status & \ttt{boolean} & \ttt{false} \\
     \hline
 \end{tabular}
@@ -172,7 +172,7 @@ The data model will be referenced throughout this paper as a way to connect synt
 
 A molecular graph is described at the lowest level by its constitution. In Dialect, constitution comprises the molecular graph and those attributes locating nucleons and electrons at specific atoms and bonds. All other attributes lie outside the scope of constitution. Atomic attributes related to constitution are: \ttt{index}; \ttt{element}; \ttt{hydrogens}; and \ttt{charge}. Bond attributes related to constitution are \ttt{source}, \ttt{target}, \ttt{order}, and \ttt{elided}.
 
-The attributes \ttt{element} and \ttt{isotope} characterize an atom's nucleus. The \ttt{element} attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC~\cite{periodicTable}. When IUPAC authorizes additional symbols, they will become valid values for the \ttt{element} attribute. If the elemental identity of an atom is unknown, its \ttt{element} attribute must equal \ttt{None}. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Setting the \ttt{isotope} property to \ttt{None} means that the element's isotopic composition equals natural abundance. Otherwise, the lower bound on the value of \ttt{isotope} is zero. This lower limit allows for such physically nonsensical states such as atoms of zero implied mass (\ttt{isotope} equals zero) or negative implied neutron count (e.g., carbon-5). Implementations may reject such atomic states as invalid.
+The attributes \ttt{element} and \ttt{isotope} characterize an atom's nucleus. The \ttt{element} attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC~\cite{periodicTable}. When IUPAC authorizes additional symbols, they will become valid values for the \ttt{element} attribute. If the elemental identity of an atom is unknown, its \ttt{element} attribute must equal \ttt{None}. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Setting the \ttt{isotope} property to \ttt{None} means that the element's isotopic composition equals natural abundance. Otherwise, the lower bound on the value of \ttt{isotope} is one. This lower limit allows for such physically nonsensical states such as atoms of negative implied neutron count (e.g., carbon-5). Implementations may reject such atomic states as invalid.
 
 The \ttt{hydrogens} attribute sets an atom's mode of \textit{hydrogen suppression}. Hydrogen suppression replaces an atomic hydrogen of natural isotopic abundance and its associated bond with an integer tally associated with the parent atom. Even so, a suppressed hydrogen and its bond are understood to be present. The relative abundance and regular bonding of hydrogen atoms in molecular graphs makes hydrogen suppression an effective technique for increasing information density. Two mutually-exclusive types of suppressed hydrogen are supported: \textit{virtual hydrogen} and \textit{implicit hydrogen}.
 
@@ -567,10 +567,10 @@ The fourth and most complex atomic production rule is \ttt{<bracket>} (\enquote{
               <virtual_hydrogen>? <charge>? "]"
 \end{lstlisting}
 
-The value of a bracket atom's \ttt{isotope} attribute is determined by the optional \ttt{<isotope>} non-terminal. It consists of between one and three digits encoding the integers 0-999. Leading zeros are disregarded when assigning the value of the \ttt{isotope} attribute. In other words, \enquote{007} and \enquote{7} are considered equivalent expressions of the value 7.
+The value of a bracket atom's \ttt{isotope} attribute is determined by the optional \ttt{<isotope>} non-terminal. It consists of between one and three digits encoding the integers 1-999. Leading zeros (e.g., \enquote{007} are disallowed.
 
 \begin{lstlisting}
-<isotope> ::= <digit> <digit>? <digit>?
+<isotope> ::= <nonzero> <digit>? <digit>?
 \end{lstlisting}
 
 The values of a bracket atom's \ttt{element} and \ttt{selected} attributes are determined by the \ttt{<symbol>} production rule (\enquote{symbol}). Three non-terminal variants are supported. These three variants influence the \ttt{element} and \ttt{selected} attributes in different ways. The \ttt{<star>} variant leaves both attributes as their default values. The \ttt{<element>} variant assigns the \ttt{element} attribute to the corresponding value while leaving the \ttt{selected} attribute as its default value. The \ttt{<selection>} non-terminal sets the \ttt{element} attribute to the corresponding element and the \ttt{selected} attribute to \ttt{true}. For example, the selection sequence \enquote{p} would assign the atomic \ttt{element} and \ttt{selected} attribute to \ttt{P} and \ttt{true}, respectively.
@@ -597,13 +597,13 @@ The \ttt{stereodescriptor} attribute of a bracket atom is determined by the \ttt
 The \ttt{hydrogens} attribute of a bracket atom is controlled by the \\ \ttt{<virtual{\_}hydrogen>} non-terminal. It is comprised of the terminal \enquote{H} followed by an optional \ttt{<digit>} non-terminal. A digit appearing after the \enquote{H} terminal sets \ttt{hydrogens} to the corresponding virtual hydrogen count. A digit of 0 (i.e., \enquote{H0}) sets the \ttt{hydrogens} attribute to zero. If no digit is present, \ttt{hydrogens} is set to one.
 
 \begin{lstlisting}
-<virtual_hydrogen> ::= "H" <digit>?
+<virtual_hydrogen> ::= "H" <nonzero>?
 \end{lstlisting}
 
-The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (\enquote{+} and \enquote{-} respectively) and ends with an optional \ttt{<digit>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, the plus terminal (\enquote{+}) sets the \ttt{charge} attribute to one and the minus terminal (\enquote{-}) sets it to minus one. A charge of zero (e.g., \enquote{+0} or \enquote{-0}) sets the \ttt{charge} attribute to zero.
+The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (\enquote{+} and \enquote{-} respectively) and ends with an optional \ttt{<digit>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, the plus terminal (\enquote{+}) sets the \ttt{charge} attribute to one and the minus terminal (\enquote{-}) sets it to minus one. Charge values of zero are obtained if \ttt{<charge>} production is present.
 
 \begin{lstlisting}
-<charge> ::= ( "+" | "-" ) <digit>?
+<charge> ::= ( "+" | "-" ) <nonzero>?
 \end{lstlisting}
 
 Values not defined within a bracket production leave the atomic attributes of the atom built from it in as their default values. For example, the bracket sequence \enquote{[C@H+]} lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket sequence \enquote{[13CH+]} lacks the \ttt{<stereodescriptor>} non-terminal, so the corresponding \ttt{configuration} attribute remains \ttt{None}.
@@ -634,10 +634,10 @@ The \ttt{<union>} non-terminal consists of an optional \ttt{<bond>} non-terminal
 
 A sequence can contain a union, which in turn can contain a sequence. This is an example of recursion, transitive though it may be. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in \ttt{<sequence>} is allowed. Right recursion also occurs within the \ttt{<union>} and \ttt{<branch>} non-terminals.
 
-The \ttt{<cut>} non-terminal (\enquote{cut}) can takes two forms. A digit non-terminal can be used, enabling single-digit cut indexes. Double- or single-digit cut indexes, supporting the values zero through 99 inclusive, are available by prepending the percent character (\ttt{\%}). For the latter variant, any leading zero is disregarded, meaning that the sequences "07" and "7" are both interpreted as the index seven.
+The \ttt{<cut>} non-terminal (\enquote{cut}) can takes two forms. A digit non-terminal can be used, enabling single-digit cut indexes in the range one through nine, inclusive. Double- or single-digit cut indexes, supporting the values ten through 99 inclusive, are available by prepending the percent character (\ttt{\%}). For the latter variant, leading zeros are disallowed, meaning that the sequence \enquote{\%07} must generate an error.
 
 \begin{lstlisting}
-<cut> ::= <digit> | "%" <digit> <digit>
+<cut> ::= <nonzero> | "%" <nonzero> <digit>
 \end{lstlisting}
 
 A cut signifies the disconnection of an atom from its neighbor. The most common use for cut is to encode a cycle. The cut index serves as a placeholder for the neighboring atom, which is located by scanning either forward or backward along a string. If the number of previous appearances of the cut index is even, then the string is scanned right. Otherwise, the string is scanned left. Although often used for cycles, cuts can be used for any bond, regardless of cycle membership. The only requirement is that a cut must be paired with another cut having the same index.
