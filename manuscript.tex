@@ -235,7 +235,9 @@ DIME can interfere with \textit{canonicalization}, or the selection of a single 
 
 To eliminate DIME and thereby streamline canonicalization, the molecular graph is augmented with a \textit{delocalization subgraph} (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS may be drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
 
-Membership of a DS is determined as follows. An atom is added to the DS by setting its \ttt{selected} attribute to \ttt{true} through a process called \textit{selection}. For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements (or \ttt{None}) must not be selected. A bond will be added to the DS if both of its terminals are selected and the \ttt{elided} attribute equals \ttt{true}. No other bond will be added to the DS. This rule allows arbitrary bonds between selected atoms to be excluded from the DS.
+Membership of a DS is determined as follows. An atom is added to the DS by setting its \ttt{selected} attribute to \ttt{true} through a process called \textit{selection}. For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements must not be selected. A bond will be added to the DS if both of its terminals are selected and the \ttt{elided} attribute equals \ttt{true}. No other bond will be added to the DS. This rule allows arbitrary bonds between selected atoms to be excluded from the DS.
+
+Atoms whose \ttt{element} attribute equals \ttt{None} are not selectable, which prevents their entry into the DS. Bonds to such atoms are similarly excluded. The alternative, conditional inclusion, would complicate both data structures and algorithms for little gain. Exclusion avoids these complexities.
 
 \begin{figure}
     \centering
