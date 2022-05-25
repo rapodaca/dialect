@@ -8,6 +8,7 @@
 \usepackage{courier}
 \usepackage{csquotes}
 \usepackage[USenglish]{babel}
+\usepackage{nameref}
 
 \usepackage[backend=bibtex,sorting=none]{biblatex}
 \addbibresource{manuscript}
@@ -667,6 +668,7 @@ Having defined sequence, it's now possible to define a string as an optional seq
 \end{lstlisting}
 
 \section*{Reading Strings}
+\label{reading-strings}
 
 The goal of a Dialect reader is to transform a string input into a data structure output consistent with the string's content. The output data structure can take many forms. For example, a reader can merely validate a string by returning a boolean type. A more sophisticated reader can return a molecular graph capturing all atom and bond attributes and connectivity relationships.
 
@@ -778,7 +780,7 @@ Regardless of the form taken by the input data structure, it must be traversable
 
 A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The \ttt{<atom>} and \ttt{<bond>} non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane using either implicit or virtual hydrogens (e.g., \enquote{C} or \enquote{[CH4]}). Single bonds may be elided or not. Similarly, the DS may or may not be empty. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
 
-The presence of branches within an input data structure is encoded via the \ttt{<branch>} data structure. A useful tool for this purpose is a \ttt{stack}. A stack is a data structure that allows items to be added individually and removed (\enquote{popped}) in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
+The presence of branches within an input data structure is encoded via the \ttt{<branch>} non-terminal. A useful tool for this purpose is a \ttt{stack}. A stack is a data structure that allows items to be added individually and removed (\enquote{popped}) in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
 
 \begin{figure}
     \centering
@@ -807,7 +809,7 @@ The encoding of cuts is likely to pose special challenges for writers. For a cut
     \label{fig:difficult-cuts}
 \end{figure}
 
-The presence of conformational restriction about a double bond presents a special challenge to writers. Few other molecular graph systems distribute a conformation descriptor over two or more bonds the way that PPBs does. Instead, descriptors are more likely to be localized at the double bond. Producing the necessary PPBs from a descriptor localized at the double bond is likely to be non-trivial. An approach to the reverse problem was presented previously (Reading Strings section). That approach can also be adapted to the reverse problem.
+The presence of conformational restriction about a double bond presents a special challenge to writers. Few other molecular graph systems distribute a conformation descriptor over multiple individual bonds the way that PPBs does. Instead, descriptors are more likely to be localized at the double bond. Producing the necessary PPBs from a descriptor localized at the double bond is likely to be non-trivial. An approach to the reverse problem was presented previously (\nameref{reading-strings} section). That approach can also be adapted to the reverse problem.
 
 \begin{figure}
     \centering
@@ -816,9 +818,9 @@ The presence of conformational restriction about a double bond presents a specia
     \label{fig:writing-ppb}
 \end{figure}
 
-Writers should carefully weigh the non-negligible costs of atom selection. Algorithms for doing so sometimes involve the perceptions of cycles, and often exhibit superlinear time complexity. Very often a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In this sense atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
+Writers should carefully weigh the non-negligible costs of atom selection. Algorithms for selection are likely to involve the perceptions of cycles, and could exhibit superlinear time complexity. Often, a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In this sense atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
 
-Writers must ensure that all selected atoms can be deselected. Consider pyrrole, erroneously encoded with a selected nitrogen atom (e.g., \enquote{n1cccc1}). The nitrogen atom can not be pruned because its subvalence is 1 (3 - 2). The DS therefore contains all five atoms and all five bonds. A perfect matching does not exist. A reader receiving such a string must report an error. To avoid this outcome, a writer can consume the subvalence by adding a virtual hydrogen (e.g., \enquote{[nH]1cccc1}). The subvalence of nitrogen in this case is zero, so the atom can be pruned. Doing so leaves a DS with four nodes, four edges, and a perfect matching. Readers will consider the string valid. Nevertheless, the larger question of gratuitous selection remains.
+Writers must ensure that all selected atoms can be deselected. Consider pyrrole, erroneously encoded with a selected nitrogen atom (e.g., \enquote{n1cccc1}). The nitrogen atom can not be pruned because of its subvalence is 1 (3 - 2). The DS therefore contains all five atoms and all five bonds. A perfect matching does not exist. A reader receiving such a string must report an error. To avoid this outcome, a writer can consume the subvalence by adding a virtual hydrogen (e.g., \enquote{[nH]1cccc1}). The subvalence of nitrogen in this case is zero, so the atom can be pruned. Doing so leaves a DS with four nodes, four edges, and a perfect matching. Readers will consider the string valid. Nevertheless, the larger question of gratuitous selection remains.
 
 \section*{Compatibility}
 
