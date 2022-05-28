@@ -100,6 +100,7 @@ Dialect uses several abstractions collectively known as the \textit{data model}.
     \ttt{Three} & Integer count & 1..4 \\
     \ttt{Dec} & Integer count &0..10 \\
     \ttt{SignedDec} & Integer count & -9..10 \\
+    \ttt{Cent} & Integer count & 1..100 \\
     \ttt{Thou} & Integer count & 1..1000 \\
     \ttt{Element} & IUPAC-\-approved element symbol & \ttt{Ac}, \ttt{Ag}, \ttt{Al}, {\ldots}\ttt{Zn}\\
     \ttt{Configuration} & Configurational descriptor & \ttt{Right}, \ttt{Left} \\
@@ -148,7 +149,6 @@ Like atoms, bonds carry metadata in the form of attributes (Table \ref{table:bon
     \ttt{order} & Bond order & \ttt{Three} & 1 \\
     \ttt{elided} & Elision status & \ttt{boolean} & \ttt{false} \\
     \ttt{direction} & Partial conformational parity & \ttt{Option} \ttt{<Direction>} & \ttt{None} \\
-    \ttt{target} & Child atom & \ttt{Atom} & - \\
     \hline
 \end{tabular}
 \label{table:bond-state}
@@ -163,7 +163,7 @@ The data model will be referenced throughout this paper as a way to connect synt
 
 \section*{Constitution}
 
-A molecular tree is described at the lowest level by its constitution. In Dialect, constitution comprises those attributes locating nucleons and electrons at specific atoms and bonds. All other attributes lie outside the scope of constitution. Atomic attributes related to constitution are: \ttt{element}; \ttt{hydrogens}; and \ttt{charge}. Bond attributes related to constitution are \ttt{order} and \ttt{elided}.
+A molecular tree is described at the lowest level by its constitution. In Dialect, constitution comprises those attributes that associate atoms in bonding relationships, and which locate nucleons and electrons at specific atoms and bonds. All other attributes lie outside the scope of constitution. Atomic attributes related to constitution are: \ttt{element}; \ttt{hydrogens}; and \ttt{charge}. Bond attributes related to constitution are \ttt{order} and \ttt{elided}.
 
 The attributes \ttt{element} and \ttt{isotope} characterize an atom's nucleus. The \ttt{element} attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC~\cite{periodicTable}. When IUPAC authorizes additional symbols, they will become valid values for the \ttt{element} attribute. If the elemental identity of an atom is unknown, its \ttt{element} attribute must equal \ttt{None}. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Setting the \ttt{isotope} property to \ttt{None} means that the element's isotopic composition equals natural abundance. Otherwise, the lower bound on the value of \ttt{isotope} is one. This lower limit allows for such physically nonsensical states such as atoms of negative implied neutron count (e.g., carbon-5). Implementations may reject such atomic states as invalid.
 
@@ -208,7 +208,53 @@ Whereas negative bond order is disallowed by definition, Dialect places no restr
     \label{fig:hypervalence}
 \end{figure}
 
-Each atom carries an \ttt{index} attribute, allowing bonds to reference atoms in a molecular graph. To do so, the \ttt{source} and \ttt{target} attributes are set with the respective indexes of the source and target atoms. The set of all bonds and the nodes they reference determines the connectivity of a molecular graph. In the context of determining connectivity, source and target indexes may be reversed.
+\section*{Node Order}
+
+Certain aspects of Dialect rely on \textit{node order}. An order is a property of a set that allows its members to be sorted through pairwise comparisons. Node order is the order in which the nodes of a molecular tree are added during depth-first construction. A node added before another node is said to \enquote{precede} it. A node added after another node is said to \enquote{succeed} it. Using node order, the nodes of a molecular tree can be sorted from first to last.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Node Order. Nodes in a molecular tree have the order in which they were added through depth-first construction.}
+    \label{fig:node-order}
+\end{figure}
+
+Some generalizations about node order follow from these definitions. The root atom, uniquely lacking a parent, precedes every other node. Every parent node precedes its children. The first child added to a given parent precedes all of its siblings. Moreover, this relationship is transitive. If a node precedes (or succeeds) a sibling, then all of its descendants will as well.
+
+\section*{Decoupling Bonding from Connectivity}
+
+A bond performs two important tasks within a molecular tree: it creates a bond between two atoms and it creates a connection between two nodes. Most of the time, performing both tasks together is exactly what's needed. In two cases, however, doing so limits the range of molecules that can be encoded.
+
+The first case for decoupling involves cycles. A molecular tree is by definition devoid of cycles, yet cycles are ubiquitous, crucial elements of molecular structure. To encode cycles, a molecular tree needs a way unambiguously record the presence of cycle-closure bonds without creating the corresponding connection. Dialect accomplishes this goal through \textit{cut bonding}.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Cut Bonding. A bonding relationship represented by two nodes and two edges.}
+    \label{fig:cut-bonding}
+\end{figure}
+
+Cut bonding represents a bond as two semi-independent node/bond pairs. These pairs are distinguished from each other with the designations \enquote{left} and \enquote{right.} The left cut node and its parent precede the right cut node and its parent. Left and right side cut nodes are attached to their respective atom parents through equivalent bonds, but not to each other. In this way a bonding arrangement is established without creating a connection. Unlike an atom, a cut node has zero children and must have an atomic parent. As such a cut node can not serve as the root of a molecular tree.
+
+Each cut node is associated with a single attribute, \ttt{index}. The value of this attribute ranges from one to 99, inclusive (\ttt{Cent} type). Left and right cut nodes identify themselves as a pair by using identical \ttt{index} attributes. A single molecular tree can support far more than 99 cuts through index reuse. Any left cut node succeeding the last right cut node having a particular index can reuse it. The next succeeding cut node with the index must by definition be the matching right hand side.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Index reuse. This allows for many more than 99 cuts to be used within a single molecular tree.}
+    \label{fig:index-reuse}
+\end{figure}
+
+The second case for decoupling the formation of bonds and connections is multiple molecules. Dialect supports these uses through \textit{split edges}. A split edge allows two atoms to be connected within a tree, but without creating a bonding relationship. Split edges can be used whenever multiple molecules need to be encoded within the same molecular tree. One application would be molecules with ionic bonding. The atoms are not bound covalently, and so fall outside the scope of the VB model. Another application would be non-ionic complexes. No bonding relationship whatsoever is implied between atoms connected through a split edge.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Split Edge. Connection without a bonding relationship.}
+    \label{fig:split-edge}
+\end{figure}
+
+Split edges and cut bonding accomplish the same goal, namely the decoupling of connectivity and bonding, but for opposite purposes. Whereas split edges connect two atoms without bonding them, cut bonds create a bonding relationship between two nodes without connecting them. This decoupling complicates the analysis of molecular trees. For example, the atom succeeding a split edge behaves in some situations as if it were a root node. When tallying the bonds surrounding such a node, only children are considered. Likewise, cut nodes behave as if they were atoms in the sense that they can be associated with a bond. Within these and several other situations, analysis of bonding and connectivity relationships within molecular trees need to explicitly account for the possibility of connection-free bonds and bond-free connections. 
 
 \section*{Bond Elision}
 
@@ -340,12 +386,6 @@ An atom's implicit hydrogen count may or may not correlate with chemical intuiti
     \label{fig:implicit-hydrogen-count}
 \end{figure}
 
-\section*{Atom Index}
-
-To support the assignment and interpretation stereochemical features, each node carries a unique, non-negative integer \ttt{index} attribute (\enquote{index}). Assignment is sequential, meaning that the first atom gets index zero, the next one, and so on. For example, the index for the first atom is zero, for the second atom one, for the third atom two, and so on. The maximum value of an atomic index is 2\textsuperscript{32} - 1.
-
-Indexes impose an ordering over the atoms in a molecular graph. An atom with an index less than another atom is said to \textit{precede} it. An atom with an index grater than another atom \textit{succeeds} it. No special significance is ascribed to the atom whose index is zero, except that every other atom succeeds it.
-
 \section*{Conformation}
 
 The second major component of molecular representation in Dialect is \textit{conformation}. Conformation is a rotational restriction about one or more bonds. Dialect limits conformation to just one of many possible types: rotational restrictions occurring at individual double bonds.
@@ -368,11 +408,15 @@ Dialect takes a different approach by introducing \textit{partial parity bonds} 
     \label{fig:partial-parity-bonds}
 \end{figure}
 
-To support this system, each bond carries an optional \ttt{direction} attribute (\enquote{direction}). When present, direction may assume one of the two values \ttt{Up} or \ttt{Down}. These values refer to a geometrical model in which the two terminals of a double bond and their neighbors are assigned local relative coordinates in a plane. The terminals of the bond are placed on the x-axis such that the one on the right succeeds the one on the left. The neighbors at each terminal joined through a PPB are then assigned relative coordinates in the plane.
+To support this system, each bond carries an optional \ttt{direction} attribute (\enquote{direction}). When defined, direction may assume one of two values: \ttt{Up} or \ttt{Down}. These values refer to a geometrical model in which a parent node and its child are placed along a vertical axis. If the bond between parent and child has the direction \ttt{Up}, then the child is moved in the upward direction. If the bond between parent and child is \ttt{Down}, the child is moved downward.
 
-Neighbors of the left terminal are positioned according to the relative ordering of atomic indexes and the bond's \ttt{direction} attribute. If the neighbor precedes the terminal then a \ttt{direction} attribute equal to \ttt{Up} locates the neighbor in the lower-left quadrant and a \ttt{direction} attribute of \ttt{Down} locates the neighbor in the upper-left quadrant. If the neighbor succeeds the terminal, these placements are reversed.
+Using this protocol, the conformation for a double bond flanked by two or more PPBs can be determined. The process begins by identifying the parent node. This node has the lowest order of the conformational assembly, meaning that it was added first. The parent node is placed on a vertical axis. The children of the parent node are then examined in order. The child connected through the first directional bond is then positioned as described above, either above or below the parent as determined by the value of the bond's direction attribute.
 
-An analogous procedure assigns relative coordinates to a neighbor of the right terminal. If a neighbor succeeds the right terminal, place it to the upper right given an \ttt{Up} direction, or to the lower right given a \ttt{Down} direction. Reverse these assignments if the neighbor precedes the right terminal.
+Next, grandchildren are examined in order. Should a PPB be found, its direction must match that of the bond between parent and child. Otherwise an error is generated. A double bond must be found, or an error is reported. On finding the double bond, the corresponding grandchild is placed to the right of the child.
+
+The process finishes by iterating the great-grandchildren of the double-bond grandchild, in order. The first PPB is placed as before, above the grandchild if the direction is \ttt{Up}, or below if the direction is \ttt{Down}. If an additional PPB is present, it must have a direction opposite to the one previously found. Otherwise, an error is reported.
+
+The result will be equivalent to one of two diagrams, which for convenience and to avoid confusion are given the labels \textit{syn} (both vertical lines above or below the double bond) and \textit{anti} (vertical lines on opposite sides of the double bond).
 
 \begin{figure}
     \centering
@@ -381,18 +425,7 @@ An analogous procedure assigns relative coordinates to a neighbor of the right t
     \label{fig:interpret-ppb}
 \end{figure}
 
-In some cases the placement of a terminal neighbor can be deduced from the placement of a sibling, without the presence of an explicit PPB. For example, a left terminal has two neighbors, but only one of them uses a PPB. The neighbor with the PPB can then be placed explicitly. Doing so allows the remaining neighbor without a PPB to be placed as well by elimination. For example, if the neighbor of a left terminal is placed in the upper left quadrant, then the sibling without a PPB can only occupy the lower left quadrant.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Implied neighbor placement. Bond directions can be omitted when inferrable.}
-    \label{fig:implied-neighbor-placement}
-\end{figure}
-
-The assignment of relative coordinates to both terminals and all neighbors yields a double bond conformation.
-
-Consider the encoding of PPBs for (\textit{E})-2-butene. Assume that indexes are assigned sequentially from the neighbor of the left terminal to the neighbor of the right terminal and that the goal is to arrive at a trans (or anti) substituent orientation. Begin by placing the two double bond terminals on the x-axis according to succession. The left terminal succeeds its neighbor, which should be placed in the lower-left quadrant. To achieve this, assign a PPB direction of \ttt{Up}. The right terminal precedes its neighbor, which should be placed in the upper-right quadrant. To active this, assign a PPB direction of \ttt{Up}.
+Consider the problem of encoding of PPBs for (\textit{E})-2-butene. The parent atom, a primary carbon, is first identified. A direction of \ttt{Up} for the PPB joining it to its child is arbitrarily chosen. A double bond connects child to grandchild. Just one bond connects grandchild to great-grandchild. Because the \textit{anti} arrangement is desired, the value for direction must be \ttt{Up}. In this example, the directions for both PPBs could also have been equivalently set to \ttt{Down}.
 
 \begin{figure}
     \centering
@@ -403,24 +436,15 @@ Consider the encoding of PPBs for (\textit{E})-2-butene. Assume that indexes are
 
 PPBs are decoded analogously. Start by placing the terminals on the x-axis according to succession. The PPB between the left terminal and its neighbor has a direction of \ttt{Up}. Because the neighbor precedes the terminal, the neighbor should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor has a direction of \ttt{Up}. Because the neighbor succeeds the terminal, the neighbor is placed in the upper-right quadrant. The result is the expected (\textit{E}) conformation.
 
-The above procedures assume that all PPBs are expressed in \textit{normal form}. In normal form, a PPB's source precedes it target. In other words, \ttt{source} is less than \ttt{target}. If a PPB is not in normal form, it must be \textit{inverted} before quadrants can be assigned. Inversion swaps the values of `source` and target attributes while simultaneously toggling the `direction` attribute. Inversion occurs in two contexts: conjugated polyenes and cycles. In the case of polyenes, the same PPB carries partial conformation for at least two different double bond systems. In the case of cycles, non-normal PPBs can be generated at bonds forming cycles. However, readers and writers must be capable of inverting PPBs wherever they appear.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Partial parity bond inversion. Direction must be inverted for bonds not expressed in normal form.}
-    \label{fig:ppb-inversion}
-\end{figure}
-
 The distributed nature of conformational encoding means that several additive error states are possible:
 
 \begin{itemize}
-    \item{Overspecification. This state occurs when two or more PPBs share a common terminal and simultaneously use the same parity, thus placing multiple neighbors into the same quadrant.}
-    \item{Underspecification. A required and non-deducible PPB is absent. This state occurs when a double bond terminal connects to at least one neighbor through a PPB, but the terminal's mate does not.}
-    \item{ Misspecification. A PPB is used between atoms lacking at least one double bond.}
+    \item{Overspecification. This error occurs when children are forced into the same quadrant of a diagram.}
+    \item{Underspecification. A required PPB is missing.}
+    \item{ Misspecification. A PPB is used between atoms, neither of which connects to a double bond.}
 \end{itemize}
 
-A reader that detects one of these error conditions must abort the molecular graph being read and report the error state. It is possible for a conformation to be both overspecified and underspecified.
+A reader that detects any of these error conditions must abort the molecular tree being read and report the error state. It is possible for a conformation to be both overspecified and underspecified.
 
 \begin{figure}
     \centering
@@ -429,7 +453,7 @@ A reader that detects one of these error conditions must abort the molecular gra
     \label{fig:bond-error-states}
 \end{figure}
 
-An exception to the underspecification rule applies in the case of conjugated polyenes. Here a double bond with a terminal connected through a PPB does not require the opposing terminal to also bear a neighbor connected through a PPB. If the opposing terminal lacks neighbors, no error is generated and reading continues normally. If the opposing terminal has at least one neighbor, the bond to it need not be a PPB. In either case the conformation of the double bond in question remains undefined.
+An exception to the underspecification rule applies in the case of conjugated polyenes. Here, a PPB may be present into the terminal double bond but not out of it. No error is reported in such a case and the conformation of the terminal double bond remains undefined.
 
 \begin{figure}
     \centering
@@ -438,7 +462,7 @@ An exception to the underspecification rule applies in the case of conjugated po
     \label{fig:bond-error-state-exceptions}
 \end{figure}
 
-Given that conformational specification is distributed over three or more bonds, some conformations will be difficult or possible to represent. Cyclooctatetraene offers an example. Although the (\textit{E}, \textit{E}, \textit{E}, \textit{E}) conformation is expressable, the (\textit{Z}, \textit{E}, \textit{E}, \textit{E}) conformation is not. This problem arises because the same PPB encodes a partial conformation of two different double bonds.
+Cyclic conjugated polyenes present special challenges to the use of PPBs. Cyclooctatetraene offers an example. Although the (\textit{E}, \textit{E}, \textit{E}, \textit{E}) conformation is expressable, the (\textit{Z}, \textit{E}, \textit{E}, \textit{E}) conformation is not. This problem arises because the same PPB encodes a partial conformation of two different double bonds.
 
 \begin{figure}
     \centering
@@ -451,11 +475,9 @@ Given that conformational specification is distributed over three or more bonds,
 
 The third major element of molecular representation is \textit{configuration}, the three-dimensional arrangement of neighbors about a central atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertices of a tetrahedron. Here, \enquote{substituent} means an atomic neighbor or virtual hydrogen. Lone electron pairs are not considered substituents.
 
-A configuration is comprised of two components: an ordering of bonds to a central atom; and a \textit{configurational descriptor}. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: \ttt{Left} and \ttt{Right}. These descriptors constrain the neighbors of a central atom to the vertices of a tetrahedron.
+A configuration is fully specified by its \textit{configurational descriptor}. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: \ttt{Left} and \ttt{Right}. These descriptors constrain the neighbors of a central atom to the vertices of a tetrahedron.
 
-The \ttt{Left} variant works as follows. First, the bond having the index with the lowest value identified. The frame of reference is shifted by sighting down this bond from the neighbor to the central atom. An equilateral triangle with one vertex pointing upward is then inscribed about the central atom. The bond with the next lowest index is then identified and its neighbor is placed at the top vertex of the triangle. The neighbor attached to the succeeding bond is then placed at the left triangle vertex. Finally, the remaining neighbor is placed at the remaining vertex. The overall pattern is one of counterclockwise distribution.
-
-The \ttt{Right} variant follows the same pattern, except that placement of the neighbors attached to the last two bonds in succession are transposed. The overall pattern here is one of clockwise distribution.
+A descriptor generates a tetrahedral arrangement as follows. First, the parent (predecessor) bound to an atom of interest is identified. Next, the frame of reference is shifted by sighting down the bond from parent to child. An equilateral triangle is then inscribed bout the central atom. Grandchildren are then iterated in order. If the configurational descriptor is \ttt{Left}, children are arranged counterclockwise. Otherwise, children are arranged clockwise.
 
 \begin{figure}
     \centering
@@ -464,7 +486,7 @@ The \ttt{Right} variant follows the same pattern, except that placement of the n
     \label{fig:configurational-descriptor}
 \end{figure}
 
-A modified procedure is used for atoms bearing one virtual hydrogen and three atomic substituents. The implied bond to the virtual hydrogen is considered to precede the others. Sighting down this bond, the atomic neighbors are then placed as previously at the vertices of a triangle inscribed about the central atom.
+A modified procedure is used for atoms bearing one virtual hydrogen and three atomic substituents. The implied bond to the virtual hydrogen is considered to precede the others. Sighting down this bond, the parent node is placed at an arbitrary position. Children are then iterated counterclockwise (\ttt{Left}) or clockwise (\ttt{Right}).
 
 \begin{figure}
     \centering
@@ -472,6 +494,8 @@ A modified procedure is used for atoms bearing one virtual hydrogen and three at
     \caption{Configurational descriptor with one virtual hydrogen. In this case, hydrogen assumes the role of the first substituent.}
     \label{fig:configurational-descriptor-vh}
 \end{figure}
+
+A root atom bearing a configurational descriptor is handled with one more modification. The frame of reference is shifted to sight along the direction of the first child to the parent. The remaining children are then iterated in order either counterclockwise (\ttt{Left}) or clockwise (\ttt{Right}).
 
 An atom whose \ttt{configuration} attribute assumes a non-default value must have a neighbor count of either four if no virtual hydrogens are present or three if one virtual hydrogen is present. In any other context, the use of a configurational descriptor is considered an error.
 
@@ -484,7 +508,7 @@ This restriction places some constraints around the use of configuration. Some t
     \label{fig:invalid-configurational-descriptors}
 \end{figure}
 
-A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, and partial parity bond types can all be present. The only requirement that must be satisfied by a central atom is a neighbor count of four, or three when a virtual hydrogen is present.
+A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, and partial parity bond types can all be present. The only requirement that must be satisfied by a central atom is a connected neighbor count of four, or three when a virtual hydrogen is present.
 
 It is sometimes useful to manipulate a configuration in a way that preserves the relative three-dimensional positioning of neighbor atoms. This process is called \textit{transformation}. Five operations suffice to transform any configuration into any other:
 
