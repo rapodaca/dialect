@@ -9,6 +9,7 @@
 \usepackage{csquotes}
 \usepackage[USenglish]{babel}
 \usepackage{nameref}
+\usepackage{makecell}
 
 \usepackage[backend=bibtex,sorting=none]{biblatex}
 \addbibresource{manuscript}
@@ -52,19 +53,20 @@ This paper attempts to solve these problems with Dialect, a fully-specified lang
 
 \section*{Goals and Overall Design}
 
-Dialect's purpose is to solve the \textit{molecular serialization} problem. Serialization refers to the process of translating a data structure into a format that can be transmitted over a communication channel for later reconstruction. This is useful because it enables general-purpose devices and networks to convey complex pieces of domain-specific information. Receiver and recipient may be separated by time, space, or both. Molecular serialization extends the concept of serialization to molecular structure. Examples of molecular serialization formats other than SMILES include Chemical Markup Language (CML)~\cite{murray-rust:2011}, CDXML~\cite{cdxml}, and CTfile ("molfile")~\cite{ctfileFormats}.
+Dialect's main goal is to solve the \textit{molecular serialization} problem. Serialization refers to the process of translating a data structure into a format that can be transmitted over a communication channel for later reconstruction. This allows general-purpose devices and networks to convey complex pieces of domain-specific information. Receiver and recipient may be separated by time, space, or both. Molecular serialization extends the concept of serialization to molecular structure. Examples of molecular serialization formats other than SMILES include Chemical Markup Language (CML)~\cite{murray-rust:2011}, CDXML~\cite{cdxml}, and CTfile (\enquote{molfile})~\cite{ctfileFormats}.
 
-Molecular serialization require careful attention to two complementary rule sets: \textit{syntax} and \textit{semantics}. Syntax defines the set of valid strings for a language, whereas semantics determine the meaning of valid strings. Incomplete specification of either syntax or semantics can lead to data loss and corruption. The semantics for Dialect are complex due to the brevity of its syntax and the inherently complex nature of molecular representation.
+A secondary goal is brevity. Molecules should be expressable using only a few characters for each atom and either zero or one character for each bond. Brevity benefits humans who manually encode chemical structures within interactive line-driven interfaces such as those found in terminal sessions and notebooks. Brevity also benefits computers, for which compact molecular representation can improve the performance when storage, bandwidth, or processor cycles are limiting factors.
 
-As a molecular serialization scheme, Dialect must balance two opposing factors: generality and complexity. If the chemical space Dialect spans is too broad, complete implementation could become impractical due to language complexity. But if the language is made too simple, the chemical space it spans may be of little interest. An important goal for Dialect is therefore to address the most interesting chemical space with the simplest possible syntax and semantics.
+Molecular serialization schemes need to balance generality against complexity. As the diversity of the molecules that can be encoded increases, so do the rules needed to encode them and the software needed to interpret the rules. For this reason, Dialect's capabilities are directed at that region of chemical space populated by small organic molecules. Although Dialect can be used to represent a variety of other kinds of molecules, doing so in general risks data loss or corruption.
 
-Toward this end, Dialect is built on four mutually-exclusive concepts:
+Dialect's rules can be divided into two broad categories: \textit{syntax} and \textit{semantics}. Syntax defines the set of valid strings for a language, whereas semantics determine the meaning these strings. Dialect semantic are complex due to the brevity of its syntax and the inherently complex nature of molecular representation.
+
+Underpinning molecular serialization are conventions and abstractions for molecular representation. These are divided into three broad categories:
 
 \begin{itemize}
-\item \textit{Constitution}, the atoms present in a molecule and how they are connected with each other through bonds. Dialect supports elements having two-letter IUPAC designations and all bonding arrangements available through the valence bond model.
-\item \textit{Conformation}, the kind of stereoisomerism resulting from restricted rotation about a bond. Dialect support restricted rotation about double bonds leading to alkene isomerism.
-\item \textit{Configuration}, the kind of stereoisomerism resulting from the arrangement of neighboring atoms in three-dimensional space. Dialect supports configurations for atoms having tetrahedral symmetry attached to four neighboring atoms.
-\item \textit{Delocalization}, a type of bonding in which electrons are shared among three or more atoms, or across a combination of atoms and bonds. Dialect supports a limited form of delocalization operating over paths of alternating single and double bonds.
+\item \textit{Constitution}, the atoms present in a molecule and their bonding relationships. Dialect's extends the valence bond model with a limited form of delocalized bonding.
+\item \textit{Conformation}, a kind of stereoisomerism resulting from restricted rotation about a bond. Dialect supports restricted rotation about double bonds capable of producing alkene isomerism.
+\item \textit{Configuration}, a kind of stereoisomerism resulting from the arrangement of neighboring atoms in three-dimensional space. Dialect supports configurations for atoms having tetrahedral symmetry attached to four neighboring atoms.
 \end{itemize}
 
 \begin{figure}
@@ -74,195 +76,216 @@ Toward this end, Dialect is built on four mutually-exclusive concepts:
 \label{fig:myfig}
 \end{figure}
 
-Dialect molecules inherit behavior from an underlying \textit{molecular tree}. A tree is a data structure comprised of nodes. Each node is associated with zero or more child nodes through a directed edge. A molecular tree is a specialized tree onto which chemically-relevant metadata have been overlaid. The presence of this overlay allows nodes and edges to represent atoms and bonds, respectively.
+\section*{Molecular Tree}
+\label{molecular-tree}
 
-A molecular tree is related to the more widely-used concept of a \textit{molecular graph}~\cite{balaban:1985}. There are two main difference: (1) bonds are undirected in molecular graphs but directed in molecular trees; and (2) cycles are possible in molecular graphs but not in molecular trees. The difference might appear to render trees unsuitable to represent molecules, in which cycles often play a prominent structural role. But as the next sections demonstrate, the differences between molecular trees and graphs are not so large as they might at first appear.
+Dialect represents molecular structure as a \textit{molecular tree}. A tree is a data structure comprised of a set of nodes and pairwise relationships between them called edges. Any two nodes in a tree are connected through exactly one path of alternating nodes and edges. As such, a tree contains no cycles and exactly one connected component. A molecular tree is a specialized tree onto which chemically-relevant metadata have been overlaid. A Dialect molecule is a molecular tree having zero or more nodes and zero or more edges. The empty molecule, devoid of atoms and bonds, is therefore allowed. There is no upper bound on the number of nodes or edges, although limitations in hardware and software may restrict maximum molecular size.
 
-A Dialect molecule is a molecular tree having zero or more nodes and zero or more edges. The empty molecule, devoid of atoms and bonds, is therefore allowed. Dialect imposes no upper bound on the number of nodes or edges, although limitations in hardware and software may impose a practical upper bound on molecular size.
+A related but more common concept is the \textit{molecular graph}~\cite{balaban:1985}. Unlike molecule graphs, molecular trees do not support cycles or disconnected components. This difference might appear to make molecular trees unsuitable for molecular representation, where both rings and aggregation play important structural roles. However, these apparent shortcomings can be mitigated and even harnessed.
 
-\section*{Data Model}
+The main advantage of trees over graphs is information density. Graphs must accommodate cycles, which is accomplished by assigning a unique identifier to each node. An edge references two of these identifiers. Graph representations therefore incur the storage overhead of identifiers associated with both nodes and edges. In contrast, a tree can be directly encoded as a set of nested, alternating paths of nodes and edges. This simplifies the representation and eliminates the overhead of assigning and using node identifiers. 
 
-Dialect uses several abstractions collectively known as the \textit{data model}. The data model defines metadata attributes associated with the components of a molecular tree. These attributes are themselves composed of \textit{primitives} (Table~\ref{table:primitives}), or irreducible data types.
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Tree vs. Graph.}
+    \label{fig:tree-vs-graph}
+\end{figure}
 
-% TODO: completely re-work this to fit with the exact model being used by the reference implementation
+When discussing molecular trees, it's often useful to refer to \textit{node order}. An order is a property of a set that allows its members to be sorted through pairwise comparisons. Node order is the order in which the nodes of a molecular tree are added through depth-first construction. A node added before another node is said to \enquote{precede} it. A node added after another node is said to \enquote{succeed} it. In this way nodes can be prioritized. The root atom, uniquely lacking a parent, has highest priority because it precedes every other node. Similarly, a parent always precedes its children. Finally, the first child added to a given parent precedes all of its siblings. This relationship is transitive. If a node precedes (or succeeds) a sibling, then so do all of its descendants.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Node Order. Nodes in a molecular tree assume the order in which they were added through depth-first construction.}
+    \label{fig:node-order}
+\end{figure}
+
+To support cycles and disconnected components, a molecular tree decouples connectivity from bonding. This means that nodes and edges don't generally map to atoms and bonds as they often do in molecular graphs. This indirection enables rings and disconnections to be encoded despite the fact that trees can contain no cycles or disconnected components.
+
+Cycles are supported through \textit{bridges}. A bridge consists of two bond-node pairs that together represent one bond. One ach side of a bridge and atom connects to a bond, but the two atoms are not connected to each other. Instead, each atom is succeeded by a \textit{bridge node}. Unlike an atom, a bridge node has no children and so may not serve as the root of the tree. A bridge preserves the immediate atomic environment around each atom, allowing many of the same atomic computations possible in molecular graphs. Any bond, whether it closes a ring or not, can be represented as a bridge.
+
+Each bridge node serves as a proxy to a \textit{referenced atom}. Should a bridge node be present during an operation that requires an atom, the referenced is used instead. Although a bridge node always succeeds its parent, the referenced atom may precede or succeed that parent.
+
+Multiple molecules are supported through \textit{gaps}. A gap is an edge devoid of bonding. Gaps can be used whenever two or more molecules need to be encoded within the same molecular tree. Specific applications include ionic bonding and non-ionic complexes. However, no bonding relationship whatsoever is implied by the presence of a gap. In particular, the zero-order bond interpretation is excluded \cite{clark:2011}.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Nodes and Edge Associations. Three node/edge associations are possible within a molecular tree. A parent atom can be connected to a child atom through a bond (left). A parent atom can also be connected to a child bridge node through a bond (center). Finally, an atom can be connected, without bonding, to a child atom through a gap (right).}
+    \label{fig:nodes-and-edges}
+\end{figure}
+
+Gaps and bridges decouple connectivity from bonding, but for opposite purposes. Whereas a gap connects two atoms without bonding them, a bridge creates a bond between two atoms without connecting them. These relationships can complicate the analysis of connectivity and bonding. For example, the atom succeeding a gap behaves in most situations as if it were a root node. When tallying the bonds surrounding such a node, only children are considered. Similar considerations apply when a gap succeeds an atom. Likewise, a bridge node behaves as if it were an atom in the sense that it connects to an atom through a bond. Nevertheless, a bridge node merely stands in for another atom found elsewhere in the tree. Bonding and connectivity analyses within molecular trees must therefore account for the possibility of connection-free bonds and bond-free connections. 
+
+\section*{Atoms and Bonds}
+\label{atoms-and-bonds}
+
+Within a molecular tree, atoms and bonds play complementary roles. Atoms control nuclear particle counts, valence electron counts, and configuration. Bonds determine bonding electron counts and conformation. Constitution, configuration, and conformation are all influenced by the individual and collective behavior of atoms and bonds.
+
+At the lowest level, atom and bond behavior are governed by their respective \textit{attributes}. An attribute is a key/value pair in which the key is a name composed of a character sequence and the value is constrained by a single, immutable \textit{type}. Types can be composed and decomposed, a feature supported by many programming languages.
 
 \begin{table}
 \begin{minipage}{\textwidth}
 \renewcommand*\footnoterule{}
-\caption{Data Model Primitives.}
+\caption{Primitives.}
 \label{table:primitives}
 \centering
-\begin{tabular}{l l l}
+\begin{tabular}{l l l l}
     \hline
-    Name & Description & Values\footnote{Ranges defined as \ttt{a..b} include \ttt{a} and exclude \ttt{b}.} \\
+    Name & Description & Notation & Values \\
     \hline
-    \ttt{Option<T>} & Optional Value & \ttt{None}, \ttt{T} \\
-    \ttt{Three} & Integer count & 1..4 \\
-    \ttt{Dec} & Integer count &0..10 \\
-    \ttt{SignedDec} & Integer count & -9..10 \\
-    \ttt{Cent} & Integer count & 1..100 \\
-    \ttt{Thou} & Integer count & 1..1000 \\
-    \ttt{Element} & IUPAC-\-approved element symbol & \ttt{Ac}, \ttt{Ag}, \ttt{Al}, {\ldots}\ttt{Zn}\\
-    \ttt{Configuration} & Configurational descriptor & \ttt{Right}, \ttt{Left} \\
-    \ttt{Direction} & Conformational descriptor & \ttt{Up}, \ttt{Down} \\
-    \ttt{Implicit} & Implicit hydrogen count flag & - \\
-    \ttt{boolean} & Boolean & \ttt{true}, \ttt{false} \\
+    \ttt{Option} & Optional value & \ttt{\{T\}} & \ttt{None}, $t$ \\
+    \ttt{List} & Ordered list of values & \ttt{[T]} & $t_0, t_1, ... t_n$ \\
+    \ttt{Range} & Bounded integer range & m..n & from \ttt{m} to \ttt{n}, excluding \ttt{n} \\
+    \ttt{Boolean} & Boolean value & \ttt{?} & \ttt{true}, \ttt{false} \\
     \hline
 \end{tabular}
 \end{minipage}
 \end{table}
 
-An atom possesses several attributes (Table~\ref{table:atomic-state}), which collectively define an \textit{atomic state}. Not all atomic states are valid. Implementations must ensure either the impossibility of an invalid state, or an error condition in the event that one is created. Atomic state is restricted in the following ways:
+Dialect types are composed of four \textit{primitives} (Table~\ref{table:primitives}). The first, \ttt{Option}, represents a value of a particular type that may either be present or absent. If not present, the special value \ttt{None} is used. A \ttt{List} is a possibly empty ordered collection of values of the same type. The \ttt{Range} type represents an integer value constrained by a lower inclusive bound (\ttt{m}) and an upper, exclusive bound (\ttt{n}). The \ttt{Boolean} type assumes one of two values: \ttt{true} or \ttt{false}.
+
+An atom is composed of seven attributes (Table~\ref{table:atomic-attributes}). Default values are applied at the time of atom creation if no other values are used. The specific values assigned to an atom collectively define an \textit{atomic state}. 
 
 \begin{table}
-\caption{Atomic State.}
+\caption{Atomic Attributes.}
 \centering
-\begin{tabular}{l L L l}
+\begin{tabular}{l L l l}
     \hline
     Attribute & Description & Type & Default \\
     \hline
-    \ttt{element} & Elemental symbol & \ttt{Option} \ttt{<Element>} & \ttt{None} \\
-    \ttt{hydrogens} & Hydrogen count & \ttt{Implicit}, \ttt{Dec} & 0 \\
-    \ttt{configuration} & Configuration & \ttt{Option} \ttt{<Configuration>} & \ttt{None} \\
-    \ttt{charge} & Formal charge & \ttt{SignedDec} & 0 \\
-    \ttt{isotope} & Mass number & \ttt{Option<Thou>} & \ttt{None} \\
-    \ttt{selected} & Selection status & \ttt{boolean} & \ttt{false} \\
+    \ttt{element} & Elemental symbol & \ttt{\{Element\}} & \ttt{None} \\
+    \ttt{isotope} & Mass number & \ttt{\{1..1000\}} & \ttt{None} \\
+    \ttt{hydrogens} & Hydrogen count & \ttt{Implicit}, \ttt{0..10} & 0 \\
+    \ttt{charge} & Formal charge & \ttt{-9..10} & 0 \\
+    \ttt{selected} & Selection status & \ttt{?} & \ttt{false} \\
+    \ttt{parity} & Configuration & \ttt{\{AtomParity\}} & \ttt{None} \\
+    \ttt{edges} & Edges directed toward child nodes & \ttt{[Edge]} & \ttt{[]} \\
     \hline
 \end{tabular}
-\label{table:atomic-state}
+\label{table:atomic-attributes}
 \end{table}
 
-\begin{enumerate}
-    \item{If the value of \ttt{hydrogens} equals \ttt{Implicit}, then the values of \ttt{isotope}, \ttt{configuration}, and \ttt{charge} must equal their respective defaults. Furthermore, the value of \ttt{element} must equal one of \ttt{B}; \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; \ttt{S}; \ttt{F}; \ttt{Cl}; \ttt{Br}; \ttt{I}; or \ttt{None}.}
-    \item{If the value of \ttt{selected} equals \ttt{true}, then the value of \ttt{element} must equal one of: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; or \ttt{S}.}
-\end{enumerate}
-
-Like atoms, bonds carry metadata in the form of attributes (Table \ref{table:bond-state}), which collectively define a \textit{bond state}. As with atomic attributes, not all bond states are valid. Bond state is restricted in the following ways:
-
-\begin{table}
-\caption{Bond State.}
-\centering
-\begin{tabular}{l L L l}
-    \hline
-    Attribute & Description & Type & Default \\
-    \hline
-    \ttt{order} & Bond order & \ttt{Three} & 1 \\
-    \ttt{elided} & Elision status & \ttt{boolean} & \ttt{false} \\
-    \ttt{direction} & Partial conformational parity & \ttt{Option} \ttt{<Direction>} & \ttt{None} \\
-    \hline
-\end{tabular}
-\label{table:bond-state}
-\end{table}
-
-\begin{enumerate}
-    \item{If the value of \ttt{direction} does not equal \ttt{None}, then the value of \ttt{order} must equal one.}
-    \item{If the value of \ttt{elided} equals \ttt{true}, the values of \ttt{order} and \ttt{direction} must equal one and \ttt{None}, respectively.}
-\end{enumerate}
-
-The data model will be referenced throughout this paper as a way to connect syntax and semantics. Dialect-compatible software may, of course, use any suitable internal data model. Implementations must, however, ensure that any internal data model is consistent with the one provided here.
-
-\section*{Constitution}
-
-A molecular tree is described at the lowest level by its constitution. In Dialect, constitution comprises those attributes that associate atoms in bonding relationships, and which locate nucleons and electrons at specific atoms and bonds. All other attributes lie outside the scope of constitution. Atomic attributes related to constitution are: \ttt{element}; \ttt{hydrogens}; and \ttt{charge}. Bond attributes related to constitution are \ttt{order} and \ttt{elided}.
-
-The attributes \ttt{element} and \ttt{isotope} characterize an atom's nucleus. The \ttt{element} attribute is an optional one- or two-letter character sequence selected from the set designated by the IUPAC~\cite{periodicTable}. When IUPAC authorizes additional symbols, they will become valid values for the \ttt{element} attribute. If the elemental identity of an atom is unknown, its \ttt{element} attribute must equal \ttt{None}. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, where mass number is the sum of proton and neutron count. Setting the \ttt{isotope} property to \ttt{None} means that the element's isotopic composition equals natural abundance. Otherwise, the lower bound on the value of \ttt{isotope} is one. This lower limit allows for such physically nonsensical states such as atoms of negative implied neutron count (e.g., carbon-5). Implementations may reject such atomic states as invalid.
-
-The \ttt{hydrogens} attribute sets an atom's mode of \textit{hydrogen suppression}. Hydrogen suppression replaces an atomic hydrogen of natural isotopic abundance and its associated bond with an integer tally associated with the parent atom. Even so, a suppressed hydrogen and its bond are understood to be present. The relative abundance and regular bonding of hydrogen atoms in molecular graphs makes hydrogen suppression an effective technique for increasing information density. Two mutually-exclusive types of suppressed hydrogen are supported: \textit{virtual hydrogen} and \textit{implicit hydrogen}.
-
-A virtual hydrogen is one that appears as an integer unit contribution associated with the parent atom. For example, methane can be represented by a molecular graph having five nodes and four edges. But methane can also be represented as a graph of one node whose \ttt{hydrogens} attribute equals four. When using this mode, the \ttt{hydrogens} attribute may assume integer values from zero to nine, inclusive. The process of replacing atomic hydrogens with virtual hydrogen is called \enquote{virtualization.} The opposite process, replacing virtual hydrogen with atomic hydrogen, is called \enquote{reification.}
-
-An implicit hydrogen is similar to a virtual hydrogen in that both the hydrogen node and bond have been replaced with a tally. Unlike a virtual hydrogen, however, this tally is not present as attribute on the parent atom but rather as a computation. Subject to certain limitations, an atom identifies itself as having an implicit hydrogen count by setting its \ttt{hydrogens} attribute to \ttt{Implicit}. The computation and its limitations will be described later in this paper.
-
-The atomic attribute, \ttt{charge}, enables electron counting. The purpose of electron counting is to associate each electron in a molecular graph with either an atom or a bond. This is a fundamental requirement for the principle of mass conversion. In a more practical sense, electron counting lays the foundation for calculations of formal charge and bond order~\cite{dietz:1995}.
-
-Electron counting in Dialect is based on the well-known \textit{valence bond model} (VB Model)~\cite{lewis:1916}. Although not commonly considered as such, the VB model can be thought of as an algorithm for molecular assembly. This perspective is especially useful given that Dialect itself can be viewed as a programming language for molecular assembly.
-
-A simplified algorithm for electron counting can be summarized as follows. A molecular graph starts as a set of disconnected atoms and an integer electron count equal to the atomic number of the atom's element. Two nodes are selected as the terminals of a bond. From each atom, the same positive electron count is deducted. The total electron count deducted from each atom is simultaneously credited to the bond's electron count. For example, if each atom contributes one electron to a bond, then the bond's electron count will increase by two.
+The attributes \ttt{element} (\enquote{element}) and \ttt{isotope} (\enquote{isotope}) define atomic number and neutron count, respectively. Elements are selected from a subset of those approved by IUPAC \cite{periodicTable} (Figure~\ref{fig:elements}). An atom whose element is unknown must have an \ttt{element} attribute equal to \ttt{None}. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, defined as the sum of proton and neutron count. Setting the \ttt{isotope} property to \ttt{None} means that the element's isotopic composition equals natural abundance. Otherwise, the lower bound of the value of \ttt{isotope} is one. This lower limit allows for physically nonsensical states such as atoms of negative implied neutron count (e.g., carbon-5). Implementations may reject such atomic states as invalid.
 
 \begin{figure}
     \centering
     \includegraphics{filler}
-    \caption{Generalized Valence Bond Electron Counting. Two unconnected nodes are chosen for bonding (left). One electron is subtracted from each atom, and both electrons are added to the bond's count (right).}
+    \caption{Elements. The element that may be associated with an atom.}
+    \label{fig:elements}
+\end{figure}
+
+The \ttt{hydrogens} attribute sets an atom's mode of \textit{hydrogen suppression}. Hydrogen suppression replaces an atomic hydrogen of natural isotopic abundance and its associated bond with an integer tally associated with the parent atom. Even so, a suppressed hydrogen and its bond are understood to be present. The high relative abundance and regular bonding of hydrogen atoms makes hydrogen suppression an effective technique for increasing information density. Two mutually-exclusive types of suppressed hydrogen are supported: \textit{virtual hydrogen} and \textit{implicit hydrogen}.
+
+A virtual hydrogen is one that appears as an integer unit contribution associated with the parent atom. For example, methane can be represented using five atoms and four bonds. But methane can also be represented as a single atom whose \ttt{hydrogens} attribute equals four. Virtual hydrogen count defaults to zero, and may be set to a maximum value of nine. By default, atoms use virtual hydrogen counting.
+
+An implicit hydrogen is similar to a virtual hydrogen in that both the hydrogen node and bond have been replaced with a tally. Unlike a virtual hydrogen, however, this tally is not present as an attribute on the parent atom but rather as a computation. Setting the \ttt{hydrogens} attribute to \ttt{Implicit} activates implicit hydrogen counting. However, not all atoms are eligible to do so (see: \nameref{computing-implicit-hydrogen-count}).
+
+The \ttt{charge} (\enquote{charge}) and \ttt{selected} (\enquote{selected}) attributes determine valence electron count (see: \nameref{electron-counting}). Charge refers formal charge, or the difference between the valence electron count of the element and the sum of bonding and nonbonding electrons of the bound atom. By default, an atom is assigned a charge of zero. Minimum and maximum values for charge are -9 and +9, respectively. The \ttt{selected} attribute adjusts an atom's selection status. Selecting an atom allows it to participate in extended bonding (see: \nameref{delocalization-subgraph}).
+
+Configuration is determined by the \ttt{parity} attribute (\enquote{atom parity}). The type of this value, \ttt{AtomParity} is an enumeration supporting two values: \ttt{Clockwise} and \ttt{Counterclockwise} (Table~\ref{table:atom-parity-variants}). The interpretation and encoding of atom parity will be described in detail later (see: \nameref{configuration}).
+
+\begin{table}
+\caption{Atom Parity Variants.}
+\centering
+\begin{tabular}{l l}
+    \hline
+    Variant & Description  \\
+    \hline
+    \ttt{Clockwise} & Configuration runs with node order. \\
+    \ttt{Counterclockwise} & Configuration runs against node order. \\
+    \hline
+\end{tabular}
+\label{table:atom-parity-variants}
+\end{table}
+
+The \ttt{edges} ("edges") attribute is a possibly empty ordered list of edges associated with an atom. As noted in the previous section, an edge may represent either a bond or a gap (Table~\ref{table:edge-variants}). The mere presence of an edge does not guarantee a bonding relationship.
+
+\begin{table}
+\caption{Edge Variants.}
+\centering
+\begin{tabular}{l l}
+    \hline
+    Variant & Description  \\
+    \hline
+    \ttt{Bond} & A bonding and connectivity relationship. \\
+    \ttt{Gap} & A connectivity relationship only. \\
+    \hline
+\end{tabular}
+\label{table:edge-variants}
+\end{table}
+
+Not all atomic states are valid. Implementations must ensure either the impossibility of creating an invalid state, or an error condition in the event that one is created. Atomic state is restricted in the following two ways:
+
+\begin{enumerate}
+    \item{If implicit hydrogen counting is used, default values of isotope, charge, and parity must also be used. Implicit hydrogen counting is only supported for elements in the list: B; C, N; O; P; S; F; Cl; Br; or I.}
+    \item{A selected atom must use one of the following five elements: C; N; O; P; or S.}
+\end{enumerate}
+
+A bond is composed of four attributes (Table~\ref{table:bond-attributes}). The \ttt{order} attribute (\enquote{order}) represents the concept of formal bond order, or the number of bonding electrons divided by two. A bond's order may only assume the values one, two, or three. The \ttt{elided} attribute (\enquote{elided}) allows a bond to be omitted during serialization and participate in extended bonding. The \ttt{direction} attribute (\enquote{direction}) is used with other information to conformationally restrict a bond. The two allowed variants for \ttt{Direction}, \ttt{Up} and \ttt{Down}, will be described in detail later (see: \nameref{conformation}). The \ttt{target} attribute identifies the child node at which the bond is directed (Table~\ref{table:target-variants}).
+
+\begin{table}
+\caption{Bond Attributes.}
+\centering
+\begin{tabular}{l p{3.6cm} l l}
+    \hline
+    Attribute & Description & Type & Default \\
+    \hline
+    \ttt{order} & Formal bond order & \ttt{1..4} & 1 \\
+    \ttt{elided} & Elision status & \ttt{boolean} & \ttt{false} \\
+    \ttt{direction} & Partial conformational parity & \ttt{\{Direction\}} & \ttt{None} \\
+    \ttt{target} & An atom or bridge node & \ttt{Target} & - \\
+    \hline
+\end{tabular}
+\label{table:bond-attributes}
+\end{table}
+
+\begin{table}
+\caption{Target Variants.}
+\centering
+\begin{tabular}{l p{6.6cm}}
+    \hline
+    Variant & Description \\
+    \hline
+    \ttt{Atom} & A parent and child atom are bound. \\
+    \tt{Bridge} & A parent atom and bridge node are bound. \\
+    \hline
+\end{tabular}
+\label{table:target-variants}
+\end{table}
+
+As with atomic state, not all bond states are valid. The following restrictions apply:
+
+\begin{enumerate}
+    \item{An elided bond must have an order of one and default direction.}
+    \item{A bond with a non-default direction must have an order of one.}
+\end{enumerate}
+
+The atom and bond attributes defined here will be referenced throughout this paper as a way to connect syntax and semantics. Implementations may, of course, use any suitable internal data model. They must, however, ensure that any internal data model is consistent with the one provided here.
+
+\section*{Electron Counting}
+\label{electron-counting}
+
+A molecular tree explicitly encodes the presence of protons and neutrons through the atomic attributes \ttt{element} and \ttt{isotope}, respectively. The presence of electrons, in contrast, is merely implied. The principles of charge and mass conservation nevertheless require a method to determine explicit electron counts. This is possible through \textit{electron counting}. 
+
+Electron counting in Dialect is based on the well-known \textit{valence bond model} (VB Model)~\cite{lewis:1916}. This model assumes that a bond spans exactly two atoms and is associated with a nonzero, positive, and even number of electrons. These electrons are drawn in equal quantities from each atom's set of valence electrons. A single bond draws one electron from each atom (two total), a double bond two (four total), and a triple bond three (six total). The electron count of an atom whose \ttt{element} attribute equals \ttt{None} is always zero. Bonding to such an atom adds the required number of electrons directly to the bond.
+
+Electrons are counted as follows. A molecular tree starts as a single root atom. The electron count of this atom equals the difference between proton count (atomic number) and charge. Adding a bond is a three-step process. First, a child atom is constructed with an electron count determined in the same way as the root atom. Next, the child atom and the bond are added to the molecular tree. Finally, the electron counts of each atom and the bond are updated. If parent and child are connected through a gap edge, no electrons are deducted from either atom. Should a parent atom be bound to a child bridge node, then the electron count of the referenced atom is reduced.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Electron Counting. A root atom and its child are added to a tree (left). Next, a bond is added (center). Finally, the appropriate electron count is deducted from each atom and added to the bond (right).}
     \label{fig:electron-counting}
 \end{figure}
 
-For convenience, the actual model used by Dialect differs slightly from the above description. Neither nodes nor edges carry an explicit electron count attribute. Instead, edges carry an \ttt{order} attribute, and nodes carry a \ttt{charge} attribute. Bond order equals electron count divided by two. Formal charge equals the number of electrons gained or lost due to ionization events outside of bond formation. Gaining an electron decrements the \ttt{charge} attribute, whereas losing an electron increments it. If no electrons are gained or lost to ionization outside of bond formation, the formal charge equals zero. 
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Electron counting shorthand. Rather than explicit electron counts, atoms and bonds possess charge and order attributes. The atomic charge attribute captures deviations from generalized counting.}
-    \label{fig:electron-counting-shorthand}
-\end{figure}
-
-From these rules follow some practical consequences. For one, bond order must be an integer greater than zero. This follows from the definition of bond formation. The electron count deducted from each atom is $n$, an integer greater than zero. Given that bond formation deducts an equal number of electrons from each atom, the total number of electrons associated with the newly-formed bond is $2n$. By definition, bond order is the bond's electron count divided by two, therefore $n$ is the bond order. Fractional, negative, and zero bond orders are all disallowed by Dialect for this reason.
-
-Dialect imposes an upper limit of three on formal bond order. The relative scarcity of bond orders greater than this limit in molecules conforming the the VB Model makes this restriction unlikely to meaningfully restrict applicability.
-
-Whereas negative bond order is disallowed by definition, Dialect places no restrictions on \textit{hypervalence}. Hypervalence occurs when an atom undergoes enough bonding operations to leave it with a negative implied valence electron count. Consider lithium, which possesses one valence electron. Formation of one single bond leaves lithium with zero implied valence electrons. Application of a second bond formation leaves lithium with a zero charge and an implied valence electron count of -1. Such an arrangement may be physically meaningless, but Dialect explicitly supports it. Software using Dialect may or may not reject such species for semantic reasons.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Hypervalence. Depletion of atomic electron count through excessive bonding. Hypervalent atoms are valid by default, although chemically nonsensical.}
-    \label{fig:hypervalence}
-\end{figure}
-
-\section*{Node Order}
-
-Certain aspects of Dialect rely on \textit{node order}. An order is a property of a set that allows its members to be sorted through pairwise comparisons. Node order is the order in which the nodes of a molecular tree are added during depth-first construction. A node added before another node is said to \enquote{precede} it. A node added after another node is said to \enquote{succeed} it. Using node order, the nodes of a molecular tree can be sorted from first to last.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Node Order. Nodes in a molecular tree have the order in which they were added through depth-first construction.}
-    \label{fig:node-order}
-\end{figure}
-
-Some generalizations about node order follow from these definitions. The root atom, uniquely lacking a parent, precedes every other node. Every parent node precedes its children. The first child added to a given parent precedes all of its siblings. Moreover, this relationship is transitive. If a node precedes (or succeeds) a sibling, then all of its descendants will as well.
-
-\section*{Decoupling Bonding from Connectivity}
-
-A bond performs two important tasks within a molecular tree: it creates a bond between two atoms and it creates a connection between two nodes. Most of the time, performing both tasks together is exactly what's needed. In two cases, however, doing so limits the range of molecules that can be encoded.
-
-The first case for decoupling involves cycles. A molecular tree is by definition devoid of cycles, yet cycles are ubiquitous, crucial elements of molecular structure. To encode cycles, a molecular tree needs a way unambiguously record the presence of cycle-closure bonds without creating the corresponding connection. Dialect accomplishes this goal through \textit{cut bonding}.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Cut Bonding. A bonding relationship represented by two nodes and two edges.}
-    \label{fig:cut-bonding}
-\end{figure}
-
-Cut bonding represents a bond as two semi-independent node/bond pairs. These pairs are distinguished from each other with the designations \enquote{left} and \enquote{right.} The left cut node and its parent precede the right cut node and its parent. Left and right side cut nodes are attached to their respective atom parents through equivalent bonds, but not to each other. In this way a bonding arrangement is established without creating a connection. Unlike an atom, a cut node has zero children and must have an atomic parent. As such a cut node can not serve as the root of a molecular tree.
-
-Each cut node is associated with a single attribute, \ttt{index}. The value of this attribute ranges from one to 99, inclusive (\ttt{Cent} type). Left and right cut nodes identify themselves as a pair by using identical \ttt{index} attributes. A single molecular tree can support far more than 99 cuts through index reuse. Any left cut node succeeding the last right cut node having a particular index can reuse it. The next succeeding cut node with the index must by definition be the matching right hand side.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Index reuse. This allows for many more than 99 cuts to be used within a single molecular tree.}
-    \label{fig:index-reuse}
-\end{figure}
-
-The second case for decoupling the formation of bonds and connections is multiple molecules. Dialect supports these uses through \textit{split edges}. A split edge allows two atoms to be connected within a tree, but without creating a bonding relationship. Split edges can be used whenever multiple molecules need to be encoded within the same molecular tree. One application would be molecules with ionic bonding. The atoms are not bound covalently, and so fall outside the scope of the VB model. Another application would be non-ionic complexes. No bonding relationship whatsoever is implied between atoms connected through a split edge.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Split Edge. Connection without a bonding relationship.}
-    \label{fig:split-edge}
-\end{figure}
-
-Split edges and cut bonding accomplish the same goal, namely the decoupling of connectivity and bonding, but for opposite purposes. Whereas split edges connect two atoms without bonding them, cut bonds create a bonding relationship between two nodes without connecting them. This decoupling complicates the analysis of molecular trees. For example, the atom succeeding a split edge behaves in some situations as if it were a root node. When tallying the bonds surrounding such a node, only children are considered. Likewise, cut nodes behave as if they were atoms in the sense that they can be associated with a bond. Within these and several other situations, analysis of bonding and connectivity relationships within molecular trees need to explicitly account for the possibility of connection-free bonds and bond-free connections. 
-
-\section*{Bond Elision}
-
-A bond whose attributes are assigned default values can participate in \textit{bond elision}. In bond elision, a bond's \ttt{elided} attribute is set to \ttt{true}. When written in string form, elided bonds require no characters. This makes bond elision useful for data compression. The second application for elided bonds will be described in the next section.
+Whereas negative bond order is disallowed by definition, Dialect places no restrictions on \textit{hypervalence}. Hypervalence occurs when an atom undergoes enough bonding operations to leave it with a negative implied valence electron count. Consider lithium, which possesses one valence electron. Formation of one single bond leaves lithium with zero implied valence electrons. Application of a second bond formation leaves lithium with a zero charge and an implied valence electron count of -1. Such an arrangement may be physically meaningless, but Dialect explicitly supports it. Software using Dialect may or may not reject such species on semantic grounds.
 
 \section*{Delocalization Subgraph}
+\label{delocalization-subgraph}
 
-A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME arises when a molecular graph exists in two or more unequal forms, each differing from the others only through electron delocalization. In this context, two graphs are equal if they are isomorphic and each matched pair of atoms or bonds possess equivalent non-index attributes. If shifting electrons through delocalization causes two graphs to become equal, then DIME has occurred. DIME is sometimes referred to as \enquote{resonance} or \enquote{aromaticity,} but those terms are avoided here due to their ambiguity~\cite{randic:2018,kerber:2006}.
+A molecular representation based solely on the valence bond model can yield artifacts resulting from \textit{delocalization induced molecular equality} (DIME). DIME arises when a given molecule can be represented by two forms, each differing from the other only in double bond placement. DIME is sometimes referred to as \enquote{resonance} or \enquote{aromaticity,} but those terms are avoided here due to their ambiguity~\cite{randic:2018,kerber:2006}.
 
 \begin{figure}
     \centering
@@ -271,13 +294,11 @@ A molecular representation based solely on the valence bond model can yield arti
     \label{fig:dime}
 \end{figure}
 
-DIME can interfere with \textit{canonicalization}, or the selection of a single representation for a molecular graph. The presence of multiple equivalent molecular graphs differing only in electron delocalization complicates the formulation of selection rules and invariants, which must be adapted to account for the artificial asymmetry.
+The main problem with DIME is its interference with \textit{canonicalization}, or the selection of a single molecular representation among many alternatives. The presence of multiple equivalent molecular forms differing only in electron delocalization complicates the formulation of selection rules and invariants, which must be adapted to account for the artificial asymmetry.
 
-To eliminate DIME and thereby streamline canonicalization, the molecular graph is augmented with a \textit{delocalization subgraph} (DS). A DS is a possibly empty node-induced subgraph of a molecular graph. The membership of a DS may be drawn from the set of atoms and bonds that participate in DIME within a given molecular graph.
+To eliminate DIME and thereby streamline canonicalization, each molecular tree is augmented with a \textit{delocalization subgraph} (DS). A DS is a possibly empty node-induced subgraph over a molecular tree. The membership of a DS will typically be drawn from the set of atoms and bonds that participate in DIME within a given molecular tree.
 
-Membership of a DS is determined as follows. An atom is added to the DS by setting its \ttt{selected} attribute to \ttt{true} through a process called \textit{selection}. For an atom to be selectable, its \ttt{element} attribute must be contained in the list: \ttt{C}; \ttt{N}; \ttt{O}; \ttt{P}; and \ttt{S}. Atoms having other elements must not be selected. A bond will be added to the DS if both of its terminals are selected and the \ttt{elided} attribute equals \ttt{true}. No other bond will be added to the DS. This rule allows arbitrary bonds between selected atoms to be excluded from the DS.
-
-Atoms whose \ttt{element} attribute equals \ttt{None} are not selectable, which prevents their entry into the DS. Bonds to such atoms are similarly excluded. The alternative, conditional inclusion, would complicate both data structures and algorithms for little gain. Exclusion avoids these complexities.
+Membership of a DS is determined as follows. An atom is added to the DS by setting its \ttt{selected} attribute to \ttt{true} through a process called \textit{selection}. As noted previously (see: \nameref{atoms-and-bonds}), only some atomic states are compatible with selection. An edge will be added to the DS if both of the atoms it spans are selected and the bond itself is elided. This allows arbitrary bonds between selected atoms to be excluded from the DS. If a bond's target is a bridge node, the corresponding edge will be added to the DS if both the parent atom and the equivalent target atom are selected.
 
 \begin{figure}
     \centering
@@ -286,9 +307,9 @@ Atoms whose \ttt{element} attribute equals \ttt{None} are not selectable, which 
     \label{fig:perfect-matching}
 \end{figure}
 
-A non-empty DS must possess a \textit{perfect matching}. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes all the nodes of its parent graph. Every atom added to a DS must therefore become part of its perfect matching.
+A non-empty DS must possess a \textit{perfect matching}. A matching is a subgraph in which no two edges share a common node. Equivalently, a matching is a subgraph in which all nodes have degree one. A perfect matching includes every node present in the parent graph. Every atom added to a DS must therefore become part of its perfect matching.
 
-A filled DS can be emptied through a two-step process of \textit{deselection}. First, a perfect matching over the DS is found. Next, each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A widely-used algorithm for matching, the Edmunds \enquote{blossom algorithm,} has a time complexity of $O(|E||V|^2)$, where $|E|$ is the number of edges and $|V|$ is the number of nodes~\cite{edmonds:1965}. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
+A filled DS can be emptied through a two-step process of \textit{deselection}. First, a perfect matching over the DS is found. Next, the elided bond corresponding to each matched edge is replaced by a double bond. Because the presence of a filled DS implies a perfect matching over it, kekulization always succeeds. A widely-used algorithm for matching, the Edmunds \enquote{blossom algorithm,} has a time complexity of $O(|E||V|^2)$, where $|E|$ is the number of edges and $|V|$ is the number of nodes~\cite{edmonds:1965}. Although more efficient algorithms are known, they are either much more difficult to implement or lack generality.
 
 \begin{figure}
     \centering
@@ -297,7 +318,7 @@ A filled DS can be emptied through a two-step process of \textit{deselection}. F
     \label{fig:deselection}
 \end{figure}
 
-The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more atoms, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm may restrict candidate atoms to those found in cycles. Electron-counting techniques may also be introduced to approximate the chemical concept of \enquote{aromaticity.} Elision of the single bonds to be added to the DS completes the process.
+The opposite operation can be accomplished with a \textit{selection algorithm}. A selection algorithm selects two or more nodes, thereby adding them to the DS. The only requirement for a selection algorithm is that the resulting DS must have a perfect matching. Depending on the application, other criteria may be applied. For example, a selection algorithm may restrict candidate atoms to those found in cycles. Electron-counting techniques may also be introduced to approximate the chemical concept of \enquote{aromaticity.} Elision of the single bonds to be added to the DS completes the process.
 
 \begin{figure}
     \centering
@@ -368,6 +389,7 @@ The phosphorous atom in phosphorous acid (H\textsubscript{3}PO\textsubscript{3})
 The valence of some atoms exceeds the largest default valence. In these cases, subvalence is reported as zero. Consider sodium perchlorate (NaClO\textsubscript{4}). The chlorine atom has a bond order sum of seven ($2 + 2 + 2 + 1$). From Table~\ref{table:default-valences}, the only default valence for chlorine is one. Subtracting seven yields a negative number (-6). Therefore, the subvalence is reported as zero.
 
 \section*{Computing Implicit Hydrogen Count}
+\label{computing-implicit-hydrogen-count}
 
 An atom whose \ttt{hydrogens} attribute equals \ttt{Implicit} signals that its hydrogens must be counted algorithmically. The exact algorithm depends on the value of the atoms's \ttt{selected} attribute.
 
@@ -387,19 +409,9 @@ An atom's implicit hydrogen count may or may not correlate with chemical intuiti
 \end{figure}
 
 \section*{Conformation}
+\label{conformation}
 
-The second major component of molecular representation in Dialect is \textit{conformation}. Conformation is a rotational restriction about one or more bonds. Dialect limits conformation to just one of many possible types: rotational restrictions occurring at individual double bonds.
-
-Organic chemistry uses the descriptors \textit{entgegen} (\textit{E}) and \textit{zusammen} (\textit{Z}) to label conformational parity. This system is based on prioritization of the atoms neighboring the double bond. One pattern of priority yields the \textit{E} parity, and the other yields \textit{Z}. Conveniently, the parity descriptor can be localized at the double bond.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Traditional conformational stereodescriptors.}
-    \label{fig:traditional-conformational-stereodescriptors}
-\end{figure}
-
-Dialect takes a different approach by introducing \textit{partial parity bonds} (PPB). As the name implies, a PPB expresses a portion of the parity characterizing a conformationally-restricted double bond. Constructing the full parity requires the double bond itself, and at least two PPBs. With just a few exceptions (see below), a double bond with a neighbor at one terminal bound through a PPB must also have a neighbor at the opposite terminal bound through a PPB.
+Restricted rotation about a bond leads to conformational isomers (\enquote{conformers}). When the bond in question is a double bond, two conformers result. They can be distinguished through \textit{partial parity bonds} (PPBs). As the name implies, a PPB encodes some of the parity information characterizing a conformationally restricted double bond. Reconstruction of the full parity requires the double bond itself and at least one flanking PPB at each terminal.
 
 \begin{figure}
     \centering
@@ -408,43 +420,39 @@ Dialect takes a different approach by introducing \textit{partial parity bonds} 
     \label{fig:partial-parity-bonds}
 \end{figure}
 
-To support this system, each bond carries an optional \ttt{direction} attribute (\enquote{direction}). When defined, direction may assume one of two values: \ttt{Up} or \ttt{Down}. These values refer to a geometrical model in which a parent node and its child are placed along a vertical axis. If the bond between parent and child has the direction \ttt{Up}, then the child is moved in the upward direction. If the bond between parent and child is \ttt{Down}, the child is moved downward.
+A PPB is designated by setting its \ttt{direction} attribute to a non-default variant (\ttt{Up} or \ttt{Down}). The names of these variants refer to a two-dimensional geometrical model in which a parent node and its child are placed along a vertical axis. If the child lies above the parent, the \ttt{Up} variant is used. If the child lies below the parent, the \ttt{Down} variant is used.
 
-Using this protocol, the conformation for a double bond flanked by two or more PPBs can be determined. The process begins by identifying the parent node. This node has the lowest order of the conformational assembly, meaning that it was added first. The parent node is placed on a vertical axis. The children of the parent node are then examined in order. The child connected through the first directional bond is then positioned as described above, either above or below the parent as determined by the value of the bond's direction attribute.
+The parity of a double bond is determined by the relative direction of the PPBs neighboring it. First, the parent atom is identified. This atom has the lowest order in the assembly, meaning that it was added first to the molecular tree. The parent is placed on a vertical axis. Bonds from the parent atom are then iterated. If a PPB is found, its child atom is placed above the parent for a direction of \ttt{Up} or below the parent for a direction of \ttt{Down}. The child's bonds are then iterated in order. Should an additional PPB be found, its direction must match that of the bond between parent and child. Otherwise an error must be reported. An error must also be reported if more than two PPBs are present. If a double bond is found, its target, a grandchild, is placed to the right of the parent. The bonds of the grandchild are then iterated in order. The target of the first PPB, a great-grandchild, is placed as before, above the grandchild if the direction is \ttt{Up}, or below if the direction is \ttt{Down}. If a second PPB is present, it must have a direction opposite the first. Otherwise an error must be reported.
 
-Next, grandchildren are examined in order. Should a PPB be found, its direction must match that of the bond between parent and child. Otherwise an error is generated. A double bond must be found, or an error is reported. On finding the double bond, the corresponding grandchild is placed to the right of the child.
-
-The process finishes by iterating the great-grandchildren of the double-bond grandchild, in order. The first PPB is placed as before, above the grandchild if the direction is \ttt{Up}, or below if the direction is \ttt{Down}. If an additional PPB is present, it must have a direction opposite to the one previously found. Otherwise, an error is reported.
-
-The result will be equivalent to one of two diagrams, which for convenience and to avoid confusion are given the labels \textit{syn} (both vertical lines above or below the double bond) and \textit{anti} (vertical lines on opposite sides of the double bond).
+The placement of parent, child, grandchild, and great-grandchild will yield one of two parities (Figure~\ref{fig:ppb-placement}). For convenience and to avoid confusion, these parities are given the labels  \textit{syn} (vertical lines both lie above or below the double bond) and \textit{anti} (vertical lines lie on opposite sides of the double bond).
 
 \begin{figure}
     \centering
     \includegraphics{filler}
-    \caption{Interpreting partial parity bonds.}
-    \label{fig:interpret-ppb}
+    \caption{Partial Parity Bond Placement.}
+    \label{fig:ppb-placement}
 \end{figure}
 
-Consider the problem of encoding of PPBs for (\textit{E})-2-butene. The parent atom, a primary carbon, is first identified. A direction of \ttt{Up} for the PPB joining it to its child is arbitrarily chosen. A double bond connects child to grandchild. Just one bond connects grandchild to great-grandchild. Because the \textit{anti} arrangement is desired, the value for direction must be \ttt{Up}. In this example, the directions for both PPBs could also have been equivalently set to \ttt{Down}.
+To illustrate, consider the placement for (\textit{E})-2-butene. The parent atom, a methyl group, is placed on a vertical axis. Bonds are iterated and a PPB with a direction of \ttt{Down} is found. The child attached to the bond is therefore placed below the parent. Iterating the child's bonds reveals one bond of order two. The atom attached to it is placed to the right of the previous child. Bonds are again iterated, revealing a PPB whose direction is \ttt{Down}. The atom attached to this bond is then placed below its parent. The completed diagram reveals the \textit{anti} conformation.
+
+The same procedure works in reverse when encoding the \ttt{direction} attribute. 2-butene having the \textit{anti} conformation is modeled using a diagram whose left- and right-hand sides point downward and upward, respectively. The parent atom, a primary carbon, is identified. It is bonded to one neighbor through a PPB. To match the diagram, a direction of \ttt{Up} is assigned. The child atom is attached to its own child through a double bond. Finally, the grandchild is attached to its own child through a PPB whose direction is consistent with the diagram. A direction of \ttt{Up} is therefore assigned.
 
 \begin{figure}
     \centering
     \includegraphics{filler}
-    \caption{Assigning partial parity bonds to *trans*-2-butene.}
+    \caption{Assigning partial parity bonds to \textit{anti}-2-butene.}
     \label{fig:assigning-ppb}
 \end{figure}
 
-PPBs are decoded analogously. Start by placing the terminals on the x-axis according to succession. The PPB between the left terminal and its neighbor has a direction of \ttt{Up}. Because the neighbor precedes the terminal, the neighbor should be placed in the lower-left quadrant. The PPB between the right terminal and its neighbor has a direction of \ttt{Up}. Because the neighbor succeeds the terminal, the neighbor is placed in the upper-right quadrant. The result is the expected (\textit{E}) conformation.
-
-The distributed nature of conformational encoding means that several additive error states are possible:
+Spreading conformational parity over more than one bond in this way means that several error states are possible (Figure~\ref{fig:bond-error-states}):
 
 \begin{itemize}
-    \item{Overspecification. This error occurs when children are forced into the same quadrant of a diagram.}
+    \item{Overspecification. Two children are forced into the same direction along an axis.}
     \item{Underspecification. A required PPB is missing.}
     \item{ Misspecification. A PPB is used between atoms, neither of which connects to a double bond.}
 \end{itemize}
 
-A reader that detects any of these error conditions must abort the molecular tree being read and report the error state. It is possible for a conformation to be both overspecified and underspecified.
+An error must be reported should any of these states be encountered. Note that it is possible for a conformation to be both overspecified on one side and underspecified on the other.
 
 \begin{figure}
     \centering
@@ -453,7 +461,7 @@ A reader that detects any of these error conditions must abort the molecular tre
     \label{fig:bond-error-states}
 \end{figure}
 
-An exception to the underspecification rule applies in the case of conjugated polyenes. Here, a PPB may be present into the terminal double bond but not out of it. No error is reported in such a case and the conformation of the terminal double bond remains undefined.
+An exception to the underspecification rule applies in the case of conjugated polyenes (Figure~\ref{fig:bond-error-state-exceptions}). Here, a PPB may run from parent to child but not from grandchild to great-grandchild. No error is reported in such a case and the conformation of the terminal double bond remains undefined.
 
 \begin{figure}
     \centering
@@ -462,7 +470,16 @@ An exception to the underspecification rule applies in the case of conjugated po
     \label{fig:bond-error-state-exceptions}
 \end{figure}
 
-Cyclic conjugated polyenes present special challenges to the use of PPBs. Cyclooctatetraene offers an example. Although the (\textit{E}, \textit{E}, \textit{E}, \textit{E}) conformation is expressable, the (\textit{Z}, \textit{E}, \textit{E}, \textit{E}) conformation is not. This problem arises because the same PPB encodes a partial conformation of two different double bonds.
+The presence of a bridge node within a PPB complicates the assignment of direction (Figure~\ref{fig:bridged-ppb-bond}). A bridge node has no children and therefore can never be a parent. At the same time, a bond always points from parent to child. This means that a bridged PPB yields a pair of bonds with opposite directions. The first (or "left") bond, has the direction that would result from a direct bond to an atomic child. The second (or "right") bond has the opposite direction.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Bridged PPB Bond. A bridge across a PPB yields two bonds of opposite direction.}
+    \label{fig:bridged-ppb-bond}
+\end{figure}
+
+Cyclic conjugated polyenes present special challenges to the use of PPBs, as exemplified by cyclooctatetraene. Although the (\textit{anti}, \textit{anti}, \textit{anti}, \textit{anti}) conformation is expressable, the (\textit{syn}, \textit{anti}, \textit{anti}, \textit{anti}) conformation is not. This problem arises because the same PPB encodes partial parity for two different double bonds.
 
 \begin{figure}
     \centering
@@ -472,12 +489,11 @@ Cyclic conjugated polyenes present special challenges to the use of PPBs. Cycloo
 \end{figure}
 
 \section*{Configuration}
+\label{configuration}
 
-The third major element of molecular representation is \textit{configuration}, the three-dimensional arrangement of neighbors about a central atom. Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertices of a tetrahedron. Here, \enquote{substituent} means an atomic neighbor or virtual hydrogen. Lone electron pairs are not considered substituents.
+Dialect limits configuration to the special case of an atom with exactly four substituents placed at the vertices of a tetrahedron. Here, \enquote{substituent} means an atomic neighbor or virtual hydrogen. Lone electron pairs are not considered to be substituents.
 
-A configuration is fully specified by its \textit{configurational descriptor}. A configurational descriptor is a template for the relative three-dimensional positioning of neighbors about a central atom. Dialect supports two configurational descriptors: \ttt{Left} and \ttt{Right}. These descriptors constrain the neighbors of a central atom to the vertices of a tetrahedron.
-
-A descriptor generates a tetrahedral arrangement as follows. First, the parent (predecessor) bound to an atom of interest is identified. Next, the frame of reference is shifted by sighting down the bond from parent to child. An equilateral triangle is then inscribed bout the central atom. Grandchildren are then iterated in order. If the configurational descriptor is \ttt{Left}, children are arranged counterclockwise. Otherwise, children are arranged clockwise.
+The configuration about an atom can specified through its \ttt{parity} attribute. This attribute, together with a general convention, determine the relative three-dimensional positioning of substituents about a central atom. First, the parent of the central atom is identified. Then the frame of reference is shifted by sighting down the bond from the central atom's parent to the central atom. An equilateral triangle is then inscribed about the central atom. The bonds from the central atom are then iterated in order. If the parity of the central atom equals \ttt{Clockwise}, the child atoms attached through each bond are placed around the triangle in clockwise order. Otherwise the children are arranged in counterclockwise order.
 
 \begin{figure}
     \centering
@@ -486,7 +502,7 @@ A descriptor generates a tetrahedral arrangement as follows. First, the parent (
     \label{fig:configurational-descriptor}
 \end{figure}
 
-A modified procedure is used for atoms bearing one virtual hydrogen and three atomic substituents. The implied bond to the virtual hydrogen is considered to precede the others. Sighting down this bond, the parent node is placed at an arbitrary position. Children are then iterated counterclockwise (\ttt{Left}) or clockwise (\ttt{Right}).
+The procedure is modified for atoms bearing one virtual hydrogen and three atomic substituents. The implied bond to the virtual hydrogen is considered to precede the others. Sighting down this bond, the central atom's parent is placed on the triangle at an arbitrary position. Children are then iterated counterclockwise or clockwise relative to it.
 
 \begin{figure}
     \centering
@@ -495,11 +511,9 @@ A modified procedure is used for atoms bearing one virtual hydrogen and three at
     \label{fig:configurational-descriptor-vh}
 \end{figure}
 
-A root atom bearing a configurational descriptor is handled with one more modification. The frame of reference is shifted to sight along the direction of the first child to the parent. The remaining children are then iterated in order either counterclockwise (\ttt{Left}) or clockwise (\ttt{Right}).
+One additional modification applies to a central atom without a parent. The frame of reference is shifted to sight along the direction of the first child. The remaining children are then placed around the triangle in either counterclockwise or clockwise order according to the value of the central atom's \ttt{parity} attribute. If a central root atom bears a virtual hydrogen, it is considered to be the first child.
 
-An atom whose \ttt{configuration} attribute assumes a non-default value must have a neighbor count of either four if no virtual hydrogens are present or three if one virtual hydrogen is present. In any other context, the use of a configurational descriptor is considered an error.
-
-This restriction places some constraints around the use of configuration. Some topologies may appear close enough to tetrahedral to stretch the meaning of the configurational descriptors. However, all such adaptations are invalid. Examples include the central atom of allenes and other odd cumulenes, and the sulfur atom of sulfoxides where the lone pair plays the role of a substituent.
+A central atom whose parity attribute assumes a non-default value must have either four bonds if no virtual hydrogens are present, or three bonds if one virtual hydrogen is present. Some topologies might appear to be similar enough that the \ttt{parity} attribute can be used, but they all must be reported as errors. Examples include the central atom of allenes and other odd cumulenes, and the sulfur atom of sulfoxides where the lone pair is misconstrued as a substituent.
 
 \begin{figure}
     \centering
@@ -508,7 +522,7 @@ This restriction places some constraints around the use of configuration. Some t
     \label{fig:invalid-configurational-descriptors}
 \end{figure}
 
-A configurational descriptor may be applied without regard to bond type. In other words, single, double, triple, and partial parity bond types can all be present. The only requirement that must be satisfied by a central atom is a connected neighbor count of four, or three when a virtual hydrogen is present.
+Configurational descriptors may be assigned without regard to bond order. In other words, single, double, triple, and PPBs can all be present. The only requirement that must be satisfied by a central atom is an atomic neighbor count of four, or three when a virtual hydrogen is present.
 
 It is sometimes useful to manipulate a configuration in a way that preserves the relative three-dimensional positioning of neighbor atoms. This process is called \textit{transformation}. Five operations suffice to transform any configuration into any other:
 
@@ -527,15 +541,15 @@ It is sometimes useful to manipulate a configuration in a way that preserves the
     \label{fig:iconfigurational-transformations}
 \end{figure}
 
-Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is an atom whose \enquote{ligand permutation produces stereoisomers,} as defined by Mislow and Siegel~\cite{mislow:1984}. In the context of Dialect, a stereocenter must be tetracoordinate. However, this is a necessary but insufficient condition. Molecular topology can result in permutation that does not produce stereoisomers. Readers should avoid the assignment of stereodescriptors to atoms that are not stereocenters.
+Not all tetracoordinate atoms will be \textit{stereocenters}. A stereocenter is an atom whose \enquote{ligand permutation produces stereoisomers,} as defined by Mislow and Siegel~\cite{mislow:1984}. The presence of four bonds around a central atom is therefore a necessary, but insufficient condition. Molecular topology can result in permutation that does not yield stereoisomers. The assignment of non-default parities to such atoms should therefore be avoided.
 
-Special handling is required for \textit{undefined stereocenters}. A stereocenter is undefined if it lacks a stereodescriptor. Omitting a stereodescriptor conveys to readers that no information about the stereocenter's configuration is known. This could imply that either a single configuration or a configurational mixture are present. This interpretation is consistent with the one used by molfile format~\cite{ctfileFormats}.
+Special handling is required for \textit{undefined stereocenters}. A stereocenter is undefined if it lacks a parity. Undefined stereocenters indicate that no information about a central atom's configuration is known. This could indicate the presence of either a single configuration or a configurational mixture. This interpretation is consistent with the one used by molfile format~\cite{ctfileFormats}.
 
 \section*{Syntax}
 
 A Dialect string is a UTF-8-encoded sequence of zero or more characters chosen from the set \{ \ttt{A}, \ttt{B}, \ttt{C}, \ttt{D}, \ttt{E}, \ttt{F}, \ttt{G}, \ttt{H}, \ttt{I}, \ttt{K}, \ttt{L}, \ttt{M}, \ttt{N}, \ttt{O}, \ttt{P}, \ttt{R}, \ttt{S}, \ttt{T}, \ttt{U}, \ttt{V}, \ttt{W}, \ttt{X}, \ttt{Y}, \ttt{Z}, \ttt{a}, \ttt{b}, \ttt{c}, \ttt{d}, \ttt{e}, \ttt{f}, \ttt{g}, \ttt{h}, \ttt{i}, \ttt{k}, \ttt{l}, \ttt{m}, \ttt{n}, \ttt{o}, \ttt{p}, \ttt{r}, \ttt{s}, \ttt{t}, \ttt{u}, \ttt{v}, \ttt{0}, \ttt{1}, \ttt{2}, \ttt{3}, \ttt{4}, \ttt{5}, \ttt{6}, \ttt{7}, \ttt{8}, \ttt{9}, \ttt{+}, \ttt{-}, \ttt{.}, \ttt{\%}, \ttt{@}, \ttt{*}, \ttt{[}, \ttt{]}, \ttt{/}, \ttt{\char`\\}, \ttt{=}, \ttt{\#} \}. The internal structure of a string reflects a depth-first traversal of the corresponding molecular graphs. As such, the syntax supports branches, cycles, and disconnected components.
 
-Strings conform to an \textit{LL(1) grammar}.\cite{thain:2020} An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. These features make LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR~\cite{parr:2014}. The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
+Strings conform to an \textit{LL(1) grammar} \cite{thain:2020}. An LL(1) grammar is a context-free grammar whose strings can be parsed one character at a time from left to right with at most one character of lookahead. Additionally, LL(1) grammars expand the leftmost non-terminal first. These features make LL(1) grammars such as the one used by Dialect a good fit for manually-written recursive descent parsers. LL(1) grammars can also be used as a basis for auto-generated parsers through packages such as ANTLR~\cite{parr:2014}. The full grammar for Dialect strings is available as a text file in this paper's Supporting Material.
 
 Dialect's formal grammar is presented as a series of \textit{production rules} (aka \enquote{productions}). A production rule defines a transformation allowed under the grammar. These transformations collectively define the set of valid Dialect strings. Production rules can be used in the forward direction, when writing a string, or in the reverse direction, when reading a string. 
 
@@ -571,20 +585,20 @@ The next atomic production rule, \ttt{<shortcut>} is a non-terminal selected fro
              | "S" | "F" | "I"
 \end{lstlisting}
 
-The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: \enquote{c}; \enquote{n}; \enquote{o}; \enquote{p}; and \enquote{s.} An atom encoded in this way (\enquote{selected shortcut atom}) assigns the corresponding atom symbol to the \ttt{element} attribute, sets the \ttt{selected} attribute to \ttt{true}, and sets the \ttt{hydrogens} attribute to \ttt{Implicit}. All other atomic attributes retain their default values.
+The third atomic production rule, \ttt{<selection>} is a non-terminal selected from the list: \enquote{c}; \enquote{n}; \enquote{o}; \enquote{p}; and \enquote{s.} An atom encoded in this way (\enquote{selected shortcut atom}) assigns the corresponding capitalized atom symbol to the \ttt{element} attribute, sets the \ttt{selected} attribute to \ttt{true}, and sets the \ttt{hydrogens} attribute to \ttt{Implicit}. All other atomic attributes retain their default values.
 
 \begin{lstlisting}
 <selection> ::= "c" | "n" | "o" | "p" | "s"
 \end{lstlisting}
 
-The fourth and most complex atomic production rule is \ttt{<bracket>} (\enquote{bracket atom}). Bracket can be used to set any atomic attribute. A bracket atom must be used for any atom whose \ttt{configuration}, or \ttt{charge} attributes deviate from default values, or whose \ttt{hydrogens} attributes equals anything other than \ttt{Implicit}. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
+The fourth and most complex atomic production rule is \ttt{<bracket>} (\enquote{bracket atom}). Bracket can be used to set any atomic attribute. A bracket atom must be used for any atom whose \ttt{configuration}, or \ttt{charge} attributes assume non-default values, or whose \ttt{hydrogens} attributes equals anything other than \ttt{Implicit}. Attributes not set within the \ttt{<bracket>} production rule will leave the corresponding atomic values in their default states.
 
 \begin{lstlisting}
-<bracket> ::= "[" <isotope>? <symbol> <stereodescriptor>?
+<bracket> ::= "[" <isotope>? <symbol> <parity>?
               <virtual_hydrogen>? <charge>? "]"
 \end{lstlisting}
 
-The value of a bracket atom's \ttt{isotope} attribute is determined by the optional \ttt{<isotope>} non-terminal. It consists of between one and three digits encoding the integers 1-999. Leading zeros (e.g., \enquote{007} are disallowed.
+The value of a bracket atom's \ttt{isotope} attribute is determined by the optional \ttt{<isotope>} non-terminal. It consists of between one and three digits encoding the integers 1-999. Leading zeros (e.g., \enquote{007}) are disallowed.
 
 \begin{lstlisting}
 <isotope> ::= <nonzero> <digit>? <digit>?
@@ -605,83 +619,69 @@ Given the large number of variants within the \ttt{<element>} non-terminal, the 
             ...
 \end{lstlisting}
 
-The \ttt{stereodescriptor} attribute of a bracket atom is determined by the \ttt{<stereodescriptor>} non-terminal. Allowed values are \enquote{@} and \enquote{@@,} corresponding to the values \ttt{Left} and \ttt{Right}, respectively.
+The \ttt{parity} attribute of a bracket atom is determined by the \ttt{<parity>} non-terminal. Allowed values are \enquote{@} and \enquote{@@,} corresponding to the values \ttt{Left} and \ttt{Right}, respectively.
 
 \begin{lstlisting}
-<stereodescriptor> ::= "@" "@"?
+<parity> ::= "@" "@"?
 \end{lstlisting}
 
-The \ttt{hydrogens} attribute of a bracket atom is controlled by the \\ \ttt{<virtual{\_}hydrogen>} non-terminal. It is comprised of the terminal \enquote{H} followed by an optional \ttt{<digit>} non-terminal. A digit appearing after the \enquote{H} terminal sets \ttt{hydrogens} to the corresponding virtual hydrogen count. A digit of 0 (i.e., \enquote{H0}) sets the \ttt{hydrogens} attribute to zero. If no digit is present, \ttt{hydrogens} is set to one.
+The \ttt{hydrogens} attribute of a bracket atom is controlled by the \\ \ttt{<virtual{\_}hydrogen>} non-terminal. It is comprised of the terminal \enquote{H} followed by an optional \ttt{<nonzero>} non-terminal. A digit appearing after the \enquote{H} terminal sets \ttt{hydrogens} to the corresponding virtual hydrogen count. If no digit is present, \ttt{hydrogens} is set to one. The virtual hydrogen count is set to zero by omitting the \ttt{<virtual{\_}hydrogen} non-terminal.
 
 \begin{lstlisting}
 <virtual_hydrogen> ::= "H" <nonzero>?
 \end{lstlisting}
 
-The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (\enquote{+} and \enquote{-} respectively) and ends with an optional \ttt{<digit>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, the plus terminal (\enquote{+}) sets the \ttt{charge} attribute to one and the minus terminal (\enquote{-}) sets it to minus one. Charge values of zero are obtained if \ttt{<charge>} production is present.
+The \ttt{<charge>} production rule sets the \ttt{charge} attribute of a bracket atom. This non-terminal begins with either the plus or minus terminals (\enquote{+} and \enquote{-} respectively) and ends with an optional \ttt{<nonzero>} non-terminal. A missing digit causes the atomic \ttt{charge} attribute to be set to one. In other words, the plus terminal (\enquote{+}) sets the \ttt{charge} attribute to one and the minus terminal (\enquote{-}) sets it to minus one. Charge values of zero are obtained if \ttt{<charge>} production is omitted.
 
 \begin{lstlisting}
 <charge> ::= ( "+" | "-" ) <nonzero>?
 \end{lstlisting}
 
-Values not defined within a bracket production leave the atomic attributes of the atom built from it in as their default values. For example, the bracket sequence \enquote{[C@H+]} lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket sequence \enquote{[13CH+]} lacks the \ttt{<stereodescriptor>} non-terminal, so the corresponding \ttt{configuration} attribute remains \ttt{None}.
-
-\subsection*{Bond}
-
-An atom may be connected to zero or more neighbors through a bond, encoded with the non-terminal \ttt{<bond>}.
-
-\begin{lstlisting}
-<bond> ::= "-" | "=" | "#" | "/" | "\"
-\end{lstlisting}
-
-Five terminals are available (\enquote{-,} \enquote{=,} \enquote{\#,} \enquote{/,} and \enquote{\textbackslash}). The first three (\enquote{-,} \enquote{=,} and \enquote{\#}) set the \ttt{order} attribute of a bond to one, two, or three, respectively. The last two terminals, \enquote{/} and \enquote{\textbackslash,} set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
+Values not defined within a bracket production leave the atomic attributes of the atom built from it in as their default values. For example, the bracket sequence \enquote{[C@H+]} lacks the \ttt{<isotope>} non-terminal so the value of the \ttt{isotope} attribute will remain as \ttt{None}. Similarly, the bracket sequence \enquote{[13CH+]} lacks the \ttt{<parity>} non-terminal, so the corresponding \ttt{parity} attribute remains \ttt{None}.
 
 \subsection*{Sequence}
 
-An atom may be assigned zero or more children through the \ttt{<sequence>} non-terminal (\enquote{sequence}). A sequence starts with a required \ttt{<atom>} non-terminal. If no allowed non-terminals follow, the corresponding atom will have no children. Allowed non-terminals are chosen from the list: \ttt{<union>}; \ttt{<branch>}; and \ttt{<sequence>}.
+Children are added to an atom through the \ttt{<sequence>} non-terminal (\enquote{sequence}). A sequence starts with a required \ttt{<atom>} non-terminal. If no allowed non-terminals follow, the corresponding atom will have no children. Allowed non-terminals are chosen from the list: \ttt{<union>}; \ttt{<branch>}; and \ttt{<split>}.
 
 \begin{lstlisting}
 <sequence> ::= <atom> ( <union> | <branch> | <split> )*
 \end{lstlisting}
 
-The \ttt{<union>} non-terminal consists of an optional \ttt{<bond>} non-terminal followed by a mandatory non-terminal selected from the list: \ttt{<cut>} or \ttt{<sequence>}. If either of these latter non-terminals are detected but \ttt{<bond>} is not, the resulting bond is elided.
+The \ttt{<union>} non-terminal consists of an optional \ttt{<bond>} non-terminal followed by a mandatory non-terminal selected from the list: \ttt{<gap>} or \ttt{<sequence>}. If either of these latter non-terminals are detected but \ttt{<bond>} is not, the resulting bond is elided.
 
 \begin{lstlisting}
-<union> ::= <bond>? ( <cut> | <sequence> )
+<union> ::= <bond>? ( <bridge> | <sequence> )
+\end{lstlisting}
+
+The \ttt{<bond>} non-terminal supports five variants (\enquote{-,} \enquote{=,} \enquote{\#,} \enquote{/,} and \enquote{\textbackslash}). The first three (\enquote{-,} \enquote{=,} and \enquote{\#}) set the \ttt{order} attribute of a bond to one, two, or three, respectively. The last two terminals, \enquote{/} and \enquote{\textbackslash,} set the \ttt{order} attribute to 1 while also setting the \ttt{direction} attribute to \ttt{Up} and \ttt{Down}, respectively.
+
+\begin{lstlisting}
+<bond> ::= "-" | "=" | "#" | "/" | "\"
 \end{lstlisting}
 
 A sequence can contain a union, which in turn can contain a sequence. This is an example of recursion, transitive though it may be. Although left-recursion is disallowed in LL(1) grammars, right recursion of the kind in \ttt{<sequence>} is allowed. Right recursion also occurs within the \ttt{<union>} and \ttt{<branch>} non-terminals.
 
-The \ttt{<cut>} non-terminal (\enquote{cut}) can takes two forms. A digit non-terminal can be used, enabling single-digit cut indexes in the range one through nine, inclusive. Double- or single-digit cut indexes, supporting the values ten through 99 inclusive, are available by prepending the percent character (\ttt{\%}). For the latter variant, leading zeros are disallowed, meaning that the sequence \enquote{\%07} must generate an error.
+The \ttt{<bridge>} non-terminal (\enquote{bridge}) can take two forms. A digit non-terminal can be used, enabling single-digit bridge indexes in the range one through nine, inclusive. Double-digit bridge indexes, supporting the values ten through 99 inclusive, are available by prepending the percent character (\ttt{\%}). For the latter variant, leading zeros are disallowed, meaning that the sequence \enquote{\%07} must generate an error.
 
 \begin{lstlisting}
-<cut> ::= <nonzero> | "%" <nonzero> <digit>
+<bridge> ::= <nonzero> | "%" <nonzero> <digit>
 \end{lstlisting}
 
-A cut signifies the disconnection of an atom from its neighbor. The most common use for cut is to encode a cycle. The cut index serves as a placeholder for the neighboring atom, which is located by scanning either forward or backward along a string. If the number of previous appearances of the cut index is even, then the string is scanned right. Otherwise, the string is scanned left. Although often used for cycles, cuts can be used for any bond, regardless of cycle membership. The only requirement is that a cut must be paired with another cut having the same index.
+As noted previously, the purpose of a bridge is to create a bond without creating a connection within the molecular tree (see: \nameref{molecular-tree}). A bridge will most commonly be used to encode a ring-closure bond, but can be used anywhere within a string. The only requirement is that a bridge must be paired with another bridge having the same index. To prevent overflow, a bridge index may be reused.
 
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Cut. Each cycle yields a bond that must be cut.}
-    \label{fig:cut}
-\end{figure}
-
-To prevent overflow, a cut index may be reused provided that it appears to the right of its last paired appearance.
-
-An alternative to \ttt{<union>} within a sequence is the \ttt{<branch>} non-terminal (\enquote{branch}). Like union, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (\enquote{(} and \enquote{)} respectively), branch encodes a sequence that may or may not be attached to its parent. Attachment occurs if the \ttt{<bond>} non-terminal is included. Alternatively, the sequence will be detached if the \ttt{<detachment>} non-terminal (\enquote{.}) appears. If neither \ttt{<bond>} nor \ttt{<detachment>} are present then bond to the first atom of the sequence is elided.
+An alternative to \ttt{<union>} within a sequence is the \ttt{<branch>} non-terminal (\enquote{branch}). Like union, branch joins a parent and child node through a bond. Wrapped by opening and closing parenthesis terminals (\enquote{(} and \enquote{)} respectively), branch encodes a sequence that may or may not be bonded to its parent. Bonding occurs if the \ttt{<bond>} non-terminal is included. Alternatively, the sequence will not be bonded if the \ttt{<dot>} non-terminal (\enquote{.}) appears. If neither \ttt{<bond>} nor \ttt{<dot>} are present then bond to the first atom of the sequence is elided.
 
 \begin{lstlisting}
-<branch> ::= "(" ( <detachment> | <bond> )?
-             <sequence> ")"
+<branch> ::= "(" ( <dot> | <bond> )? <sequence> ")"
 \end{lstlisting}
 
-The third option for adding atoms within a sequence is the \ttt{<split>} non-terminal (\enquote{split}). A split is a sequence of \ttt{<detachment>} and \ttt{<sequence>} productions. The \ttt{<detachment>} non-terminal serves the same purpose as it does within a branch: to prevent the bonding to the first atom of the sequence.
+The third option for adding atoms within a sequence is the \ttt{<gap>} non-terminal (\enquote{gap}). A gap is a sequence of \ttt{<dot>} and \ttt{<sequence>} productions. The \ttt{<gap>} non-terminal serves the same purpose as it does within a branch: to enable connection within a molecular tree without creating a bonding relationship.
 
 \begin{lstlisting}
-<split> ::= <detachment> <sequence>
+<gap> ::= <dot> <sequence>
 \end{lstlisting}
 
-Having defined sequence, it's now possible to define a string as an optional sequence. In other words, a Dialect string is either empty or contains a sequence. A string without a sequence encodes a molecular graph having zero nodes and zero edges.
+Having defined sequence, it's now possible to define a string as an optional sequence. In other words, a Dialect string is either empty or contains a sequence. A string without a sequence encodes a molecular tree having zero nodes and zero edges.
 
 \begin{lstlisting}
 <string> ::= <sequence>?
@@ -694,7 +694,7 @@ The goal of a Dialect reader is to transform a string input into a data structur
 
 Dialect strings are read one character at a time starting at the leftmost character and finishing at the rightmost character. The first character sets an initial reader state, and each subsequent character causes a state transition. The cumulative application of these state transitions yields the data structure to be returned.
 
-Readers that capture atom-atom connectivity will typically maintain a reference to a \textit{root atom}. The root atom is initially undefined. On reading the first complete \ttt{<atom>} non-terminal, the corresponding atom is constructed and set as the root atom. Subsequently processing a complete \ttt{<union>}, \ttt{<branch>}, or \ttt{<split>} non-terminal triggers three changes: (1) a child atom is constructed; (2) the child is connected to the current root atom, unless a \ttt{<detachment>} non-terminal intervenes; and (3) the root atom is replaced with the child atom.
+Readers that capture atom-atom connectivity will typically maintain a reference to a \textit{root atom}. The root atom is initially undefined. On reading the first complete \ttt{<atom>} non-terminal, the corresponding atom is constructed and set as the root atom. Subsequently processing a complete \ttt{<union>}, \ttt{<branch>}, or \ttt{<gap>} non-terminal triggers three changes: (1) a child atom is constructed; (2) the child is connected to the current root atom, unless a \ttt{<dot>} non-terminal intervenes; and (3) the root atom is replaced with the child atom.
 
 The presence of a branch adds some nuances over a union. The leading open parenthesis terminal (\enquote{(}) signifies that the current root atom will later be re-exposed. This operation can be supported by a stack. At the start of a branch, the current root is pushed to the stack. At the end of the branch, the stack is popped and its top value is assigned as the new root atom.
 
@@ -705,55 +705,34 @@ The presence of a branch adds some nuances over a union. The leading open parent
     \label{fig:branches-stack}
 \end{figure}
 
-Further workflow adjustments can handle cuts. The necessary state can be maintained by a 100-element array. The first occurrence of a cut creates an entry in the array at the cut index consisting of the bond and the root atom. The second occurrence of a cut takes the entry at the cut index, attaching the atom in the entry to the current root atom. The two bonds spanning a cut must be \textit{compatible}. Compatibility is determined by comparing attributes using the following rules. If no rule applies to both bonds they are not compatible. It is an error to span a cut with incompatible bonds.
+Additional modifications allow bridge bonds to be tested for \textit{compatibility}. Compatibility is tested by comparing the attributes of each bridge bond. This test has three parts:
 
 \begin{enumerate}
-    \item An elided bond is compatible with any other bond, regardless of order or direction.
-    \item A bond with a defined direction is compatible with bond having the opposite direction if \ttt{source} precedes \ttt{target} (the usual case), or the same direction otherwise.
-    \item A bond without a direction is compatible with any bond having the same order.
+    \item An elided bond is compatible with any other bond.
+    \item A bond with a non-default direction is only compatible with an elided bond or a bond of opposite direction.
+    \item A bond with default direction is only compatible with an elided bond or a bond of identical order and default direction.
 \end{enumerate}
 
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Array for cuts. The array's fixed length reflects the syntactic constraint on cut index.}
-    \label{fig:cuts-array}
-\end{figure}
+A workflow modification allows bridge bonds to be compared for compatibility (Figure~\ref{fig:testing-bridge-bond-compatibility}). A 100-element array is used to maintain state. The first occurrence of a bridge causes the bridge bond's attributes to be copied to the array at the bridge index. The second occurrence of a bridge causes the entry to be removed. The attributes stored in the entry are then compared with those of the current bridge bond. If the two sets of attributes are incompatible, an error must be reported.
 
 \begin{figure}
     \centering
     \includegraphics{filler}
-    \caption{Bond compatibility. Two non-elided bonds across a cut must have compatible `order` and \ttt{direction} attributes.}
-    \label{fig:bond-compatibility}
+    \caption{Testing bridge bond compatibility.}
+    \label{fig:testing-bridge-bond-compatibility}
 \end{figure}
 
-One further complication applies to decoding cuts. Atomic configuration is defined in terms of the relative order of attachment of neighbors about a central atom. In the first bond of a cut pair, the neighbor atom is undefined. It won't be known until the second bond of the cut pair is found. This might only occur after the addition of several intervening neighbors. Nevertheless, the neighbor atom across the cut must precede any subsequent neighbors. This requirement can be met by a placeholder or some other mechanism that preserves the relative order of neighbor attachment. No such special treatment is needed for the second bond of a cut pair.
+An elided bond is compatible with any other bond (Rule 1). Unless both bridge bonds are elided, however, the presence of compatible but unmatched bridge bonds could interfere with atom-centered computations. One solution is to set the attributes of the elided bridge bond explicitly. The array used for compatibility testing can be re-used to set the attributes of an unmatched bridge bond pair.
 
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Order of attachment. A placeholder target index preserves the order of attachment.}
-    \label{fig:order-of-attachment}
-\end{figure}
-
-Readers must not assume that detachment (the period terminal, \enquote{.}) implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the connected molecular graph for propane can be encoded using the string \enquote{C1C.C1}.
-
-The use of PPBs conformation over three or more bonds. Readers must therefore report as an error any PPB not connected to an atom connected through a double bond. For example, an isolated PPB is invalid (e.g., \enquote{C/C} and \enquote{C/CC}). Beyond this check, generating (\textit{E}) and (\textit{Z}) stereodescriptors from PPBs is not a straightforward process. One approach is to first consider the parity of each double bond terminal individually. A separate step would then relate the individual terminal parities to a double bond conformation parity. This intermediate parity can then be used to perform the final conversion.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Localized configurational descriptor. Such a representation can be useful when bridging Dialect to other representations.}
-    \label{fig:localized-configurational-descriptor}
-\end{figure}
+Readers must not assume that a dot (the period terminal, \enquote{.}) implies the presence of disconnected components. This assumption is most likely to arise in the context of ad-hoc parsers using regular expressions, string matching, and the like. For example, the connected molecular graph for propane can be encoded using the string \enquote{C1C.C1}.
 
 A reader must assume that any input string can contain errors, and take appropriate steps to report them. The most useful errors will report a specific cause. Some will also report one or more cursor indexes. The most common mandatory errors are:
 
 \begin{enumerate}
     \item{Invalid character (position). An unexpected character was encountered. A list of acceptable characters is helpful, but not required.}
     \item{Unexpected end-of-line. Input ended unexpectedly.}
-    \item{Unbalanced cut (position). A cut with a given index appears an odd number of times.}
-    \item{Incompatible cut bonds (position, position). The bonds to a pair of cuts are incompatible.}
+    \item{Unbalanced bridge (position). A bridge with a given index appears an odd number of times.}
+    \item{Incompatible bridge bonds (position, position). The bonds to a pair of cuts are incompatible.}
     \item{Delocalization subgraph lacks perfect matching. Before reporting this error, steps to remove unnecessarily selected atoms should be taken as described in the next section.}
     \item{Partial parity bond not allowed (position). Neither terminal of a PPB possesses a double bond. Strings such as \enquote{C/C} and \enquote{C{\textbackslash}C} contain isolated PPBs, which are invalid. A reader encountering such strings must report an error.}
 \end{enumerate}
@@ -768,11 +747,11 @@ A reader may also report optional errors, including:
 
 \section*{Pruning}
 
-As noted previously, a delocalization subgraph is invalid if it lacks a perfect matching. The one exception is when a selected atom can be deleted from the delocalization subgraph through \textit{pruning}. Pruning unsets the \ttt{selected} attribute of a selected atom without corresponding promotion of any attached bonds.
+As noted previously, a delocalization subgraph is invalid if it lacks a perfect matching. The one exception is when a selected atom and its associated bonds can be deleted from the delocalization subgraph through \textit{pruning}. Pruning unsets the \ttt{selected} attribute of a selected atom without corresponding promotion of any attached bonds.
 
 An atom must be pruned if its subvalence equals zero. None of the bonds to such an atom can be promoted without altering the atom's \ttt{charge} attribute. Pruning the atom ensures the stability of its \ttt{charge} attribute, without interfering with bond promotion elsewhere. Viewed from another perspective, an atom with zero subvalence lacks unpaired electrons - at least within the narrow boundaries of the Dialect valence model. Such atoms can only form double bonds through changes to atomic charge. 
 
-If a selected atom bears a non-zero \ttt{charge} attribute, subvalence is computed using the isoelectronic element's default valences. For example, a selected nitrogen atom with a charge of +1 would use the default valences for carbon. A selected phosphorous atom with a charge of -1 would use the default valences of sulfur. And so on. If no default valences are found in this way (e.g., \enquote{[c+2]}), a reader must generate an error. Writers must not encode such atoms.
+If a selected atom bears a non-zero \ttt{charge} attribute, subvalence is computed using the isoelectronic element's default valences. For example, a selected nitrogen atom with a charge of +1 would use the default valences for carbon. A selected phosphorous atom with a charge of -1 would use the default valences of sulfur. And so on. If no default valences are found in this way (e.g., \enquote{[c+2]}), a reader must report an error. Writers must not encode such atoms.
 
 \begin{figure}
     \centering
@@ -781,15 +760,15 @@ If a selected atom bears a non-zero \ttt{charge} attribute, subvalence is comput
     \label{fig:gratuitous-selection}
 \end{figure}
 
-Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience overrides necessity. Consider a string representing furan in which all atoms are selected (e.g., \enquote{c1ccco1}). Selecting any atom is unnecessary because furan does not exhibit DIME. But selecting the oxygen atom is particularly unnecessary because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation (e.g., \enquote{c1cccO1}) leads to a delocalization subgraph with a perfect matching and hydrogen counts consistent with the original encoding.
+Pruning becomes necessary in cases of gratuitous atomic selection. This occurs whenever style, tradition, or convenience overrides necessity. Consider a string representing furan in which all atoms are selected (e.g., \enquote{c1ccco1}). Selecting any atom is unnecessary because furan does not exhibit DIME. This applies doubly to the the oxygen atom because it lacks an unpaired electron and so will never lead to DIME. It is nevertheless convenient to select the carbon atoms because all bonds can then be elided. The resulting representation (e.g., \enquote{c1cccO1}) leads to a delocalization subgraph with a perfect matching and hydrogen counts consistent with the original encoding.
 
 Writers are encouraged, but not required, to avoid gratuitous atom selection. Readers, however, must always be prepared to prune.
 
 \section*{Writing Strings}
 
-Whereas a reader transforms a string into a data structure, the goal of a writer is the opposite: to transform a data structure into a valid string. This data structure will most commonly take the form of a molecular graph, but other forms are possible. Although a graph itself could be used as the basis for an input representation, a more primitive representation such as an adjacency list could also be used. For practical reasons, the input data structure is likely to resemble the output from a reader. Such an arrangement makes it possible to encode and decode strings with minimal intermediate translation.
+Whereas a reader transforms a string into a data structure, the goal of a writer is the opposite: to transform a data structure into a valid string. This data structure will most commonly take the form of a molecular graph or tree, but other forms are possible. For practical reasons, the input data structure is likely to resemble the output from a reader. Such an arrangement makes it possible to encode and decode strings with minimal intermediate translation.
 
-Regardless of the form taken by the input data structure, it must be traversable in \textit{depth-first} order. A depth-first traversal operates over a set of nodes bound by a set of connectivity relationships, which are typically edges. Traversal proceeds by successively replacing each node as the center of focus, or root. Each new root is selected from the untraversed neighbors of the current root. Iteration eventually selects all nodes, at which point the traversal ends.
+Regardless of the form taken by the input data structure, it must be traversable in \textit{depth-first} order. A depth-first traversal operates over a set of nodes bound by a set of connectivity relationships, which are typically edges. Traversal proceeds by successively replacing each node as the center of focus, or root. Each new root is chosen from the untraversed neighbors of the current root. Eventually all nodes are processed, ending the traversal.
 
 \begin{figure}
     \centering
@@ -798,7 +777,7 @@ Regardless of the form taken by the input data structure, it must be traversable
     \label{fig:depth-first-traversal}
 \end{figure}
 
-A writer intercepts the depth-first traversal of an input data structure to write node and edge representations. The \ttt{<atom>} and \ttt{<bond>} non-terminals are used for this purpose. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane using either implicit or virtual hydrogens (e.g., \enquote{C} or \enquote{[CH4]}). Single bonds may be elided or not. Similarly, the DS may or may not be empty. Although an organization may seek to standardize certain styles of string output, any syntactically-valid string must be considered valid by a reader.
+A writer intercepts the depth-first traversal of an input data structure to write an output string compatible with the formal grammar. There are no requirements around style. For example, it's equally valid to represent the carbon atom of methane using either implicit or virtual hydrogens (e.g., \enquote{C} or \enquote{[CH4]}). Single bonds may be elided or not, all other things being equal. Similarly, the DS may or may not be empty. Although an organization may seek to standardize certain styles of string output, any syntactically and semantically valid string must be considered valid by a reader.
 
 The presence of branches within an input data structure is encoded via the \ttt{<branch>} non-terminal. A useful tool for this purpose is a \ttt{stack}. A stack is a data structure that allows items to be added individually and removed (\enquote{popped}) in the reverse order of addition. A writer begins by pushing the current branch onto the stack and extending it. When a new branch is encountered, it is pushed to the stack and extended. When the branch terminates, the current branch is popped and its contents are appended to the stack's new top item.
 
@@ -809,38 +788,38 @@ The presence of branches within an input data structure is encoded via the \ttt{
     \label{fig:branch-stack}
 \end{figure}
 
-Cycles are encoded using the \ttt{<cut>} non-terminal. This one- or two-digit integer replaces one terminal of a cycle closure bond. The challenge is to unambiguously supply these integers while allowing re-use to avoid overflow. This can be accomplished with a \textit{pool}. A pool is a data structure that yields a numerical index given an ordered pairing of atomic indexes. The numerical index will not be re-issued until the pool receives the corresponding reversed pairing.
+Writers should consider the non-negligible costs of atom selection. Algorithms for selection are likely to involve the perceptions of cycles, and could exhibit superlinear time complexity. Often, a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In other words, atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
+
+Writers must ensure that all selected atoms can be deselected. Consider pyrrole, erroneously encoded with a selected nitrogen atom (e.g., \enquote{n1cccc1}). The nitrogen atom can not be pruned because of its non-zero subvalence (3 - 2). The DS therefore contains all five atoms and all five bonds. A perfect matching does not exist. A reader receiving such a string must report an error. To avoid this outcome, a writer can consume the subvalence by adding a virtual hydrogen (e.g., \enquote{[nH]1cccc1}). The subvalence of nitrogen in this case is zero, so the atom can be pruned. Doing so leaves a DS with four nodes, four edges, and a perfect matching. Readers will therefore consider the string valid. The larger question of gratuitous selection nevertheless remains.
+
+\section*{Working with Molecular Graphs}
+\label{working-with-molecular-graphs}
+
+Molecular trees offer some important advantages, but they are used less often than molecular graphs. Sooner or later, it will be necessary to interconvert the two representations when using Dialect. Readers will need to transform a tree into a graph, and writers will need to transform a graph into a tree. Although there are only three main differences between molecular trees and molecular graphs, these differences can lead to subtle effects during transformation. Understanding these effects is the key to lossless conversion.
+
+The first difference is the simplest to account for: atoms in a molecular tree have two kinds of edges: the one entering from an optional parent; and the zero or more exiting to children. A molecular graph, in contrast, maintains a single set of edges for an atom. Transformation of an atom in a tree to one in a graph must account for a possible inbound bond. The converse transformation must place the inbound bond.
+
+The second difference is that molecular trees have gaps, but molecular graphs do not. An edge may or may not represent a bonding relationship. Transformation from tree to graph must recognize the presence of gaps and place no corresponding bond. Gaps can occur at any outbound edge, even those within branches. Transformation from graph to tree must locate an appropriate pair of atoms to host the gap. A convenient pair would be the last atom of the first connected component and the first atom of the next connected component, but other choices are possible.
+
+The third difference leads to the most complex reconciliation: molecular trees have bridges but molecular graphs do not. When transforming tree to graph, the two sides of a bridge bond must be identified, spliced, and added to the graph. When transforming graph to tree, a ring closure bond must be detected and split into a pair compatible bridge bonds. Compounding the problem in either sense of conversion is index reuse. Transformation from graph to tree will reuse gap indexes to avoid overflow. Transformation from tree to graph must account for the possibility that gap index reuse has occurred.
+
+Transformation of tree to graph can be aided by a \textit{fastener} (Figure~\ref{fig:fastener}). A fastener is a key/value store whose keys are bridge indexes and whose values are an aggregation of atom rank with the bond attributes \ttt{order}, \ttt{elided}, and \ttt{direction}. Odd insertions (first, third, etc.) associate the bridge index with the aggregation and return \ttt{None}. Even insertions (second, fourth, etc.) remove the associated aggregation and return it. A fastener is paired with a depth-first traversal of the tree to be transformed. On encountering a gap an insertion is made. If the return value is an aggregation, it is used together with the current gap bond attributes and atom rank to create a bond and place it within the molecular graph.
 
 \begin{figure}
     \centering
     \includegraphics{filler}
-    \caption{Pool for assigning cut indexes.}
+    \caption{Fastener. Use of a fastener with the depth-first traversal of a molecular tree aids transformation to a molecular graph.}
+    \label{fig:fastener}
+\end{figure}
+
+Transformation of graph to tree can be aided by a \textit{pool} (Figure~\ref{fig:pool}). A pool issues a bridge index given an unordered pairing of atomic indexes. The gap index will not be re-issued until the pool receives the same pairing. A pool is used during a depth-first traversal of a molecular graph, where the presence of a cycle is indicated by the discovery of an index that has already been traversed. On encountering a cycle, a bridge index is requested from the pool by submitting the source and target atomic indexes as an unordered pair. The bridge index is then used to construct the first half of the gap bond. Later, the same bond will be traversed in the opposite direction. When it is, a gap index is requested from the pool by re-submitting a source and target index pairing. Doing so yields the bridge index, while simultaneously freeing it for later use.
+
+\begin{figure}
+    \centering
+    \includegraphics{filler}
+    \caption{Pool. When used with the depth-first traversal of a molecular graph, pool enables bridge index reuse.}
     \label{fig:pool}
 \end{figure}
-
-A pool can be used by a writer in the following way. The presence of a cycle during depth-first traversal is indicated by an atom that has already been traversed. On encountering a cycle, a writer requests an index from the pool, submitting the corresponding atomic indexes as an ordered pair. Later, the same bond must be reversed in the reverse direction. When it is, the writer once again requests an index, but this time using a reversed pairing. Doing so yields the same index, while simultaneously freeing it for later use.
-
-The encoding of cuts is likely to pose special challenges for writers. For a cut across a PPB, care must be taken to report the correct parity. Consider \textit{trans}-cyclooctene. The correct encoding accounts for the reverse in parity at the left-hand side (e.g., \enquote{C{\textbackslash}1C=C/CCCCC/1}). Moreover, the double-encoding of the PPB bond type can lead to inconsistencies that must be reported by a reader (e.g., the invalid string \enquote{C/1C=C/CCCCC/1}). Such errors can be avoided by encoding the bond type of one side or the other side of a cut, but not both. (e.g., \enquote{C{\textbackslash}1C=C/CCCCC/1} or \enquote{C1C=C/CCCCC/1}). A cut across a bond attached to an atom with a stereodescriptor must take bond ordering into consideration. For example, the two strings \enquote{O[C@H]1NC1} and \enquote{O[C@H](C1)N1} encode the same configuration, but the string \enquote{O[C@H](N1)C1} encodes the \textit{opposite} configuration. 
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Difficult cuts.}
-    \label{fig:difficult-cuts}
-\end{figure}
-
-The presence of conformational restriction about a double bond presents a special challenge to writers. Few other molecular graph systems distribute a conformation descriptor over multiple individual bonds the way that PPBs does. Instead, descriptors are more likely to be localized at the double bond. Producing the necessary PPBs from a descriptor localized at the double bond is likely to be non-trivial. An approach to the reverse problem was presented previously (\nameref{reading-strings} section). That approach can also be adapted to the reverse problem.
-
-\begin{figure}
-    \centering
-    \includegraphics{filler}
-    \caption{Writing partial parity bonds through a localized conformation descriptor.}
-    \label{fig:writing-ppb}
-\end{figure}
-
-Writers should carefully weigh the non-negligible costs of atom selection. Algorithms for selection are likely to involve the perceptions of cycles, and could exhibit superlinear time complexity. Often, a reader must perform a global deselection to arrive at a localized valence bond representation, which at the very least requires pruning and a maximal matching procedure. In this sense atom selection imposes two sets of costs: one on the writer and the other on every subsequent reader forever into the future.
-
-Writers must ensure that all selected atoms can be deselected. Consider pyrrole, erroneously encoded with a selected nitrogen atom (e.g., \enquote{n1cccc1}). The nitrogen atom can not be pruned because of its subvalence is 1 (3 - 2). The DS therefore contains all five atoms and all five bonds. A perfect matching does not exist. A reader receiving such a string must report an error. To avoid this outcome, a writer can consume the subvalence by adding a virtual hydrogen (e.g., \enquote{[nH]1cccc1}). The subvalence of nitrogen in this case is zero, so the atom can be pruned. Doing so leaves a DS with four nodes, four edges, and a perfect matching. Readers will consider the string valid. Nevertheless, the larger question of gratuitous selection remains.
 
 \section*{Compatibility}
 
@@ -856,9 +835,9 @@ A publicly-available and precise subset of SMILES would offer a new way to addre
 
 Unfortunately, the choice of the Dialect base language is fraught with difficulty on technical, historical, and cultural grounds. Simply put, the term \enquote{SMILES} has come to mean different things to different people. To some, SMILES is the language defined in public documentation. To others, SMILES is the Daylight implementation source code. Some may view SMILES as the collective definitions contained in both published documents and all software. To others, SMILES isn't even definable.
 
-These problems can be avoided by considering as a base language not SMILES itself, but a \textit{protolanguage}. A protolanguage is a hypothetical language from which a family of languages can be derived. A suitable SMILES protolanguage would ideally contain all of the features consistent with the many ways in which the term \enquote{SMILES} is used today.
+These problems can be avoided by considering as a base language not SMILES itself, but a \textit{proto-language}. A proto-language is a hypothetical language from which a family of languages can be derived. A suitable SMILES proto-language would ideally contain all of the features consistent with the many ways in which the term \enquote{SMILES} is used today.
 
-Accordingly, Dialect's base language is \enquote{ProtoSMILES,} a SMILES protolanguage. ProtoSMILES was developed through a process of elimination that started with every SMILES document ever published and every SMILES software implementation, Open Source or not. The field was narrowed through two limitations: (1) the source must be authoritative; and (2) the source must be publicly accessible. In this context, authoritative means that the source was created by either Weininger himself or Daylight. They alone can speak most authoritatively about what SMILES is. The requirement for public accessibility ensures that, even if inconvenient, claims of compatibility can be tested. The following documents were identified as candidate ProtoSMILES sources:
+Accordingly, Dialect's base language is \enquote{ProtoSMILES,} a SMILES proto-language. ProtoSMILES was developed through a process of elimination that started with every SMILES document ever published and every SMILES software implementation, Open Source or not. The field was narrowed through two limitations: (1) the source must be authoritative; and (2) the source must be publicly accessible. In this context, authoritative means that the source was created by either Weininger himself or Daylight. They alone can speak most authoritatively about what SMILES is. The requirement for public accessibility ensures that, even if inconvenient, claims of compatibility can be tested. The following documents were identified as candidate ProtoSMILES sources:
 
 \begin{itemize}
     \item Weininger's report to the US Environmental Protection Agency (\enquote{The Article})~\cite{anderson:1987}.

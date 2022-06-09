@@ -1,19 +1,19 @@
 <string>            ::= <sequence>?
-<sequence>          ::= <atom> ( <union> | <branch> | <split> )*
-<union>             ::= <bond>? ( <cut> | <sequence> )
-<branch>            ::= "(" ( <detachment> | <bond> )? <sequence> ")"
-<split>             ::= <detachment> <sequence>
+<sequence>          ::= <atom> ( <union> | <branch> | <gap> )*
+<union>             ::= <bond>? ( <bridge> | <sequence> )
+<branch>            ::= "(" ( <dot> | <bond> )? <sequence> ")"
+<gap>               ::= <dot> <sequence>
 <atom>              ::= <star> | <shortcut> | <selection> | <bracket>
-<bracket>           ::= "[" <isotope>? <symbol> <stereodescriptor>?
+<bracket>           ::= "[" <isotope>? <symbol> <parity>?
                          <virtual_hydrogen>? <charge>? "]"
 <isotope>           ::= <nonzero> <digit>? <digit>?
 <symbol>            ::= <star> | <element> | <selection>
 <virtual_hydrogen>  ::= "H" <nonzero>?
 <charge>            ::= ( "+" | "-" ) <nonzero>?
-<cut>               ::= <nonzero> | "%" <nonzero> <digit>
-<stereodescriptor>  ::= "@" "@"?
+<bridge>            ::= <nonzero> | "%" <nonzero> <digit>
+<parity>            ::= "@" "@"?
 <star>              ::= "*"
-<detachment>        ::= "."
+<dot>               ::= "."
 <shortcut>          ::= "B" "r"? | "C" "l"? | "N" | "O" | "P" | "S" | "F" | "I"
 <selection>         ::= "c" | "n" | "o" | "p" | "s"
 <element>           ::= "A" ( "c" | "g" | "l" | "m" | "r" | "s" | "t" | "u" )
