@@ -695,9 +695,9 @@ The goal of a Dialect reader is to transform a string input into a data structur
 
 Dialect strings are read one character at a time starting at the leftmost character and finishing at the rightmost character. The first character sets an initial reader state, and each subsequent character causes a state transition. The cumulative application of these state transitions yields the data structure to be returned.
 
-Readers that capture atom-atom connectivity will typically maintain a reference to a \textit{root atom}. The root atom is initially undefined. On reading the first complete \ttt{<atom>} non-terminal, the corresponding atom is constructed and set as the root atom. Subsequently processing a complete \ttt{<union>}, \ttt{<branch>}, or \ttt{<gap>} non-terminal triggers three changes: (1) a child atom is constructed; (2) the child is connected to the current root atom, unless a \ttt{<dot>} non-terminal intervenes; and (3) the root atom is replaced with the child atom.
+Readers that capture atom-atom connectivity will typically maintain a reference to a \textit{hub}. A hub is an atom to which the next node will be connected. On reading the first complete \ttt{<atom>} non-terminal, the corresponding atom is constructed and set as the hub. Subsequently processing a complete \ttt{<union>}, \ttt{<branch>}, or \ttt{<gap>} non-terminal triggers three changes: (1) a child node is constructed; (2) the child is connected to the current hub, unless a \ttt{<dot>} non-terminal intervenes; and (3) the hub is replaced with the child node if it is an atom.
 
-The presence of a branch adds some nuances over a union. The leading open parenthesis terminal (\enquote{(}) signifies that the current root atom will later be re-exposed. This operation can be supported by a stack. At the start of a branch, the current root is pushed to the stack. At the end of the branch, the stack is popped and its top value is assigned as the new root atom.
+The presence of a branch adds some nuances over a union. The leading open parenthesis terminal (\enquote{(}) signifies that the current hub will later be re-exposed. This operation can be supported by a stack. At the start of a branch, the current hub is pushed to the stack. At the end of the branch, the stack is popped and its top value is assigned as the new hub.
 
 \begin{figure}
     \centering
