@@ -61,6 +61,16 @@ Molecular serialization schemes need to balance generality against complexity. A
 
 Dialect's rules can be divided into two broad categories: \textit{syntax} and \textit{semantics}. Syntax defines the set of valid strings for a language, whereas semantics determine the meaning these strings. Dialect semantic are complex due to the brevity of its syntax and the inherently complex nature of molecular representation.
 
+\begin{figure}
+\centering
+\includegraphics[width=\columnwidth]{representative-examples.pdf}
+\caption{Representative Dialect examples.}
+\label{fig:myfig}
+\end{figure}
+
+\section*{Molecular Tree}
+\label{molecular-tree}
+
 Underpinning molecular serialization are conventions and abstractions for molecular representation. These are divided into three broad categories:
 
 \begin{itemize}
@@ -68,16 +78,6 @@ Underpinning molecular serialization are conventions and abstractions for molecu
 \item \textit{Conformation}, a kind of stereoisomerism resulting from restricted rotation about a bond. Dialect supports restricted rotation about double bonds capable of producing alkene isomerism.
 \item \textit{Configuration}, a kind of stereoisomerism resulting from the arrangement of neighboring atoms in three-dimensional space. Dialect supports configurations for atoms having tetrahedral symmetry attached to four neighboring atoms.
 \end{itemize}
-
-\begin{figure}
-\centering
-\includegraphics{filler}
-\caption{Representative Dialect examples.}
-\label{fig:myfig}
-\end{figure}
-
-\section*{Molecular Tree}
-\label{molecular-tree}
 
 Dialect represents molecular structure as a \textit{molecular tree}. A tree is a data structure comprised of a set of nodes and pairwise relationships between them called edges. Any two nodes in a tree are connected through exactly one path of alternating nodes and edges. As such, a tree contains no cycles and exactly one connected component. A molecular tree is a specialized tree onto which chemically-relevant metadata have been overlaid. A Dialect molecule is a molecular tree having zero or more nodes and zero or more edges. The empty molecule, devoid of atoms and bonds, is therefore allowed. There is no upper bound on the number of nodes or edges, although limitations in hardware and software may restrict maximum molecular size.
 
