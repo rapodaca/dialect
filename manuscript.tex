@@ -111,9 +111,9 @@ Multiple molecules are supported through \textit{gaps}. A gap is an edge devoid 
 
 \begin{figure}
     \centering
-    \includegraphics{filler}
+    \includegraphics[width=4in]{node-and-edge-associations.pdf}
     \caption{Nodes and Edge Associations. Three node/edge associations are possible within a molecular tree. A parent atom can be connected to a child atom through a bond (left). A parent atom can also be connected to a child bridge node through a bond (center). Finally, an atom can be connected, without bonding, to a child atom through a gap (right).}
-    \label{fig:nodes-and-edges}
+    \label{fig:nodes-and-edge-associations}
 \end{figure}
 
 Gaps and bridges decouple connectivity from bonding, but for opposite purposes. Whereas a gap connects two atoms without bonding them, a bridge creates a bond between two atoms without connecting them. These relationships can complicate the analysis of connectivity and bonding. For example, the atom succeeding a gap behaves in most situations as if it were a root node. When tallying the bonds surrounding such a node, only children are considered. Similar considerations apply when a gap succeeds an atom. Likewise, a bridge node behaves as if it were an atom in the sense that it connects to an atom through a bond. Nevertheless, a bridge node merely stands in for another atom found elsewhere in the tree. Bonding and connectivity analyses within molecular trees must therefore account for the possibility of connection-free bonds and bond-free connections. 
