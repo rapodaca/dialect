@@ -87,9 +87,9 @@ The main advantage of trees over graphs is information density. Graphs must acco
 
 \begin{figure}
     \centering
-    \includegraphics{filler}
-    \caption{Tree vs. Graph.}
-    \label{fig:tree-vs-graph}
+    \includegraphics[width=6cm]{molecular-graph-vs-tree.pdf}
+    \caption{Molecular Graph vs. Molecular Tree. The bonds in a molecular graph reference atoms indirectly through unique indexes (lower left). In contrast, a bond in a molecular tree defines its target atom inline (lower right). This increases the potential efficiency of trees over graphs for molecular representation. To simulate ring closure, a molecular tree introduces bridge nodes, as described later (solid grey circles).}
+    \label{fig:molecular-graph-vs-tree}
 \end{figure}
 
 When discussing molecular trees, it's often useful to refer to \textit{node order}. An order is a property of a set that allows its members to be sorted through pairwise comparisons. Node order is the order in which the nodes of a molecular tree are added through depth-first construction. A node added before another node is said to \enquote{precede} it. A node added after another node is said to \enquote{succeed} it. In this way nodes can be prioritized. The root atom, uniquely lacking a parent, has highest priority because it precedes every other node. Similarly, a parent always precedes its children. Finally, the first child added to a given parent precedes all of its siblings. This relationship is transitive. If a node precedes (or succeeds) a sibling, then so do all of its descendants.
