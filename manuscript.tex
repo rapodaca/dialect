@@ -167,13 +167,13 @@ An atom is composed of seven attributes (Table~\ref{table:atomic-attributes}). D
 \label{table:atomic-attributes}
 \end{table}
 
-The attributes \ttt{element} (\enquote{element}) and \ttt{isotope} (\enquote{isotope}) define atomic number and neutron count, respectively. Elements are selected from a subset of those approved by IUPAC \cite{periodicTable} (Figure~\ref{fig:elements}). An atom whose element is unknown must have an \ttt{element} attribute equal to \ttt{None}. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, defined as the sum of proton and neutron count. Setting the \ttt{isotope} property to \ttt{None} means that the element's isotopic composition equals natural abundance. Otherwise, the lower bound of the value of \ttt{isotope} is one. This lower limit allows for physically nonsensical states such as atoms of negative implied neutron count (e.g., carbon-5). Implementations may reject such atomic states as invalid.
+The attributes \ttt{element} (\enquote{element}) and \ttt{isotope} (\enquote{isotope}) define atomic number and neutron count, respectively. Elements are selected from a subset of those approved by IUPAC \cite{periodicTable} (Figure~\ref{fig:periodic-table}). An atom whose element is unknown must have an \ttt{element} attribute equal to \ttt{None}. The \ttt{isotope} attribute is an optional integer value representing an atom's nuclear mass number, defined as the sum of proton and neutron count. Setting the \ttt{isotope} property to \ttt{None} means that the element's isotopic composition equals natural abundance. Otherwise, the lower bound of the value of \ttt{isotope} is one. This lower limit allows for physically nonsensical states such as atoms of negative implied neutron count (e.g., carbon-5). Implementations may reject such atomic states as invalid.
 
 \begin{figure}
     \centering
-    \includegraphics{filler}
-    \caption{Elements. The element that may be associated with an atom.}
-    \label{fig:elements}
+    \includegraphics[width=4in]{periodic-table.pdf}
+    \caption{Elements. Available chemical elements and their allowed roles. Not all IUPAC-approved elements are available. Hydrogen counts of atoms associated with elements on blue background can be computed algorithmically. Atoms associated with elements on green background can be selected.}
+    \label{fig:periodic-table}
 \end{figure}
 
 The \ttt{hydrogens} attribute sets an atom's mode of \textit{hydrogen suppression}. Hydrogen suppression replaces an atomic hydrogen of natural isotopic abundance and its associated bond with an integer tally associated with the parent atom. Even so, a suppressed hydrogen and its bond are understood to be present. The high relative abundance and regular bonding of hydrogen atoms makes hydrogen suppression an effective technique for increasing information density. Two mutually-exclusive types of suppressed hydrogen are supported: \textit{virtual hydrogen} and \textit{implicit hydrogen}.
