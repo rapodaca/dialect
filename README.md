@@ -1,5 +1,7 @@
 # Dialect
 
+**This repository has been replaced by [Balsadoc](https://github.com/metamolecular/balsadoc/) and has been left here for documentation purposes only.**
+
 A compact chemical line notation based on SMILES. For an introduction, see [the blog post](https://depth-first.com/articles/2021/09/22/beyond-smiles/). A [reference implementation](https://github.com/rapodaca/dialect.rs) is in progress on GitHub.
 
 ## Goals
